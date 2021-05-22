@@ -96,7 +96,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <h2>Er staat nog meer op het programma</h2>
-                <p>Het is nog even wachten tot hint {visibleCards.length + 1} van de {cards.length} zichtbaar wordt</p>
+                <p>Het is nog even wachten tot hint {visibleCards.length + 1} van de {cards.length} zichtbaar wordt.</p>
                 <Timestamp>Volgende hint over {timeToNextHint}</Timestamp>
               </CardContent>
             </CardContainer>

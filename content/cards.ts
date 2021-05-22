@@ -51,14 +51,14 @@ export const cards: Card[] = [
     timestamp: at(10, 0),
     icon: '/plant-jar.png',
     title: 'Even iets uit ons systeem krijgen',
-    description: 'Vorig jaar tijdens de GNO dag hebben we iets gedaan wat bij velen van ons is gaan schimmelen. We gaan dit daarom rechtzetten dit jaar. Deze keer hebben we meer kennis en ervaring en dus laten we dit ons niet nog een keer overkomen. Loop nu naar de verranda toe!',
+    description: 'Vorig jaar tijdens de GNO dag hebben we iets gedaan wat bij velen van ons is gaan schimmelen. We gaan dit daarom rechtzetten dit jaar. Deze keer hebben we meer kennis en ervaring en dus laten we dit ons niet nog een keer overkomen. Loop nu naar de veranda toe!',
     image: '/ecosysteem.jpg',
   },
   {
     timestamp: at(11, 50),
     icon: '/hungry-ananas.png',
     title: 'Plantenvoeding',
-    description: 'De plantjes in jullie eco systeem staan te springen om met de voedingscyclus aan de slag te gaan. Maar jullie zelf beginnen misschien ook al een beetje honger te krijgen. Leg nog even de laatste hand aan je eco systeem en zorg dat je voor de volgende hint klaar bent!',
+    description: 'De plantjes in jullie ecosysteem staan te springen om met de voedingscyclus aan de slag te gaan. Maar jullie beginnen zelf misschien ook al zin in voeding te krijgen. Leg nog even de laatste hand aan je ecosysteem en zorg dat je voor de volgende hint klaar bent!',
   },
   {
     timestamp: at(12, 30),
@@ -76,7 +76,7 @@ export const cards: Card[] = [
     timestamp: at(13, 30),
     icon: '/brush.png',
     title: 'Schilderen',
-    description: 'Na Texel is het nu tijd voor het echte werk. Focus op je innerlijke Bob Ross, Piet Mondriaan of Vincent van Gogh om een prachtig kunstwerk te maken. Tip: zorg dat je tape altijd aan de rand van je doek zit.',
+    description: 'Na Texel is het nu tijd voor het echte werk. Focus op je innerlijke Bob Ross, Piet Mondriaan of Vincent van Gogh om een prachtig kunstwerk te maken. Tip: zorg ervoor dat elk stukje tape altijd over een van de randen van je schilderij loopt zodat je het makkelijk los kunt trekken.',
     link: { url: 'https://pin.it/eVl1Hcb', text: 'Ter inspiratie' },
     image: '/schilderen.jpg',
   },
@@ -127,13 +127,13 @@ export const cards: Card[] = [
     timestamp: at(16, 2),
     icon: '/family.png',
     title: 'Stap 4',
-    description: 'Ga op volgorde van klein naar lang staan en laat de voorste persoon een selfie maken, loop in die formatie parrallel aan de Goudseweg totdat je bijna een weg kruist.',
+    description: 'Ga op volgorde van klein naar lang staan en laat de voorste persoon een selfie maken, loop in die formatie parallel aan de Goudseweg totdat je bijna een weg kruist.',
   },
   {
     timestamp: at(16, 6),
     icon: '/rainbow.png',
     title: 'Stap 5',
-    description: 'Steek de weg over en zorg dat je vanaf daar op volgorde van lievelingskleur loopt. De regenboog bepaald de volgorde van de kleuren. Laat de voorste persoon een selfie maken terwijl je het voetpad uitloopt.',
+    description: 'Steek de weg over en zorg dat je vanaf daar op volgorde van lievelingskleur loopt. De regenboog bepaalt de volgorde van de kleuren. Laat de voorste persoon een selfie maken terwijl je het voetpad uitloopt.',
   },
   {
     timestamp: at(16, 10),
@@ -145,7 +145,7 @@ export const cards: Card[] = [
     timestamp: at(16, 14),
     icon: '/baby.png',
     title: 'Stap 7',
-    description: 'Daar waar het wonder geschieden van het geluk van jullie levens is waar jullie langs zullen lopen en een foto moeten maken. Zorg ervoor dat iedereen op de foto staat en het desbetreffende huis ook. Hoe mooier de gezichtsuitdrukking hoe beter.',
+    description: 'Daar waar het wonder geschiede van het geluk van jullie levens is waar jullie langs zullen lopen en een foto moeten maken. Zorg ervoor dat iedereen op de foto staat en het desbetreffende huis ook. Hoe mooier de gezichtsuitdrukking hoe beter.',
   },
   {
     timestamp: at(16, 19),
@@ -163,7 +163,7 @@ export const cards: Card[] = [
     timestamp: at(16, 30),
     icon: '/coin.png',
     title: 'Stap 10',
-    description: 'Maak bij aankomst nog een laatste selfie om de feestvreugde vast te leggen. Veel plezier bij de Munt!',
+    description: 'Maak bij aankomst nog een laatste selfie om de feestvreugde vast te leggen. Veel plezier bij de Munt! Is de onderstaande route ook hoe jullie zijn gelopen?',
     image: '/route-1.png'
   },
   {
@@ -194,7 +194,7 @@ export const cards: Card[] = [
     timestamp: at(19, 0),
     icon: '/burrito.png',
     title: 'Eet smakelijk',
-    description: 'Op het menu voor vanavond staan een hoofdgerecht en een toetje. Voor het hoofdgerecht nodigen wij u uit om een eigen wrap samen te stellen met een verscheidenheid aan door top chefs bereide vullingen. Geniet van de heerlijke maaltijd en laat u verrassen door een uitzonderlijk toetje.',
+    description: 'Op het menu voor vanavond staan een hoofdgerecht en een toetje. Voor het hoofdgerecht nodigen wij u uit om een eigen wrap samen te stellen met een, door top chefs bereidde, verscheidenheid aan vullingen. Geniet van de heerlijke maaltijd en laat u verrassen door een uitzonderlijk toetje.',
   },
   {
     timestamp: at(20, 30),
