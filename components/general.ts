@@ -24,7 +24,7 @@ export const Container = styled.div`
 `;
 
 export const Main = styled.main`
-  padding: 5rem 0;
+  padding: 3rem 0 0;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -37,12 +37,14 @@ export const Title = styled.h1`
   margin: 0;
   line-height: 1.15;
   font-size: 4rem;
+  text-align: center;
 `;
 
 export const Subtitle = styled.p`
   line-height: 1.5;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   text-align: justify;
+  padding: 0 1rem;
 `;
 
 export const Grid = styled.div`
@@ -51,7 +53,6 @@ export const Grid = styled.div`
   justify-content: center;
   flex-wrap: wrap;
   max-width: 1000px;
-  margin-top: 3rem;
 `;
 
 export const CardContainer = styled.div<AlertableProps>`
@@ -82,21 +83,30 @@ export const CardContainer = styled.div<AlertableProps>`
 `;
 
 export const CardHeader = styled.div`
+  flex-grow: 0;
   width: 10%;
+  min-width: 64px;
+  margin-right: 5%;
 `;
 
 export const CardContent = styled.div`
-  width: 90%;
+  flex-grow: 1;
 
   h2 {
-    margin: 0 0 1rem 0;
+    margin: 1rem 0;
     font-size: 1.5rem;
   }
 
   p {
-    margin: 0;
+    margin: 0.5rem 0;
     font-size: 1.25rem;
     line-height: 1.5;
+  }
+
+  img {
+    margin-top: 1rem;
+    width: 100%;
+    border-radius: 2rem;
   }
 `;
 
@@ -104,7 +114,8 @@ export const Timestamp = styled.span`
   display: block;
   font-size: 1rem;
   line-height: 1;
-  color: gray;
+  color: #aeaeae;
   width: 100%;
   text-align: right;
+  margin-top: 1rem;
 `;

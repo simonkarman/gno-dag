@@ -6,6 +6,7 @@ import {
 } from '../components/general';
 import { Spinner } from '../components/spinner';
 import { Card, cards } from '../content/cards';
+import { DateTime } from 'luxon';
 
 export default function Home() {
   const [intervalId, setIntervalId] = useState<any>(0);
@@ -32,8 +33,10 @@ export default function Home() {
     return card.timestamp >= new Date(Date.now() - 60 * 1000);
   };
 
-  const visibleCards = [...cards]
-    .sort(byTimestamp)
+  const sortedCards = [...cards]
+    .sort(byTimestamp);
+
+  const visibleCards = sortedCards
     .filter(beforeNow)
     .reverse()
     .map(card => (
@@ -44,12 +47,28 @@ export default function Home() {
         <CardContent>
           <h2>{card.title}</h2>
           <p>{card.description}</p>
+          {card.link &&
+            <p>
+              <a target="_blank" href={card.link.url}>{card.link.text}</a>
+            </p>
+          }
+          {card.image && <img src={card.image} />}
           <Timestamp>{card.timestamp.toLocaleString()}</Timestamp>
         </CardContent>
       </CardContainer>
     ));
   
   const showSpinner = visibleCards.length !== cards.length;
+  let nextCard: Card | undefined;
+  let timeToNextHint: String = '';
+  if (showSpinner) {
+    nextCard = sortedCards[visibleCards.length];
+    const diff = DateTime.fromISO(nextCard.timestamp.toISOString()).diffNow(['hours', 'minutes']).toObject();
+    if (diff.hours !== 0) {
+      timeToNextHint += `${diff.hours} uur en `
+    }
+    timeToNextHint += diff.minutes?.toFixed() === '1' ? '1 minuut' : `${diff.minutes?.toFixed()} minuten`;
+  }
 
   return (
     <Container>
@@ -78,7 +97,7 @@ export default function Home() {
               <CardContent>
                 <h2>Er staat nog meer op het programma</h2>
                 <p>Het is nog even wachten tot hint {visibleCards.length + 1} van de {cards.length} zichtbaar wordt</p>
-                <Timestamp>{new Date(time).toLocaleString()}</Timestamp>
+                <Timestamp>Volgende hint over {timeToNextHint}</Timestamp>
               </CardContent>
             </CardContainer>
           )}
