@@ -55,25 +55,25 @@ export const cards: Card[] = [
     image: '/ecosysteem.jpg',
   },
   {
-    timestamp: at(11, 50),
+    timestamp: at(11, 10),
     icon: '/hungry-ananas.png',
     title: 'Plantenvoeding',
     description: 'De plantjes in jullie ecosysteem staan te springen om met de voedingscyclus aan de slag te gaan. Maar jullie beginnen zelf misschien ook al zin in voeding te krijgen. Leg nog even de laatste hand aan je ecosysteem en zorg dat je voor de volgende hint klaar bent!',
   },
   {
-    timestamp: at(12, 30),
+    timestamp: at(12, 0),
     icon: '/lunch-bag.png',
     title: 'Lunch tijd!',
     description: 'Het is tijd om lekker te gaan lunchen. Op naar de eettafel!',
   },
   {
-    timestamp: at(13, 20),
+    timestamp: at(13, 0),
     icon: '/creativity.png',
     title: 'Let\'s get creative',
     description: 'Heb je nog wat creativiteit over na vanmorgen? Laat die creatieve aap maar uit de mouw komen, want we gaan weer aan de slag. Eet nog even rustig je lunch op en zorg dat je voor de volgende hint weer terug bent onder de veranda.',
   },
   {
-    timestamp: at(13, 30),
+    timestamp: at(13, 15),
     icon: '/brush.png',
     title: 'Schilderen',
     description: 'Na Texel is het nu tijd voor het echte werk. Focus op je innerlijke Bob Ross, Piet Mondriaan of Vincent van Gogh om een prachtig kunstwerk te maken. Tip: zorg ervoor dat elk stukje tape altijd over een van de randen van je schilderij loopt zodat je het makkelijk los kunt trekken.',
@@ -81,7 +81,7 @@ export const cards: Card[] = [
     image: '/schilderen.jpg',
   },
   {
-    timestamp: at(14, 45),
+    timestamp: at(14, 15),
     icon: '/abstract-art.png',
     title: 'Tussenstand',
     description: 'Hoe gaat het met onze kunstenaars? Is het schilderij al bijna af of moet je nog beginnen met verven? Hoe dan ook, je bent lekker bezig. Pak er nog wat lekkers te drinken en een koekje bij en ga zo door!',
