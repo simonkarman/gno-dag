@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import {
   Container, Main, Title, Subtitle, Grid, CardContainer, CardContent, CardHeader, Timestamp
@@ -42,14 +41,14 @@ export default function Home() {
     .map(card => (
       <CardContainer key={card.timestamp.toISOString()} $alert={isLessThanOneMinutesAgo(card)}>
         <CardHeader>
-          <Image src={card.icon} width={64} height={64} />
+          <img src={card.icon} width={64} height={64} />
         </CardHeader>
         <CardContent>
           <h2>{card.title}</h2>
           <p>{card.description}</p>
           {card.link &&
             <p>
-              <a target="_blank" href={card.link.url}>{card.link.text}</a>
+              <a target="_blank" rel="noreferrer" href={card.link.url}>{card.link.text}</a>
             </p>
           }
           {card.image && <img src={card.image} />}
