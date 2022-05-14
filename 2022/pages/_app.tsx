@@ -17,26 +17,43 @@ const GlobalStyle = createGlobalStyle`
     outline: none;
   }
 
+  .page {
+    width: 45%;
+    padding: 2rem;
+  }
+
+  .left {
+    flex: 50%;
+    border-right: 1px solid #41586d;
+    background: linear-gradient(to right,white 98%,#ebebeb);
+    background-repeat: no-repeat;
+  }
+
+  .right {
+    flex: 50%;
+    border-left: 1px solid #41586d;
+    background: linear-gradient(to left,white 98%,#ebebeb);
+    background-repeat: no-repeat;
+  }
+
   .paper {
     position: relative;
     background: #fff;
     width: 80%;
     margin: 100px auto;
-    padding: 1em;
+    padding: 0 1em;
+    display: flex;
   }
 
   .paper h1 {
     line-height: 3rem;
     padding: 1rem 1rem 0;
-    margin-bottom: 0;
   }
 
   .paper p {
-    margin-top: 0;
+    margin: 0;
     line-height: 2rem;
-    padding: 0 1rem;
-    background: linear-gradient(to bottom,white 1.95rem, #ebebeb 0.05rem);
-    background-size: 100% 2rem;
+    padding: 0.2rem 1rem;
   }
 
   .shadow {
