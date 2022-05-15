@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { DateTime } from 'luxon';
 import { earlyInformation, activities, welcomeMessage } from '../content/activities';
-import { paragraphFont, writingFont } from './_app';
+import { paragraphFont, writingFont } from './_document';
 
 const tableColor = '#f4d69e';
 const paperColor = '#fffaf5';
@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     background-color: ${tableColor};
     color: ${textColor};
-    font-family: ${paragraphFont.name} ,serif;
+    font-family: ${paragraphFont.name}, serif;
   }
 
   .paper {
@@ -37,8 +37,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .paper h2 {
-    line-height: 1.5rem;
-    padding: 0.3rem 0.6rem 0;
+    line-height: 1.2rem;
+    padding: 0rem 0.6rem 0;
     font-size: 0.75em;
     font-weight: 800;
     text-transform: uppercase;
@@ -96,7 +96,6 @@ const GlobalStyle = createGlobalStyle`
     
     /* Scrolling */
     max-height: 400px;
-    overflow-x: hidden;
     overflow-y: scroll;
     -ms-overflow-style: none;  
     scrollbar-width: none;
@@ -112,8 +111,11 @@ const GlobalStyle = createGlobalStyle`
       padding-left: 1.3rem;
     }
     img {
-      margin: 1em;
+      margin: 0 1.4em;
       width: 80%;
+    }
+    strong {
+      text-decoration: underline;
     }
   }
 
