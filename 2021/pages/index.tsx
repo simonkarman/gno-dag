@@ -8,17 +8,15 @@ import { Card, cards } from '../content/cards';
 import { DateTime } from 'luxon';
 
 export default function Home() {
-  const [intervalId, setIntervalId] = useState<any>(0);
   const [time, setTime] = useState(Date.now());
-
   useEffect(() => {
-    setIntervalId(setInterval(() => {
+    const intervalId = setInterval(() => {
       setTime(Date.now());
-    }, 1000));
+    }, 1000);
     return () => {
       clearInterval(intervalId);
     }
-  }, []);
+  });
 
   const byTimestamp = (cardA: Card, cardB: Card): number => {
     return cardA.timestamp.toISOString().localeCompare(cardB.timestamp.toISOString());

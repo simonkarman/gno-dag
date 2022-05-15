@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { DateTime } from 'luxon';
-import { activities, welcomeMessage } from '../content/activities';
+import { activities, WelcomeMessage } from '../content';
 import { paragraphFont, writingFont } from './_document';
 
 const tableColor = '#f4d69e';
@@ -186,7 +186,6 @@ const Landing: NextPage = () => {
   // State
   const [mockedDateTime, setMockedDateTime] = useState(activities[activities.length - 1].start);
   const [realDateTime, setRealDateTime] = useState(DateTime.now());
-  const [message, setMessage] = useState(<></>);
   const [selectedActivityIndex, setSelectedActivityIndex] = useState(-1);
 
   // Computed properties
@@ -200,15 +199,6 @@ const Landing: NextPage = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  // When selecting an activity, show the corresponding information.
-  useEffect(() => {
-    if (selectedActivityIndex === -1) {
-      setMessage(welcomeMessage(isEarly));
-    } else {
-      setMessage(activities[selectedActivityIndex].message);
-    }
-  }, [selectedActivityIndex, now]);
 
   // Make sure to hide the selected activitie if it 'now' is before it started.
   useEffect(() => {
@@ -259,14 +249,14 @@ const Landing: NextPage = () => {
               );
             }
             return (
-              <p key={activity.name} className='schedule' onClick={() => setSelectedActivityIndex(index)}>
+              <p key={activity.title} className='schedule' onClick={() => setSelectedActivityIndex(index)}>
                 <span className='time known'>
                   {activity.start.toFormat('HH:mm')}
                   -
                   {(activity.end || activities[index + 1].start).toFormat('HH:mm')}
                 </span>
                 <span className='event known'>
-                  {activity.name}
+                  {activity.title}
                 </span>
               </p>
             );
@@ -274,7 +264,10 @@ const Landing: NextPage = () => {
         </div>
         <div className='page right'>
           <h2>Informatie</h2>
-          {message}
+          {(selectedActivityIndex === -1)
+            ? <WelcomeMessage isEarly={isEarly} />
+            : activities[selectedActivityIndex].Component
+          }
         </div>
       </div>
       {useMocked && (
