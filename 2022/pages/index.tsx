@@ -3,16 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { DateTime } from 'luxon';
 import { earlyInformation, activities, welcomeMessage } from '../content/activities';
+import { paragraphFont, writingFont } from './_app';
 
-const paperColor = '#ebebeb';
-const darkPaperColor = '#cbcbcb';
-const accentColor = '#41586d';
 const tableColor = '#f4d69e';
+const paperColor = '#fffaf5';
+const darkPaperColor = '#cbcbcb';
+const textColor = '#040b35';
+const accentColor = '#41586d';
 
 const GlobalStyle = createGlobalStyle`
   body {
     background-color: ${tableColor};
-    font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
+    color: ${textColor};
+    font-family: ${paragraphFont.name} ,serif;
   }
 
   .paper {
@@ -29,7 +32,7 @@ const GlobalStyle = createGlobalStyle`
   .paper h1 {
     line-height: 1.5rem;
     padding: 0.3rem 0.3rem 0;
-    font-size: 1.2em;
+    font-size: 1.14em;
     cursor: default;
   }
 
@@ -40,8 +43,25 @@ const GlobalStyle = createGlobalStyle`
     font-weight: 800;
     text-transform: uppercase;
     background-color: ${accentColor}dd;
-    color: white;
+    color: ${paperColor};
     cursor: default;
+  }
+
+  .buttonrow {
+    display: flex;
+    align-items: center;
+    align-content: center;
+  }
+
+  .buttonrow button {
+    flex: 1;
+    background-color: ${accentColor};
+    color: ${paperColor};
+    border-radius: 3px;
+    border: none;
+    margin: 1px;
+    padding: 0.2rem;
+    font-family: monospace;
   }
 
   .page {
@@ -73,12 +93,27 @@ const GlobalStyle = createGlobalStyle`
     border-left: 1px solid ${accentColor};
     background: linear-gradient(to left,transparent 95%,${darkPaperColor});
     background-repeat: no-repeat;
+    
+    /* Scrolling */
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  
+    scrollbar-width: none;
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
     p {
-      padding: 0 0.4rem 0 1rem;
+      padding: 0 0.4rem 0.5rem 1rem;
     }
     h2 {
       margin-left: -1px;
       padding-left: 1.3rem;
+    }
+    img {
+      margin: 1em;
+      width: 80%;
     }
   }
 
@@ -90,45 +125,45 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .paragraph {
-    background: linear-gradient(to bottom,transparent 0.95rem, ${darkPaperColor}88 0.05rem);
+    background: linear-gradient(to bottom,transparent 0.95rem, ${darkPaperColor}33 0.05rem);
     background-size: 100% 1rem;
   }
 
   .information {
     display: flex;
-  }
 
-  .information .key {
-    font-weight: bold;
-    min-width: 30%;
-    margin-right: 0.3rem;
-  }
+    .key {
+      font-weight: bold;
+      min-width: 30%;
+      margin-right: 0.3rem;
+    }
 
-  .information .value {
-    color: blue;
-    font-family: cursive;
-    padding: 0rem 0.2rem;
-    border-bottom: 1px solid ${accentColor}aa;
-    flex-grow: 1;
+    .value {
+      color: blue;
+      font-family: ${writingFont.name}, cursive;
+      padding: 0rem 0.2rem;
+      border-bottom: 1px solid ${textColor}55;
+      flex-grow: 1;
+    }
   }
 
   .schedule {
     display: flex;
     align-items: flex-end;
-  }
 
-  .schedule .time {
-    font-size: 0.5rem;
-    font-family: monospace;
-    font-weight: bold;
-    margin-right: 0.5rem;
-  }
+    .time {
+      font-size: 0.5rem;
+      font-family: monospace;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
 
-  .schedule .event {
-    font-family: cursive;
-    padding: 0rem 0.2rem;
-    border-bottom: 1px solid ${accentColor}aa;
-    flex-grow: 1;
+    .event {
+      font-family: ${writingFont.name}, cursive;
+      padding: 0rem 0.2rem;
+      border-bottom: 1px solid ${textColor}55;
+      flex-grow: 1;
+    }
   }
 
   .event.known {
@@ -137,7 +172,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .unknown {
-    color: #5755556f;
+    color: ${textColor}3f;
     cursor: progress;
   }
 `;
@@ -169,7 +204,7 @@ const Landing: NextPage = () => {
     if (selectedActivityIndex === -1) {
       setMessage(welcomeMessage);
     } else {
-      setMessage(activities[selectedActivityIndex].information);
+      setMessage(activities[selectedActivityIndex].message);
     }
   }, [selectedActivityIndex]);
 
@@ -216,7 +251,7 @@ const Landing: NextPage = () => {
                     {`${r(2, 10)}:${r(2, 10)}-${r(2, 10)}:${r(2, 10)}`}
                   </span>
                   <span className='event unknown'>
-                    {r(10, 36)}
+                    {r(9, 36)}
                   </span>
                 </p>
               );
@@ -237,19 +272,22 @@ const Landing: NextPage = () => {
         </div>
         <div className='page right'>
           <h2>Informatie</h2>
-          <p className='paragraph'>
-            {message}
-          </p>
+          {message}
           {beforeFirstActivity && earlyInformation}
         </div>
       </div>
       {useMocked && (
-        <>
-          <button onClick={() => setMockedDateTime(activities[0].start.minus({ minutes: 15 }))}>before</button>
-          <button onClick={() => setMockedDateTime(mockedDateTime.minus({ minutes: 15 }))}>-15min</button>
-          <button onClick={() => setMockedDateTime(mockedDateTime.plus({ minutes: 15 }))}>+15min</button>
-          <button onClick={() => setMockedDateTime(activities[activities.length - 1].start)}>after</button>
-        </>
+        <div className='paper shadow letter'>
+          <div style={{ width: '100%' }}>
+            <h1 style={{ textAlign: 'center' }}>Development Mode ⚠️</h1>
+            <div className=' buttonrow'>
+              <button onClick={() => setMockedDateTime(activities[0].start.minus({ minutes: 15 }))}>before</button>
+              <button onClick={() => setMockedDateTime(mockedDateTime.minus({ minutes: 15 }))}>-15min</button>
+              <button onClick={() => setMockedDateTime(mockedDateTime.plus({ minutes: 15 }))}>+15min</button>
+              <button onClick={() => setMockedDateTime(activities[activities.length - 1].start)}>after</button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
