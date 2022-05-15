@@ -206,7 +206,7 @@ const Landing: NextPage = () => {
             <span className='key'>Aanwezigen</span>
             <span className='value'>GJSLMT</span>
           </p>
-          <h2 onClick={() => setSelectedActivityIndex(-1)}>Tijdsschema</h2>
+          <h2 onClick={() => setSelectedActivityIndex(-1)}>Tijdschema</h2>
           {activities.sort((a, b) => a.start.diff(b.start, 'minutes').minutes).map((activity, index) => {
             if (now < activity.start) {
               const r = (length: number, radix: number) => `${Math.random().toString(radix).slice(2, 2 + length)}`;

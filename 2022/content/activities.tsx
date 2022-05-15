@@ -9,7 +9,7 @@ export interface Activity {
 
 export const welcomeMessage = (<>
   Welkom. Dit is een digitaal boek speciaal voor GNO dag 2022.
-  Op de linker pagina van dit boek, kan je in het tijdsschema op een activiteit klikken voor meer informatie.
+  Op de linker pagina van dit boek, kan je in het tijdschema op een activiteit klikken voor meer informatie.
 </>);
 
 const gnoDag2022 = DateTime.fromISO('2022-06-05T07:00:00.000');
