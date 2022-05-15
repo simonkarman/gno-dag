@@ -48,17 +48,26 @@ export const activities: Activity[] = [
   { start: at(18, 0), end: at(20, 0), name: 'Avond eten', message: <p className='paragraph'>Avondeten</p> },
 ];
 
-export const welcomeMessage = (<p className='paragraph'>
-  Welkom. Dit is een digitaal boek speciaal voor GNO dag 2022.
-  Op de linker pagina van dit boek, kan je in het tijdschema op een activiteit klikken voor meer informatie.
-</p>);
-
-export const earlyInformation = (<p className='paragraph'>
-  Maar... je bent er wel erg vroeg bij. Kijk nog eens in dit boek op
-  {' '}
-  <strong>
-    {activities[0].start.toFormat('dd LLLL yyyy \'om\' HH:mm')}
-  </strong>
-  . Zorg dat je dan wakker bent en al hebt gedoucht.
-</p>
-);
+export const welcomeMessage = (isEarly: boolean) => (<>
+  <p className='paragraph'>
+    Welkom. Dit is een digitaal boek speciaal voor GNO dag 2022.
+    Op de linker pagina van dit boek, kan je in het tijdschema op een activiteit klikken voor meer informatie.
+  </p>
+  {isEarly && (
+    <p className='paragraph'>
+      Maar... je bent er wel erg vroeg bij. Kom hier terug op
+      {' '}
+      <strong>
+        {activities[0].start.toFormat('dd LLLL yyyy \'om\' HH:mm')}
+      </strong>
+      {' '}
+      en zie hoe het verhaal zich zal onthullen. Zorg dat je dan wakker bent en nog lege maag hebt. Gaat dat lukken?
+    </p>
+  )}
+  <h2>Vorig jaar</h2>
+  <p className='paragraph'>
+    Kijk nog eens terug naar wat we vorig jaar gedaan hebben:
+    {' '}
+    <a href="https://gno-2021.karman.dev" target="_blank" rel="noreferrer">terug naar GNO Dag 2021</a>
+  </p>
+</>);

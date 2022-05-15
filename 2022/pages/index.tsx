@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { DateTime } from 'luxon';
-import { earlyInformation, activities, welcomeMessage } from '../content/activities';
+import { activities, welcomeMessage } from '../content/activities';
 import { paragraphFont, writingFont } from './_document';
 
 const tableColor = '#f4d69e';
@@ -191,7 +191,7 @@ const Landing: NextPage = () => {
 
   // Computed properties
   const now = useMocked ? mockedDateTime : realDateTime;
-  const beforeFirstActivity = now < activities[0].start;
+  const isEarly = now < activities[0].start;
 
   // Every second update the real date time
   useEffect(() => {
@@ -204,11 +204,11 @@ const Landing: NextPage = () => {
   // When selecting an activity, show the corresponding information.
   useEffect(() => {
     if (selectedActivityIndex === -1) {
-      setMessage(welcomeMessage);
+      setMessage(welcomeMessage(isEarly));
     } else {
       setMessage(activities[selectedActivityIndex].message);
     }
-  }, [selectedActivityIndex]);
+  }, [selectedActivityIndex, now]);
 
   // Make sure to hide the selected activitie if it 'now' is before it started.
   useEffect(() => {
@@ -275,7 +275,6 @@ const Landing: NextPage = () => {
         <div className='page right'>
           <h2>Informatie</h2>
           {message}
-          {beforeFirstActivity && earlyInformation}
         </div>
       </div>
       {useMocked && (
