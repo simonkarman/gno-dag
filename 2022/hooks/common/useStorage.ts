@@ -3,7 +3,7 @@ import {
 } from 'react';
 import { usePrevious } from './usePrevious';
 
-const useStorage = <T extends string>(key: string, defaultValue: T, storage: Storage | undefined): [
+export const useStorage = <T extends string>(key: string, defaultValue: T, storage: Storage | undefined): [
   T,
   Dispatch<SetStateAction<T>>,
 ] => {

@@ -78,6 +78,6 @@ module.exports = {
     'react/jsx-filename-extension': [1, { extensions: ['.tsx', '.jsx'] }],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
-    'react/jsx-one-expression-per-line': ['error', { allow: 'literal' }],
+    'react/jsx-one-expression-per-line': ['off'],
   },
 };
