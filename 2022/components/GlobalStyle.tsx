@@ -147,6 +147,10 @@ export const GlobalStyle = createGlobalStyle`
     strong {
       text-decoration: underline;
     }
+    .selected {
+      color: green;
+      font-weight: bold;
+    }
   }
 
   .page p {

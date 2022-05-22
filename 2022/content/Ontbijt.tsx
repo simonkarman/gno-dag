@@ -38,7 +38,6 @@ const C03 = () => {
       Maar ook, dat ik alles wat ik mee maak super goed kan onthouden.
       Helaas ben ik laatst tegen een berg aangelopen (en ik kwam nog wel van rechts...).
       Sindsdien kan ik me niet veel meer herinneren.
-
     </p>
   </>);
 };
@@ -80,7 +79,7 @@ const Puzzle = () => {
       Hoe kan dit?
     </p>
     {show01 && <p className='paragraph'>
-      Er zijn maar 3 mensen: een opa, zijn zoon en zijn kleinzoon.
+      Zijn zijn maar met z&apos;n drieen: een opa, zijn zoon en zijn kleinzoon.
     </p>}
     <InputContainer>
       {!show01 && <button onClick={() => _setShow01(true)}>Toon antwoord</button>}

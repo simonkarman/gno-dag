@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74.406" height="1371" font-size="24" text-anchor="middle">
+    <filter id="shadow" x="0" y="0" width="200%" height="200%">
+        <feDropShadow dx="3" dy="3" stdDeviation="1" flood-color="#aaa" flood-opacity="1"/>
+    </filter>
+    <rect rx="10" ry="10" width="68.406" height="85" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="93" rx="10" ry="10" width="68.406" height="190" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="291" rx="10" ry="10" width="68.406" height="216" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="515" rx="10" ry="10" width="68.406" height="85" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="608" rx="10" ry="10" width="68.406" height="103" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="719" rx="10" ry="10" width="68.406" height="103" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="830" rx="10" ry="10" width="68.406" height="208" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="1046" rx="10" ry="10" width="68.406" height="190" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <rect y="1244" rx="10" ry="10" width="68.406" height="121" style="fill:#f0f3f5" filter="url(#shadow)"/>
+    <text font-size="40" font-family="Noto" x="34.203" y="48">🦵</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="75">-b</text>
+    <text font-size="18" font-family="Arial" x="18.266" y="117">b+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="159">🐍</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="186">s=e</text>
+    <text font-size="18" font-family="Arial" x="18.258" y="204">+ri</text>
+    <text font-size="18" font-family="Arial" x="35.773" y="204">j+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="246">🐄</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="273">-o</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="339">🦌</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="366">-t</text>
+    <text font-size="18" font-family="Arial" x="18.258" y="384">+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="426">🕷</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="453">-sp</text>
+    <text font-size="18" font-family="Arial" x="33.523" y="471">+ ne+</text>
+    <text font-size="12" font-family="Times" x="31.023" y="493">R</text>
+    <text font-size="18" font-family="Arial" x="-22" y="1914">/</text>
+    <text fill="#7e7e7e" font-size="46" font-family="Times" x="31.023" y="505">G</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="563">🦉</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="590">u=w</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="656">🚪</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="683">d=j</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="701">-ur</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="767">🚆</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="794">-r</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="812">⟲</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="878">🍐</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="905">-p</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="923">e=v</text>
+    <text font-size="18" font-family="Arial" x="18.258" y="941">+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="983">🌧</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1010">r=g</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1028">g=t</text>
+    <text font-size="18" font-family="Arial" x="15.758" y="1070">t+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="1112">🕸</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1139">-b</text>
+    <text font-size="18" font-family="Arial" x="18.258" y="1157">+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="1199">☮</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1226">-vr</text>
+    <text font-size="18" font-family="Arial" x="18.266" y="1268">d+</text>
+    <text font-size="40" font-family="Noto" x="34.203" y="1310">🌹</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1337">s=w</text>
+    <text font-size="18" font-family="Arial" x="34.203" y="1355">⟲</text>
+</svg>

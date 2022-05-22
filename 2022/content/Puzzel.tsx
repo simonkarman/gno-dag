@@ -23,10 +23,10 @@ export function Puzzel() {
         Tijd om even lekker te gaan zitten en uit te rusten.
       </p>
       <ImgContainer>
-        <AnimalImg visual={'round'} className='grid' name={'snake'} />
-        <AnimalImg visual={'round'} className='grid' name={'giraffe'} />
-        <AnimalImg visual={'round'} className='grid' name={'chicken'} />
-        <AnimalImg visual={'round'} className='grid' name={'penguin'} />
+        <AnimalImg visual={'round'} className='small' name={'snake'} />
+        <AnimalImg visual={'round'} className='small' name={'giraffe'} />
+        <AnimalImg visual={'round'} className='small' name={'chicken'} />
+        <AnimalImg visual={'round'} className='small' name={'penguin'} />
       </ImgContainer>
       <p className='paragraph'>
         Wij zijn <b>Slis</b> de slang, <b>Girt</b> de giraffe, <b>Karen</b> de kip, en <b>Pien</b> de pinguin.

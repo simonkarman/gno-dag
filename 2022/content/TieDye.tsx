@@ -1,6 +1,7 @@
 import { InputContainer } from '../components/InputContainer';
 import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
+import { useTransformedLocalStorage } from '../hooks/common/useTransformedStorage';
 
 const colors = [
   'Ivory',
@@ -76,6 +77,7 @@ const C04 = () => {
 };
 
 const Puzzle = () => {
+  const [selection, setSelection] = useTransformedLocalStorage<string[]>('tiedye--selection', [], t => t.join(), s => s.split(','));
   const [answer, setAnswer] = useLocalStorage<string>('tiedye--answer', '');
   const isCorrect = answer === 'fabel';
   return <>
@@ -83,14 +85,29 @@ const Puzzle = () => {
     <p className='paragraph'>
       Begin met de vijf kleuren die we hebben gebruikt bij het tie-dyen.
       De vijf kleuren staan tussen de onderstaande kleuren.
+      Tip: Je kunt op de kleuren klikken om ze te selecteren.
     </p>
     <p className='paragraph'>
-      {colors.map((color, index) => <span
-        key={index}
-        className={index % 2 === 0 ? 'bold' : ''}
-      >
-        {color.replace(' ', '-')}{' '}
-      </span>)}
+      {colors.map((color, index) => {
+        const classNames = [];
+        if (index % 2 === 0) classNames.push('bold');
+        if (selection.includes(color)) classNames.push('selected');
+        return <span
+          key={index}
+          className={classNames.join(' ')}
+          onClick={() => {
+            const index = selection.indexOf(color);
+            console.info('clicked on ', color, index);
+            if (index == -1) {
+              setSelection([ ...selection, color ]);
+            } else {
+              setSelection([ ...selection.slice(0, index), ...selection.slice(index + 1, selection.length) ]);
+            }
+          }}
+        >
+          {color.replace(' ', '-')}{' '}
+        </span>;
+      })}
     </p>
     <h3>Letters</h3>
     <p className='paragraph'>
