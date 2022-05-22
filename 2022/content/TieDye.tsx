@@ -1,7 +1,6 @@
 import { InputContainer } from '../components/InputContainer';
 import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
-import { useLocalStorageBoolean } from '../hooks/common/useTransformedStorage';
 
 const colors = [
   'Ivory',
@@ -90,7 +89,7 @@ const Puzzle = () => {
         key={index}
         className={index % 2 === 0 ? 'bold' : ''}
       >
-        {color}{' '}
+        {color.replace(' ', '-')}{' '}
       </span>)}
     </p>
     <h3>Letters</h3>

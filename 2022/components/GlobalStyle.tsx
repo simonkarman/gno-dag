@@ -129,14 +129,20 @@ export const GlobalStyle = createGlobalStyle`
       padding-left: 1.6rem;
     }
     img {
+      object-fit: cover;
       margin: 0 1.4em;
       width: 80%;
     }
     img.small {
       margin: 0.4rem 0.4rem 0.1rem 0.5rem;
       padding: 0.1rem;
-      width: 2rem;
+      width: 2.3rem;
       float: left;
+    }
+    img.grid {
+      margin: 0.3rem;
+      padding: 0;
+      width: 1.8rem;
     }
     strong {
       text-decoration: underline;
