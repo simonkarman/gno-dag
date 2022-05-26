@@ -3,7 +3,13 @@ import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
-  Tekst deel 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Wolf Wouter
+  Nieuwsgierigheid kent geen tijd.
+  Frisse lucht en beweging is goed.
+  Op jacht.
+  Ollie vergeten waar gympies zijn, op zoek waar die zijn gebleven
+  Speurtocht voor de hond (reuk grapje met stinkschoenen)
+  Iets over olifanten met gympies (voor mama)
 </p>;
 
 const C02 = <p className='paragraph'>
@@ -20,11 +26,15 @@ const C04 = <p className='paragraph'>
 
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('speurtocht--answer', '');
-  const isCorrect = answer === 'het';
+  const isCorrect = answer === 'bushalte';
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>
-      Introductie van het raadsel. Wat is het antwoord?
+      Let tijdens de wandeling goed op.
+      (Black Storie en enkele raadsels)
+      Na de wandeling moeten jullie een vraag beantwoorden.
+      Onderstaande mag pas zichtbaar zijn na de wandeling.
+      We zijn hier drie keer langs gelopen. Het heeft een dak. Maar er woont niemand.
     </p>
     <InputContainer>
       <input
@@ -34,7 +44,7 @@ const Puzzel = () => {
       />
     </InputContainer>
     {isCorrect && <p className='paragraph'>
-        Het antwoord!
+        Inderdaad, een bushalte!
     </p>}
   </>;
 };

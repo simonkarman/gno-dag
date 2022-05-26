@@ -20,21 +20,21 @@ const C04 = <p className='paragraph'>
 
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('diner--answer', '');
-  const isCorrect = answer === 'het';
+  const isCorrect = answer.trim() === 'de garage';
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>
-      Introductie van het raadsel. Wat is het antwoord?
+      Welk woord komt er uit?
     </p>
     <InputContainer>
       <input
         value={answer}
-        onChange={(e) => setAnswer(e.target.value.toLowerCase().trim())}
+        onChange={(e) => setAnswer(e.target.value.toLowerCase())}
         className={isCorrect ? 'correct' : (answer.length > 0 ? 'incorrect' : '')}
       />
     </InputContainer>
     {isCorrect && <p className='paragraph'>
-        Het antwoord!
+        Zoek in de garage naar het antwoord!
     </p>}
   </>;
 };

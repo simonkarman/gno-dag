@@ -3,7 +3,11 @@ import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
-  Tekst deel 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Walvis Red
+  Geniet van het leven
+  Reis veel rond over de wereld
+  Toch het liefst naar Europe voor het lekker speciaal bier
+  Uit slovenie geimporteerd, naar de Nederlandse kust gekomen
 </p>;
 
 const C02 = <p className='paragraph'>
@@ -20,11 +24,12 @@ const C04 = <p className='paragraph'>
 
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('bierproeverij--answer', '');
-  const isCorrect = answer === 'het';
+  const isCorrect = answer === 'zagreb';
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>
-      Introductie van het raadsel. Wat is het antwoord?
+      Kunnen jullie na al dit bier nog nadenken?
+      Hoe heet de hoofdstad van het land dat ten zuiden ligt van het land waar deze biertjes vandaan komen?
     </p>
     <InputContainer>
       <input
@@ -34,7 +39,9 @@ const Puzzel = () => {
       />
     </InputContainer>
     {isCorrect && <p className='paragraph'>
-        Het antwoord!
+        De biertjes komen uit Slovenië.
+        Ten zuiden van Slovenië ligt Kroatië.
+        De hoofdstad van Kroatië is Zagreb.
     </p>}
   </>;
 };

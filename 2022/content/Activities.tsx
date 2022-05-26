@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import React from 'react';
 import { Activity } from '../components/Activity';
+import { Afsluiting } from './Afsluiting';
 import { Bierproeverij } from './Bierproeverij';
 import { Diner } from './Diner';
 import { Lunch } from './Lunch';
@@ -22,5 +23,6 @@ export const activities: Activity[] = [
   { start: at(14, 0), title: Speurtocht.name, Component: <Speurtocht/> },
   { start: at(15, 0), title: Stroopwafel.name, Component: <Stroopwafel/> },
   { start: at(16, 30), title: Bierproeverij.name, Component: <Bierproeverij/> },
-  { start: at(18, 0), end: at(20, 0), title: Diner.name, Component: <Diner/> },
+  { start: at(18, 0), title: Diner.name, Component: <Diner/> },
+  { start: at(20, 0), end: at(21, 0), title: Afsluiting.name, Component: <Afsluiting/> },
 ];

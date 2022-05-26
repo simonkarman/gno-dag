@@ -3,10 +3,13 @@ import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
-  Buffel Bert
-  Chefkok
-  Bourgondische leven
-  Goed vers eten is de weg om gezond te worden
+  Met Waldo de walrus.
+  Bedankt voor jullie hulp.
+  Bedankt voor de leuke dag.
+  Leuke dag geweest.
+  Alle dieren opgetrommeld om te helpen.
+  Ollie weer blij
+  Alle activiteiten en het zien van de foto heeft geheugen terug gebracht.
 </p>;
 
 const C02 = <p className='paragraph'>
@@ -21,38 +24,17 @@ const C04 = <p className='paragraph'>
   Tekst deel 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 </p>;
 
-const Puzzel = () => {
-  const [answer, setAnswer] = useLocalStorage<string>('stroopwafel--answer', '');
-  const isCorrect = answer === 'weegschaal';
-  return <>
-    <h2>Puzzel</h2>
-    <p className='paragraph'>
-      Cryptische boodschap in het recept
-    </p>
-    <InputContainer>
-      <input
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value.toLowerCase().trim())}
-        className={isCorrect ? 'correct' : (answer.length > 0 ? 'incorrect' : '')}
-      />
-    </InputContainer>
-    {isCorrect && <p className='paragraph'>
-        Het antwoord!
-    </p>}
-  </>;
-};
-
-export function Stroopwafel() {
+export function Afsluiting() {
   return (
     <>
       <p className='paragraph'>
-        Tijd voor een stroopwafel!
+        Is het al voorbij?
       </p>
-      <Story shortName={'stroopwafel'} Puzzle={<Puzzel />} sections={[
-        { title: '1', animalName: 'buffalo', Component: C01 },
+      <Story shortName={'diner'} sections={[
+        { title: '1', animalName: 'walrus', Component: C01 },
         { title: '2', animalName: 'elephant', Component: C02 },
         { title: '3', animalName: 'elephant', Component: C03 },
-        { title: '4', animalName: 'buffalo', Component: C04 },
+        { title: '4', animalName: 'walrus', Component: C04 },
       ]} />
     </>
   );
