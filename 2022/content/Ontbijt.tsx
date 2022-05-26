@@ -79,7 +79,7 @@ const Puzzle = () => {
       Hoe kan dit?
     </p>
     {show01 && <p className='paragraph'>
-      Zijn zijn maar met z&apos;n drieen: een opa, zijn zoon en zijn kleinzoon.
+      Ze zijn maar met z&apos;n drieen: een opa, zijn zoon en zijn kleinzoon.
     </p>}
     <InputContainer>
       {!show01 && <button onClick={() => _setShow01(true)}>Toon antwoord</button>}

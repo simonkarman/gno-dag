@@ -7,7 +7,7 @@ const C01 = <p className='paragraph'>
   Hallo allemaal.
   Ik ben <b>Aart</b> de luiaard.
   Waar ik het meeste van houd is om niks te doen.
-  Zoals bijvoorbeeld slapen een van mijn grootste hobbies.
+  Daarom is slapen is mijn grootste hobby.
 </p>;
 
 const C02 = <p className='paragraph'>
@@ -36,7 +36,7 @@ const C04 = <p className='paragraph'>
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('dutje--answer', '');
   const isCorrect = answer === 'drie';
-  const [show01, _setShow01] = useLocalStorageBoolean('ontbijt--show01', false);
+  const [show01, _setShow01] = useLocalStorageBoolean('dutje--show01', false);
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>

@@ -22,7 +22,7 @@ const C03 = <p className='paragraph'>
   Oh wat lekker zeg!
   Ik heb er nu al zin in.
   Een olifant moet ook goed eten.
-  Wist je wel dat ik gemiddeld zo&apos;n 160 kilo voedsel moet eten.
+  Wist je wel dat ik gemiddeld zo&apos;n 160 kilo voedsel moet eten per dag.
   Daarnaast moet ik ook nog tussen de 70 en 160 liter water drinken per dag.
   Wat staat er op het menu, <b>Koo</b>?
 </p>;
@@ -32,7 +32,7 @@ const C04 = <p className='paragraph'>
   Ik heb een heerlijke lunch voor jullie gemaakt.
   Maar het is nog niet helemaal af, jullie moeten natuurlijk wel scherp blijven.
   Daarom moeten jullie zelf jullie eigen lunch afmaken.
-  Maak met de ingredienten die op tafel staan een lekkere clubsandwich!
+  Maak met de ingrediënten die op tafel staan een lekkere clubsandwich!
 </p>;
 
 const C05 = <p className='paragraph'>

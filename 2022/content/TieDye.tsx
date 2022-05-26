@@ -15,11 +15,9 @@ const colors = [
   'Teal Blue',
   'Charcoal Gray',
   'Blue Gray',
-  'Hollandaise',
   'Turquoise',
   'Chocolate',
   'Fuchsia',
-  'Pearl Grey',
   'New Black',
   'Emerald Green',
   'Khaki',
@@ -48,7 +46,7 @@ const C03 = () => {
     Als papegaai sta ik bekend om het nadoen van geluiden of woorden.
     Na-apen is natuurlijk niet echt creatief, terwijl ik dat juist wel graag ben.
     Ik geloof dat creatief bezig zijn goed voor je is.
-    En ik ben er vanovertuigd dat het jou kan helpen om je herinneringen terug te krijgen.
+    En ik ben er van overtuigd dat het jou kan helpen om je herinneringen terug te krijgen.
     Daarom gaan we &apos;Tie Dye&apos;-en!
     Dat is een speciale manier van het verfen van stof.
   </p>;
@@ -61,7 +59,7 @@ const C04 = () => {
     </p>
     <p className='paragraph'>
       <ol>
-        <li>Ingredienten verzamelen</li>
+        <li>Ingrediënten verzamelen</li>
         <li>Stof voorbereiden</li>
         <li>Stof vouwen</li>
         <li>Verfen</li>
@@ -92,7 +90,7 @@ const Puzzle = () => {
         const classNames = [];
         if (index % 2 === 0) classNames.push('bold');
         if (selection.includes(color)) classNames.push('selected');
-        return <span
+        return <li
           key={index}
           className={classNames.join(' ')}
           onClick={() => {
@@ -106,14 +104,14 @@ const Puzzle = () => {
           }}
         >
           {color.replace(' ', '-')}{' '}
-        </span>;
+        </li>;
       })}
     </p>
     <h3>Letters</h3>
     <p className='paragraph'>
       Kies de eerste letter van de vijf kleuren die je hebt gekozen.
       Is er een letter die meer dan 1x voor komt? Die letter telt dan niet mee.
-      Voeg aan de overgebleven letter de twee letters toe waarin je iets kunt opbergen.
+      Voeg aan de overgebleven letters de twee letters toe waarin je iets kunt opbergen.
       Maak van deze letters een woord wat je in de krant kunt vinden.
     </p>
     <InputContainer>
