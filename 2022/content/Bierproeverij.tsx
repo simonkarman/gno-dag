@@ -3,24 +3,39 @@ import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
-  Walvis Red
-  Geniet van het leven
-  Reis veel rond over de wereld
-  Toch het liefst naar Europe voor het lekker speciaal bier
-  Uit slovenie geimporteerd, naar de Nederlandse kust gekomen
+  Hallo allemaal!
+  Ik ben <b>Ret</b> de walvis.
+  Als walvis ben ik gek op vloeistoffen.
+  Ik vertoef daarom eigenlijk 24 uur per dag in het water.
+  Maar er is eigenlijk een vloeistof waar ik nog veel meer van houd.
+  En dat is bier!
 </p>;
 
 const C02 = <p className='paragraph'>
-  Tekst deel 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Hey <b>Ret</b> de walvis, wat is het goed om je te zien.
+  Laten we het maar niet over de vorige keer hebben toen we een biertje zijn gaan drinken.
+  Dat zwom toen nogal uit de vin.
+  Sta jij nog steeds zo vrolijk in het leven?
 </p>;
 
-const C03 = <p className='paragraph'>
-  Tekst deel 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-</p>;
-
-const C04 = <p className='paragraph'>
-  Tekst deel 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-</p>;
+const C03 = <>
+  <p className='paragraph'>
+    Zeker!
+    Mijn levensmotto is niet voor niets: &apos;genieten door te gieten&apos;.
+    Ach wat is bier toch lekker.
+    Ik reis er de hele wereld voor rond, en toch komt ik het liefste in Europa.
+    Dat komt door de variëteit aan heerlijke speciaal biertjes die jullie hier hebben.
+  </p>
+  <p className='paragraph'>
+    Vandaag ben ik speciaal voor jullie naar de Nederlandse kust gekomen.
+    Ik hoorde namelijk van <b>Ollie</b> z&apos;n probleem.
+    Hopelijk kan ik jullie helpen.
+    Ik heb namelijk een paar hele lekkere biertjes voor jullie meegenomen.
+    Maar niet te veel drinken hoor, ik heb gehoord dat je dan gaat hallucineren.
+    Geef <b>Ollie</b> maar een extra slokje.
+    Geniet ervan!
+  </p>
+</>;
 
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('bierproeverij--answer', '');
@@ -39,9 +54,11 @@ const Puzzel = () => {
       />
     </InputContainer>
     {isCorrect && <p className='paragraph'>
-        De biertjes komen uit Slovenië.
-        Ten zuiden van Slovenië ligt Kroatië.
-        De hoofdstad van Kroatië is Zagreb.
+      Ja! Dat klopt.
+      De biertjes komen uit Slovenië.
+      Ten zuiden van Slovenië ligt Kroatië.
+      En de hoofdstad van Kroatië is Zagreb.
+      Helemaal goed dus!
     </p>}
   </>;
 };
@@ -49,13 +66,14 @@ export function Bierproeverij() {
   return (
     <>
       <p className='paragraph'>
-        Tijd voor een bierproeverij!
+        Blijf maar zwemmen.
+        Blijf maar zwemmen.
+        Blijf maar zwemmen, zwemmen, zwemmen.
       </p>
       <Story shortName={'bierproeverij'} Puzzle={<Puzzel />} sections={[
-        { title: '1', animalName: 'whale', Component: C01 },
-        { title: '2', animalName: 'elephant', Component: C02 },
-        { title: '3', animalName: 'elephant', Component: C03 },
-        { title: '4', animalName: 'whale', Component: C04 },
+        { title: 'Vloeistoffen', animalName: 'whale', Component: C01 },
+        { title: 'Liep hand', animalName: 'elephant', Component: C02 },
+        { title: 'Motto', animalName: 'whale', Component: C03 },
       ]} />
     </>
   );

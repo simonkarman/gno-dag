@@ -22,7 +22,7 @@ export const activities: Activity[] = [
   { start: at(13, 30), title: 'Aart', Component: <Middagdutje/> },
   { start: at(14, 0), title: 'Wouter', Component: <Speurtocht/> },
   { start: at(15, 0), title: 'Bert', Component: <Stroopwafel/> },
-  { start: at(16, 30), title: 'Red', Component: <Bierproeverij/> },
+  { start: at(16, 30), title: 'Ret', Component: <Bierproeverij/> },
   { start: at(18, 0), title: 'Chris', Component: <Diner/> },
   { start: at(20, 0), end: at(21, 0), title: 'Bedankt', Component: <Afsluiting/> },
 ];
