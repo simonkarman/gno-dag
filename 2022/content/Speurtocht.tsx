@@ -79,14 +79,14 @@ export function Speurtocht() {
   return (
     <>
       <p className='paragraph'>
-        Tijd om die beentjes te strekken.
+        Tijd om in beweging te komen! Trek je schoenen maar aan.
       </p>
       <Story shortName={'speurtocht'} Puzzle={<Puzzel />} sections={[
         { title: 'Hoe gaat het?', animalName: 'dog', Component: C01 },
         { title: 'Zoeken nie', animalName: 'elephant', Component: C02 },
         { title: 'Roedel', animalName: 'dog', Component: C03 },
         { title: 'Onderweg', animalName: 'elephant', Component: C04 },
-        { title: 'Roedel', animalName: 'dog', Component: C05 },
+        { title: 'Let op!', animalName: 'dog', Component: C05 },
       ]} />
     </>
   );

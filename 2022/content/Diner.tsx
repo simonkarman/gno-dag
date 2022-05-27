@@ -3,6 +3,7 @@ import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
+  Chris de krokodil
   Tekst deel 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 </p>;
 

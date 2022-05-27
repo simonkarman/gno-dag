@@ -2,23 +2,40 @@ import { InputContainer } from '../components/InputContainer';
 import { Story } from '../components/Story';
 import { useLocalStorage } from '../hooks';
 
-const C01 = <p className='paragraph'>
-  Buffel Bert
-  Chefkok
-  Bourgondische leven
-  Goed vers eten is de weg om gezond te worden
-</p>;
+const C01 = <>
+  <p className='paragraph'>
+    Hallo allemaal!
+    Hopelijk hebben jullie heerlijk genoten van de wandeling.
+    Ik ben <b>Bert</b> de buffel en ik ben chefkok.
+    Ik ben zo groot omdat ik veel van proeven houd.
+  </p>
+  <p className='paragraph'>
+    Ik woon in Italie, maar ik ben special naar Nederland gekomen om jullie te helpen.
+    De beste manier waarop ik jullie kan helpen is door lekker eten met jullie te maken.
+    Vers bereid eten is namelijk de beste manier om gezond te worden.
+  </p>
+</>;
 
 const C02 = <p className='paragraph'>
-  Tekst deel 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Oh wat leuk Bert!
+  Ik heb ook al weer weer een beetje honger gekregen van het wandelen.
+  Wat gaan we dan eten?
 </p>;
 
 const C03 = <p className='paragraph'>
-  Tekst deel 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Nou, in Italie houden we erg van pizza.
+  Maar waar we stiekem nog meer van houden zijn ijsjes.
+  Een ijsje moet natuurlijk wel ergens in.
+  En waar een ijsje in zit lijkt weer erg op een Nederlandse lekkernij.
+  Weten jullie al wat het wordt?
 </p>;
 
 const C04 = <p className='paragraph'>
-  Tekst deel 4. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  We gaan zelf stroopwafels maken!
+  Lekker hea?
+  Het recept en de ingredienten liggen op tafel.
+  Ik weet zeker dat jullie daar wel uit gaan komen.
+  Veel plezier!
 </p>;
 
 const Puzzel = () => {
@@ -27,7 +44,7 @@ const Puzzel = () => {
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>
-      Cryptische boodschap in het recept
+      Lukt het jullie om uit het recept de cryptische boodschap te halen?
     </p>
     <InputContainer>
       <input
@@ -37,7 +54,8 @@ const Puzzel = () => {
       />
     </InputContainer>
     {isCorrect && <p className='paragraph'>
-        Het antwoord!
+      Het antwoord is inderdaad weegschaal!
+      Goed gedaan
     </p>}
   </>;
 };
@@ -46,13 +64,14 @@ export function Stroopwafel() {
   return (
     <>
       <p className='paragraph'>
-        Tijd voor een stroopwafel!
+        Wat zullen we nu gaan doen?
+        En wow, wat is die grote schaduw?
       </p>
       <Story shortName={'stroopwafel'} Puzzle={<Puzzel />} sections={[
-        { title: '1', animalName: 'buffalo', Component: C01 },
-        { title: '2', animalName: 'elephant', Component: C02 },
-        { title: '3', animalName: 'elephant', Component: C03 },
-        { title: '4', animalName: 'buffalo', Component: C04 },
+        { title: 'Voorstellen', animalName: 'buffalo', Component: C01 },
+        { title: 'Honger', animalName: 'elephant', Component: C02 },
+        { title: 'Verrassing', animalName: 'buffalo', Component: C03 },
+        { title: 'Stroopwafels', animalName: 'buffalo', Component: C04 },
       ]} />
     </>
   );

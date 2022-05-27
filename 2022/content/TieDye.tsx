@@ -135,7 +135,7 @@ const Puzzle = () => {
 export function TieDye() {
   return (<>
     <p className='paragraph'>
-      Het is tijd voor de tweede activiteit van de dag! We gaan langs bij de papegaai.
+      Het is tijd voor de tweede activiteit van de dag! En wie zien we daar?
     </p>
     <Story shortName='tiedye' Puzzle={<Puzzle />} sections={[
       {

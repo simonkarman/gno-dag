@@ -1,6 +1,4 @@
-import { InputContainer } from '../components/InputContainer';
 import { Story } from '../components/Story';
-import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
   Met Waldo de walrus.
