@@ -20,7 +20,8 @@ export function Puzzel() {
   return (
     <>
       <p>
-        Tijd om even lekker te gaan zitten en uit te rusten.
+        Welkom bij het leukste <b>squad</b> uit het dierenrijk!
+        Bij ons is het tijd om even lekker te gaan zitten en uit te rusten.
       </p>
       <ImgContainer>
         <AnimalImg visual={'round'} className='small' name={'snake'} />
