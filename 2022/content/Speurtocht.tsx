@@ -7,7 +7,7 @@ const C01 = <p className='paragraph'>
   Hoi allemaal! Ik ben <b>Wouter</b> de Wolf.
   Wat leuk jullie allemaal te zien.
   Hoe gaat het nu met jou <b>Ollie</b>?
-  Heb je al weer een deel van je herinnering terug?
+  Heb je al weer een deel van je geheugen terug?
 </p>;
 
 const C02 = <p className='paragraph'>

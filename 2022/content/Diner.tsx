@@ -40,7 +40,7 @@ const C04 = <p className='paragraph'>
 
 const Puzzel = () => {
   const [answer, setAnswer] = useLocalStorage<string>('diner--answer', '');
-  const isCorrect = answer.trim() === 'de garage';
+  const isCorrect = answer.trim() === 'de garage' || answer.trim() === 'degarage';
   return <>
     <h2>Puzzel</h2>
     <p className='paragraph'>

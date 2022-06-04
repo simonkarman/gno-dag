@@ -10,7 +10,7 @@ const C01 = <>
     Ik ben zo groot omdat ik veel van proeven houd.
   </p>
   <p className='paragraph'>
-    Ik woon in Italie, maar ik ben special naar Nederland gekomen om jullie te helpen.
+    Ik woon in Italië, maar ik ben speciaal naar Nederland gekomen om jullie te helpen.
     De beste manier waarop ik jullie kan helpen is door lekker eten met jullie te maken.
     Vers bereid eten is namelijk de beste manier om gezond te worden.
   </p>
@@ -18,12 +18,12 @@ const C01 = <>
 
 const C02 = <p className='paragraph'>
   Oh wat leuk Bert!
-  Ik heb ook al weer weer een beetje honger gekregen van het wandelen.
+  Ik heb ook al weer een beetje honger gekregen van het wandelen.
   Wat gaan we dan eten?
 </p>;
 
 const C03 = <p className='paragraph'>
-  Nou, in Italie houden we erg van pizza.
+  Nou, in Italië houden we erg van pizza.
   Maar waar we stiekem nog meer van houden zijn ijsjes.
   Een ijsje moet natuurlijk wel ergens in.
   En waar een ijsje in zit lijkt weer erg op een Nederlandse lekkernij.

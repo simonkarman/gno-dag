@@ -4,7 +4,7 @@ import { useLocalStorage } from '../hooks';
 
 const C01 = <p className='paragraph'>
   Hallo allemaal!
-  Ik ben <b>Ret</b> de walvis.
+  Ik ben <b>Ret</b>, Ret de walvis.
   Als walvis ben ik gek op vloeistoffen.
   Ik vertoef daarom eigenlijk 24 uur per dag in het water.
   Maar er is eigenlijk een vloeistof waar ik nog veel meer van houd.

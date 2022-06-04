@@ -16,7 +16,7 @@ const ImgContainer = styled.div`
 // antwoord: pinGuin
 export function Puzzel() {
   const [answer, setAnswer] = useLocalStorage<string>('puzzel--answer', '');
-  const isCorrect = answer === '7pinguin';
+  const isCorrect = answer === '7pinguin' || answer === '7pinguïn';
   return (
     <>
       <p>

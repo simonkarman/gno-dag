@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocalStorageBoolean, useLocalStorageInteger } from '../hooks/common/useTransformedStorage';
 import { AnimalImg, AnimalName } from './AnimalImg';
 import { InputContainer } from './InputContainer';
@@ -28,6 +28,9 @@ export function Story(props: StoryProps) {
       </div>}
     </button>
   </InputContainer>;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [isHidden]);
   return (
     <>
       {isFinished && HiddenToggle}

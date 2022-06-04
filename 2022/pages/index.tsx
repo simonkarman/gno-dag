@@ -45,9 +45,37 @@ const Landing: NextPage = () => {
     setSelectedActivityIndex(-1);
   }, [now]);
 
+  const DevelopmentMode = () => <>
+    {(useMocked && showDevelopmentMode) && (
+      <div className='paper shadow letter'>
+        <div style={{ width: '100%' }}>
+          <h1 style={{ textAlign: 'center' }}>Development Mode ⚠️</h1>
+          <div className='buttonrow'>
+            <button onClick={() => setDevTimeMode(!devTimeMode)}>
+              {`${devTimeMode ? 'dis' : 'en'}able dev time`}
+            </button>
+            <button
+              className='danger'
+              onClick={() => { window?.localStorage?.clear(); setSelectedActivityIndex(-1); }}
+            >
+              reset all
+            </button>
+          </div>
+          {devTimeMode && (<div className='buttonrow'>
+            <button onClick={() => setMockedDateTime(activities[0].start.minus({ minutes: 15 }))}>before</button>
+            <button onClick={() => setMockedDateTime(mockedDateTime.minus({ minutes: 15 }))}>-15min</button>
+            <button onClick={() => setMockedDateTime(mockedDateTime.plus({ minutes: 15 }))}>+15min</button>
+            <button onClick={() => setMockedDateTime(activities[activities.length - 1].start)}>after</button>
+          </div>)}
+        </div>
+      </div>
+    )}
+  </>;
+
   return (
     <>
       <GlobalStyle />
+      <DevelopmentMode />
       <div className='paper shadow letter'>
         <div className='page left'>
           <h1 onClick={() => setShowDevelopmentMode(!showDevelopmentMode)}>GNO Dag 2022</h1>
@@ -111,30 +139,7 @@ const Landing: NextPage = () => {
           }
         </div>
       </div>
-      {(useMocked && showDevelopmentMode) && (
-        <div className='paper shadow letter'>
-          <div style={{ width: '100%' }}>
-            <h1 style={{ textAlign: 'center' }}>Development Mode ⚠️</h1>
-            <div className='buttonrow'>
-              <button onClick={() => setDevTimeMode(!devTimeMode)}>
-                {`${devTimeMode ? 'dis' : 'en'}able dev time`}
-              </button>
-              <button
-                className='danger'
-                onClick={() => { window?.localStorage?.clear(); setSelectedActivityIndex(-1); }}
-              >
-                reset all
-              </button>
-            </div>
-            {devTimeMode && (<div className='buttonrow'>
-              <button onClick={() => setMockedDateTime(activities[0].start.minus({ minutes: 15 }))}>before</button>
-              <button onClick={() => setMockedDateTime(mockedDateTime.minus({ minutes: 15 }))}>-15min</button>
-              <button onClick={() => setMockedDateTime(mockedDateTime.plus({ minutes: 15 }))}>+15min</button>
-              <button onClick={() => setMockedDateTime(activities[activities.length - 1].start)}>after</button>
-            </div>)}
-          </div>
-        </div>
-      )}
+      <DevelopmentMode />
     </>
   );
 };
