@@ -1,5 +1,6 @@
 {
-  "name": "2023",
+  "name": "gno-dag-2023",
+  "author": "Simon Karman",
   "version": "0.1.0",
   "private": true,
   "scripts": {
