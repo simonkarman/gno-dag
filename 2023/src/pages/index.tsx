@@ -52,7 +52,7 @@ export default function Home() {
   }, []);
 
   // State
-  const [mockedDateTime, setMockedDateTime] = useState(activities[activities.length - 1].start);
+  const [mockedDateTime, setMockedDateTime] = useState(activities[activities.length - 1].end);
   const [realDateTime, setRealDateTime] = useState(DateTime.now());
   const [showDevelopmentMode, setShowDevelopmentMode] = useState(true);
   const [devTimeMode, setDevTimeMode] = useState(true);
@@ -60,7 +60,6 @@ export default function Home() {
 
   // Computed properties
   const now = (useMocked && devTimeMode) ? mockedDateTime : realDateTime;
-  const isToday = now.toFormat('yyyyMMdd') === activities[0].start.toFormat('yyyyMMdd');
   const isEarly = now < activities[0].start;
 
   // Every second; update the real date time
@@ -137,12 +136,13 @@ export default function Home() {
                 <p className="text-center mb-4">
                   Op zaterdag 6 mei vieren we GNO Dag 2023. Het is bijna zo ver, we beginnen namelijk al
                   {' '}
-                  <strong>{gnoDag2023.toRelative({base: now})}</strong>
+                  <strong>{gnoDag2023.toRelative({base: now, unit: ['days', 'hours', 'minutes', 'seconds'] })}</strong>
                   .
                 </p>
-                <p className="text-center text-sm mb-4">
-                  Let op: De dikgedrukte tijd wordt preciezer naarmate het moment dichter bij komt.
-                  Wanneer deze timer op 0 seconden staat, zorg dan dat je gedoucht aan de eettafel in Bodegraven zit.
+                <p className="text-center text-xs mb-4">
+                  Let op: De bovenstaande dikgedrukte tekst is een timer die aftelt tot het begin van GNO Dag 2023.
+                  De indicatie wordt preciezer naarmate het moment dichterbij komt.
+                  Wanneer de timer om is, zorg dan dat je gedoucht aan de eettafel in Bodegraven zit.
                 </p>
                 <p className="text-center">
                   Tot dan! Wij hebben er zin in!
