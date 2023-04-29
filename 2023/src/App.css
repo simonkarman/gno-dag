@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+.App-small-text {
+  font-size: medium;
+}
+
+.App-small-text a {
+  color: #61dafb;
+}
