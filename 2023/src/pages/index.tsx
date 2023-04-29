@@ -13,8 +13,8 @@ export default function Home() {
           Het is bijna weer zo ver! Op zaterdag 6 mei vieren we GNO Dag 2023. Kan je al raden wat het thema dit jaar gaat zijn?
         </p>
         <hr className="my-4" />
-        <div className="w-36 h-36 mx-auto mt-10 mb-4">
-          <Image src={keySvg} className="animate-spin-slow" width="100%" height="100%" />
+        <div className="w-36 h-36 mx-auto my-10">
+          <Image src={keySvg} className="animate-spin-slow" alt="a pirate like key logo that is spinning" />
         </div>
         <hr className="my-4" />
         <p className="text-center">
