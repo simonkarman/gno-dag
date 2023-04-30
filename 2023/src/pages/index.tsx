@@ -125,7 +125,7 @@ export default function Home() {
         <title>GNO Dag 2023</title>
         <meta property="og:title" content="GNO Dag 2023" key="title"/>
       </Head>
-      <div className="body-bg min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0">
+      <div className="min-h-screen pt-12 md:pt-20 pb-6 px-2 md:px-0">
         <header className="max-w-lg mx-auto">
           <h1 onClick={() => setShowDevelopmentMode(!showDevelopmentMode)} className="text-4xl font-bold text-white text-center">GNO Dag 2023</h1>
         </header>
