@@ -22,10 +22,10 @@ const at = (hour: number, minute: number) => gnoDag2023.set({ hour, minute });
 
 const activities: Activity[] = [
   { start: at(9, 0), title: 'Ontbijt', Component: <Ontbijt /> },
-  { start: at(10, 15), title: 'Aanstalte maken', Component: <p>Jas aan!</p> },
+  { start: at(10, 15), title: 'Klaar?', Component: <p>Jas aan!</p> },
   { start: at(10, 30), title: 'Reis', Component: <p>Daar gaan we! Op weg naar ...?</p> },
   { start: at(11, 30), title: 'Keukenhof', Component: <p>We zijn er!</p> },
-  { start: at(15, 15), title: 'Terug naar de auto', Component: <p>Tijd om weer naar de auto te gaan!</p> },
+  { start: at(15, 15), title: 'Heg', Component: <p>Tijd om weer naar de auto te gaan!</p> },
   { start: at(15, 30), title: 'Tochtje', Component: <p>En nu gaan we naar ...?</p> },
   { start: at(15, 45), title: 'Smederij', Component: <p>We zijn er!</p> },
   { start: at(18, 30), title: 'Bier', Component: <p>Is het gelukt? En smaakte het bier?</p> },
@@ -72,7 +72,7 @@ export default function Home() {
 
   const DevelopmentMode = () => <>
     {(useMocked && showDevelopmentMode) && (
-      <div className="bg-white max-w-lg mx-auto px-8 py-4 my-10 rounded-lg shadow-2xl">
+      <div className="bg-white max-w-lg mx-auto px-6 py-4 my-10 rounded-lg shadow-2xl text-xs">
         <h1 className="font-bold text-center text-xl">Development Mode ⚠️</h1>
         <hr className="mt-2 mb-4"/>
         <div className='flex gap-4 mb-4'>
