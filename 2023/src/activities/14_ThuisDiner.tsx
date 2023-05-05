@@ -6,7 +6,9 @@ import Image from 'next/image';
 export function ThuisDiner() {
   return <div>
     <p className="mb-4">
-      Is de kist weer gevuld? Wat fijn dat het er weer mooi uit ziet. Nu maar hopen dan Fohne en Kuek niet meer langs komen.
+      Is de kist weer goed gevuld? Wat fijn dat het er weer mooi uit ziet.
+      {' '}<strong>Fohne</strong> en <strong>Kuek</strong> zien we hopelijk niet meer terug!
+      Ook al kunnen ze onze echte rijkdom gelukkig nooit stelen.
     </p>
     <div className="px-4 mb-4 flex justify-between">
       <Image src={parrot} width="64" alt="parrot" />

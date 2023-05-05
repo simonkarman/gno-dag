@@ -13,7 +13,7 @@ export function KeukenhofLunch() {
   const [showAnswerOf, setShowAnswerOf] = useState(-1);
   return <div>
     <p className="mb-4">
-      Hoe bevalt het? Is de reis een beetje te doen? Vergeet niet om goed te drinken en neem de tijd om de lunch die jullie meegenomen op te eten.
+      Hoe bevalt het? Is de reis een beetje te doen? Vergeet niet om goed te drinken en neem de tijd om de lunch die jullie hebben meegenomen op te eten.
       We moeten scherp blijven!
     </p>
     <div className="px-4 mb-4 flex justify-between">

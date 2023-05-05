@@ -5,7 +5,7 @@ export function KeukenhofAankomst() {
   return <div>
     <p className="mb-4">
       We zijn er! Welkom bij de Keukenhof.
-      Ondanks dat de schat gestolen is door <strong>Fohne</strong> en <strong>Kuek</strong> (draai de namen eens om!), kunnen we hier
+      Ondanks dat de schat gestolen is door <strong>Fohne</strong> en <strong>Kuek</strong>, kunnen we hier
       op zoek naar een heleboel insipratie om de schat te kunnen herstellen.
     </p>
     <div className="px-4 mb-4 flex justify-between">

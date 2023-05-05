@@ -15,7 +15,7 @@ export function ThuisVerhaal() {
       Maar dat betekent dat piraat <strong>Fohne</strong> ook in de buurt moet zijn...? Oh, nee!
     </p>
     <p className="mb-4">
-      Fohne is de gevaarlijkste en meest beruchte piraat van het land. Als hij in de buurt is is het altijd oppassen geblazen.
+      Fohne is de gevaarlijkste en meest beruchte piraat van het land. Als hij in de buurt is, is het altijd oppassen geblazen.
       Maar waarom vandaag? En waarom hier?
     </p>
     <p className="mb-4">

@@ -6,7 +6,7 @@ import parrotSvg from '../assets/parrot.svg';
 export function ThuisOntbijt() {
   return <div>
     <p className="mb-4">
-      Goede morgen! Welkom aan de start van GNO Dag 2023! Het beloofd weer een spannend avondtuur te worden.
+      Goedemorgen! Welkom aan de start van GNO Dag 2023! Het belooft weer een spannend avondtuur te worden.
     </p>
     <div className="px-4 mb-4 flex justify-between">
       <Image src={scrollSvg} width="64" alt="scroll" />
@@ -14,7 +14,7 @@ export function ThuisOntbijt() {
       <Image src={parrotSvg} width="64" alt="parrot" />
     </div>
     <p className="mb-4">
-      In dit activiteiten overzicht kan je precies zijn waar we nu mee bezig zijn.
+      In dit activiteitenoverzicht kan je precies zijn waar we nu mee bezig zijn.
       Je kan ook zien hoe laat de volgende melding zichtbaar wordt!
       Houd dit gedurende de dag goed in de gaten!
     </p>
