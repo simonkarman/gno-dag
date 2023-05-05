@@ -31,7 +31,7 @@ interface Activity {
   Component: JSX.Element;
 }
 
-const gnoDag2023 = DateTime.fromISO('2023-05-05T09:00:00.000');
+const gnoDag2023 = DateTime.fromISO('2023-05-06T09:00:00.000');
 const at = (hour: number, minute: number) => gnoDag2023.set({ hour, minute });
 
 const activities: Activity[] = [
