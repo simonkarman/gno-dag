@@ -1,3 +1,18 @@
+import {ThuisOntbijt} from '@/activities/01_ThuisOntbijt';
+import {ThuisVerhaal} from '@/activities/02_ThuisVerhaal';
+import {ThuisTandenpoetsen} from '@/activities/03_ThuisTandenpoetsen';
+import {Heenreis} from '@/activities/04_Heenreis';
+import {HeenreisPuzzel} from '@/activities/05_HeenreisPuzzel';
+import {KeukenhofAankomst} from '@/activities/06_KeukenhofAankomst';
+import {KeukenhofOpdrachten} from '@/activities/07_KeukenhofOpdrachten';
+import {KeukenhofLunch} from '@/activities/08_KeukenhofLunch';
+import {KeukenhofUitgangZoeken} from '@/activities/09_KeukenhofUitgangZoeken';
+import {Terugreis} from '@/activities/10_Terugreis';
+import {ThuisAankomst} from '@/activities/11_ThuisAankomst';
+import {ThuisRaadsels} from '@/activities/12_ThuisRaadsels';
+import {ThuisKnutselen} from '@/activities/13_ThuisKnutselen';
+import {ThuisDiner} from '@/activities/14_ThuisDiner';
+import {ThuisEinde} from '@/activities/15_ThuisEinde';
 import Head from 'next/head';
 import {useEffect, useState} from 'react';
 import { DateTime, Settings } from 'luxon';
@@ -6,7 +21,6 @@ import scrollSvg from '../assets/scroll.svg';
 import rumSvg from '../assets/rum.svg';
 import parrotSvg from '../assets/parrot.svg';
 import Image from 'next/image';
-import { Ontbijt } from '@/activities/Ontbijt'
 
 Settings.defaultLocale = 'nl';
 
@@ -17,20 +31,25 @@ interface Activity {
   Component: JSX.Element;
 }
 
-const gnoDag2023 = DateTime.fromISO('2023-05-06T09:00:00.000');
+const gnoDag2023 = DateTime.fromISO('2023-05-05T09:00:00.000');
 const at = (hour: number, minute: number) => gnoDag2023.set({ hour, minute });
 
 const activities: Activity[] = [
-  { start: at(9, 0), title: 'Ontbijt', Component: <Ontbijt /> },
-  { start: at(10, 15), title: 'Klaar?', Component: <p>Jas aan!</p> },
-  { start: at(10, 30), title: 'Reis', Component: <p>Daar gaan we! Op weg naar ...?</p> },
-  { start: at(11, 30), title: 'Keukenhof', Component: <p>We zijn er!</p> },
-  { start: at(15, 15), title: 'Heg', Component: <p>Tijd om weer naar de auto te gaan!</p> },
-  { start: at(15, 30), title: 'Tochtje', Component: <p>En nu gaan we naar ...?</p> },
-  { start: at(15, 45), title: 'Smederij', Component: <p>We zijn er!</p> },
-  { start: at(18, 30), title: 'Bier', Component: <p>Is het gelukt? En smaakte het bier?</p> },
-  { start: at(18, 45), title: 'Terugreis', Component: <p>Op weg naar ... huis!</p> },
-  { start: at(19, 30), title: 'Diner', Component: <p>En dan het wel verdiende avond eten. Smakelijk!</p> },
+  { start: at(9, 0), title: 'Ontbijt', Component: <ThuisOntbijt /> },
+  { start: at(9, 15), title: 'Spanning stijgt', Component: <ThuisVerhaal /> },
+  { start: at(10, 10), title: 'Oh nee!', Component: <ThuisTandenpoetsen /> },
+  { start: at(10, 30), title: 'Erachteraan', Component: <Heenreis /> },
+  { start: at(10, 40), title: 'Heg', Component: <HeenreisPuzzel /> },
+  { start: at(11, 30), title: 'Aankomst', Component: <KeukenhofAankomst /> },
+  { start: at(11, 45), title: 'Inspiratie', Component: <KeukenhofOpdrachten /> },
+  { start: at(13, 30), title: 'Lunch', Component: <KeukenhofLunch /> },
+  { start: at(15, 0), title: 'Uitgang', Component: <KeukenhofUitgangZoeken /> },
+  { start: at(15, 15), title: 'Reis', Component: <Terugreis /> },
+  { start: at(16, 15), title: 'Thuis', Component: <ThuisAankomst /> },
+  { start: at(16, 30), title: 'Raadsels', Component: <ThuisRaadsels /> },
+  { start: at(16, 40), title: 'Knutselen', Component: <ThuisKnutselen /> },
+  { start: at(19, 15), title: 'Diner', Component: <ThuisDiner /> },
+  { start: at(20, 30), title: 'Einde', Component: <ThuisEinde /> },
 ].map((activity, index, arr) => {
   const isLast = index === arr.length - 1;
   return {
@@ -39,7 +58,7 @@ const activities: Activity[] = [
   };
 });
 
-const useMocked = process.env.NODE_ENV === 'development' || DateTime.now() > DateTime.fromISO('2023-05-06T22:00:00.000');
+const useMocked = process.env.NODE_ENV === 'development' || DateTime.now() > gnoDag2023.set({ hour: 22, minute: 0 });
 export default function Home() {
   // Preview SVG
   const previewSVG = useMemo(() => {
@@ -130,7 +149,7 @@ export default function Home() {
           <h1 onClick={() => setShowDevelopmentMode(!showDevelopmentMode)} className="text-4xl font-bold text-white text-center">GNO Dag 2023</h1>
         </header>
         <DevelopmentMode />
-        <main className="bg-white max-w-lg mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl">
+        <main className="bg-white max-w-lg mx-auto py-4 px-3 md:p-8 my-10 rounded-lg shadow-2xl">
           {isEarly
             ? <>
                 <p className="text-center mb-4">
@@ -163,37 +182,39 @@ export default function Home() {
               </>
             : <>
               <div className='flex justify-between items-end'>
-                <h1>Activiteiten</h1>
+                <h1 className="font-bold">Activiteiten</h1>
                 <div className='flex-0 bg-blue-100 text-blue-800 font-medium px-4 py-1 rounded-full'>
                   Klok: {now.toFormat('HH:mm:ss')}
                 </div>
               </div>
               <hr className='my-4'/>
-              {activities.filter(activity => activity.start <= now).reverse().map((activity, index) => {
+              {activities.filter(activity => activity.start <= now).map((activity, index) => {
                 const isNow = now < activity.end;
                 const isOpen = isNow || forceActive[index];
                 return (
-                  <>
+                  <div
+                    key={activity.start.toISO()}
+                    className={`${isNow ? 'border-2 border-green-500 border-solid' : 'border-2 border-gray border-striped'} px-3 py-2 rounded-lg mt-2`}
+                  >
                     <div
-                      key={activity.start.toISO()}
-                      className={`${isNow ? 'bg-green-200' : ''} px-4 py-3 rounded-lg border my-2`}
+                      className='flex justify-between items-center'
                       onClick={() => {
                         const newForceActive = [...forceActive];
                         newForceActive[index] = !newForceActive[index]
                         setForceActive(newForceActive);
                       }}
                     >
-                      <div className='flex justify-between items-start'>
-                        <h1 className={`${isNow ? 'font-bold' : 'text-gray-700'} text-2xl`}>{activity.title}</h1>
-                        <p
-                          className='flex-0 bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full'
-                        >{activity.start.toFormat('HH:mm')} - {activity.end.toFormat('HH:mm')}</p>
-                      </div>
-                      {isOpen && activity.Component}
+                      <h1 className={`${isNow ? 'text-green-500' : 'text-gray-700'} font-bold text-xl`}>{activity.title}</h1>
+                      <p
+                        className='flex-0 bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full'
+                      >{activity.start.toFormat('HH:mm')} - {activity.end.toFormat('HH:mm')}</p>
                     </div>
-                  </>
+                    {isOpen && <><hr className='my-1'/><div className="mt-2 text-justify">
+                      {activity.Component}
+                    </div></>}
+                  </div>
                 );
-                })}
+                }).reverse()}
             </>
           }
         </main>
