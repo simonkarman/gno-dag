@@ -15,7 +15,7 @@ import {ThuisDiner} from '@/activities/14_ThuisDiner';
 import {ThuisEinde} from '@/activities/15_ThuisEinde';
 import Head from 'next/head';
 import {useEffect, useState} from 'react';
-import { DateTime, Settings } from 'luxon';
+import {DateTime, Settings, ToRelativeUnit} from 'luxon';
 import {useMemo} from 'react';
 import scrollSvg from '../assets/scroll.svg';
 import rumSvg from '../assets/rum.svg';
@@ -80,6 +80,10 @@ export default function Home() {
   // Computed properties
   const now = (useMocked && devTimeMode) ? mockedDateTime : realDateTime;
   const isEarly = now < activities[0].start;
+  const isWithin12Hours = now > gnoDag2023.minus({ hour: 12 });
+  const relativeTimeLeftUnits: ToRelativeUnit[] = isWithin12Hours
+    ? ['minutes', 'seconds']
+    : ['days', 'hours', 'minutes', 'seconds'];
 
   // Every second; update the real date time
   useEffect(() => {
@@ -155,7 +159,7 @@ export default function Home() {
                 <p className="text-center mb-4">
                   Op zaterdag 6 mei vieren we GNO Dag 2023. Het is bijna zo ver, we beginnen namelijk al
                   {' '}
-                  <strong>{gnoDag2023.toRelative({base: now, unit: ['days', 'hours', 'minutes', 'seconds'] })}</strong>
+                  <strong>{gnoDag2023.toRelative({base: now, unit: relativeTimeLeftUnits })}</strong>
                   .
                 </p>
                 <p className="text-center text-xs mb-4">
