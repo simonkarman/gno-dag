@@ -27,9 +27,9 @@ export default function Home() {
           in Bodegraven.
         </p>
       </main>
-      <footer className="flex-grow-0 text-green-600 text-center">
-        <a href={'https://gno-2023.karman.dev'}>GNO Dag 2023</a> | <a href={'https://gno-2022.karman.dev'}>GNO Dag 2022</a> | <a href={'https://gno-2021.karman.dev'}>GNO Dag 2021</a><br/>
-        Georganiseerd door: Simon Karman & Marjolein Karman<br/>
+      <footer className="flex-grow-0 text-green-700 text-xs text-center">
+        <a className='underline' href={'https://gno-2023.karman.dev'}>GNO Dag 2023</a> | <a className='underline' href={'https://gno-2022.karman.dev'}>GNO Dag 2022</a> | <a className='underline' href={'https://gno-2021.karman.dev'}>GNO Dag 2021</a><br/>
+        Georganiseerd door: <a href='https://www.simonkarman.nl'>Simon Karman</a> & Marjolein Karman<br/>
       </footer>
     </div>
   );
