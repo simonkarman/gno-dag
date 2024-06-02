@@ -13,7 +13,7 @@ export default function Home() {
     return () => clearInterval(interval);
   });
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between bg-green-500">
+    <div className="flex h-[100svh] flex-col items-center justify-between bg-green-500">
       <main
         className={'flex-grow flex flex-col items-center justify-center gap-8 md:gap-12 p-8 md:p-24'}
       >
