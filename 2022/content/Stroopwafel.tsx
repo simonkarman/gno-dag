@@ -13,7 +13,7 @@ const C01 = <>
     Ik woon in Italië, maar ik ben speciaal naar Nederland gekomen om jullie te helpen.
     De beste manier waarop ik jullie kan helpen is door lekker eten met jullie te maken.
     Vers bereid eten is namelijk de beste manier om gezond te worden.
-  </p>
+  </p>-r
 </>;
 
 const C02 = <p className='paragraph'>
