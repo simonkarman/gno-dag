@@ -32,7 +32,7 @@ export default function Home() {
         </h1>
         {content}
       </main>
-      <footer className="flex-grow-0 text-green-700 text-xs text-center">
+      <footer className="flex-grow-0 text-green-700 text-xs text-center pb-0.5">
         <a className='underline' href={'https://gno-2023.karman.dev'}>GNO Dag 2023</a> | <a className='underline'
                                                                                             href={'https://gno-2022.karman.dev'}>GNO Dag 2022</a> | <a
         className='underline' href={'https://gno-2021.karman.dev'}>GNO Dag 2021</a><br/>
