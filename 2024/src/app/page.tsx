@@ -27,7 +27,7 @@ export default function Home() {
       <main
         className={'flex-grow flex flex-col items-center justify-center gap-8 md:gap-12 p-8 md:p-24'}
       >
-        <h1 className="text-center text-green-300 font-bold text-4xl">
+        <h1 className="text-center text-green-300 font-bold text-5xl">
           GNO Dag 2024
         </h1>
         {content}
@@ -43,15 +43,22 @@ export default function Home() {
 }
 
 const items = [
-  { start: '09:00', end: '10:00', title: 'Thuis ontbijt' },
-  { start: '10:00', end: '11:00', title: 'Reizen' },
+  { start: '09:00', end: '10:00', title: 'Ontbijt' },
+  { start: '10:00', end: '11:00', title: '🚗 🛻' },
   { start: '11:00', end: '13:15', title: 'Mini Golf Lage Vuursche' },
-  { start: '13:30', end: '14:30', title: 'Lunchen in het bos' },
-  { start: '14:30', end: '15:30', title: 'Reizen' },
+  { start: '13:15', end: '14:30', title: 'Lunchen in het bos' },
+  { start: '14:30', end: '15:30', title: '🛻 🚗' },
   { start: '15:30', end: '16:30', title: 'Rusten' },
-  { start: '16:30', end: '18:30', title: 'Zelf pasta maken' },
-  { start: '18:00', end: '21:00', title: 'Avondeten' },
-]
+  { start: '16:30', end: '18:30', title: 'Kookworkshop Ravioli' },
+  { start: '18:30', end: '21:00', title: 'Avondeten' },
+];
+
+const isNowLaterThan = (time: string) => {
+  const now = DateTime.now().setZone('Europe/Amsterdam');
+  const [hours, minutes] = time.split(':').map(Number);
+  const then = now.set({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
+  return now > then;
+}
 
 const Programma = () => {
   return <div>
@@ -59,12 +66,23 @@ const Programma = () => {
       Programma!
     </p>
     <ul className='flex flex-col gap-2'>
-      {items.map((item, index) => (
-        <li key={index} className='flex items-center gap-4'>
-          <p className='text-center text-green-100 font-bold tracking-tight px-2 py-1 w-36 bg-green-600 rounded'>{item.start} - {item.end}</p>
-          <p className='text-center text-white text-xl font-bold'>{item.title}</p>
-        </li>
-      ))}
+      {items.map((item, index) => {
+        const show = isNowLaterThan(item.start);
+        return (
+          <li key={index} className="flex items-center gap-4">
+            <p
+              className={`text-center font-bold tracking-tight px-2 py-1 w-32 rounded-xl ${show ? 'bg-green-600 text-green-100' : 'bg-green-300 text-green-500'}`}
+            >
+              {item.start} - {item.end}
+            </p>
+            <p
+              className={`text-center text-xl font-bold ${show ? 'text-white' : 'text-green-300'}`}
+            >
+              {show ? item.title : '???'}
+            </p>
+          </li>
+        );
+      })}
     </ul>
   </div>
 }
