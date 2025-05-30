@@ -4,6 +4,7 @@ import { createServer as createHttpServer } from 'http';
 import { createServer } from '@krmx/server';
 import { enableUnlinkedKicker} from './unlinked-kicker';
 import { LogSeverity } from '@krmx/base/dist/src/log';
+import { setInterval } from 'node:timers';
 
 // get version from package.json
 const version = require('../package.json').version;
@@ -48,12 +49,39 @@ interface Controller {
   y: number;
 }
 
+interface Activation {
+  identifier: string;
+  when: string;
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  color: string;
+}
+
 class World {
   private readonly controllers: Record<string, Controller> = {};
 
   constructor(
     public readonly worldSize: number,
+    private readonly activations: Activation[],
   ) {}
+
+  getActiveActivations() {
+    const now = new Date();
+    return this.activations.filter(activation => {
+      const activationDate = new Date(activation.when);
+      return activationDate <= now;
+    });
+  }
+
+  updateActivations() {
+    const activeActivations = this.getActiveActivations();
+    this.broadcastToAllDisplays({
+      type: 'activations',
+      payload: activeActivations,
+    });
+  }
 
   getControllers() {
     return structuredClone(this.controllers);
@@ -74,10 +102,21 @@ class World {
       delete this.controllers[controllerId];
       this.broadcastToAllDisplays({
         type: 'delete',
-        data: controllerId,
+        payload: controllerId,
       });
       this.logControllers();
     }
+  }
+
+  getInsideActivations(controllerId: string) {
+    const controller = this.controllers[controllerId];
+    if (!controller) {
+      return [];
+    }
+    return this.getActiveActivations().filter(activation => {
+      return controller.x >= activation.xMin && controller.x <= activation.xMax &&
+             controller.y >= activation.yMin && controller.y <= activation.yMax;
+    });
   }
 
   private logControllers = () => {
@@ -105,6 +144,11 @@ class World {
       }
       this.clampControllerPosition(controllerId);
       this.forwardLocation(controllerId);
+      const insideActivations = this.getInsideActivations(controllerId);
+      server.send(`c/${controllerId}`, {
+        type: 'activations',
+        payload: insideActivations,
+      });
     }
   }
 
@@ -121,7 +165,7 @@ class World {
     if (controller) {
       this.broadcastToAllDisplays({
         type: 'location',
-        data: {
+        payload: {
           controllerId,
           x: controller.x,
           y: controller.y,
@@ -130,7 +174,7 @@ class World {
     }
   }
 
-  broadcastToAllDisplays(message: { type: string, data: unknown }) {
+  broadcastToAllDisplays(message: { type: string, payload: unknown }) {
     server.getUsers()
       .filter(u => u.username.startsWith('d/') && u.isLinked)
       .map(u => u.username)
@@ -140,7 +184,10 @@ class World {
   }
 }
 
-const world = new World(11);
+const world = new World(13, [
+  { identifier: 'vroeg', when: '2025-01-01T00:00:00Z', xMin: 8, xMax: 10, yMin: 1, yMax: 3, color: 'rgba(25, 172, 0, 0.1)' },
+  { identifier: 'niks', when: '2025-05-01T00:00:00Z', xMin: 1, xMax: 2, yMin: 6, yMax: 6, color: 'rgba(173, 23, 236, 0.1)' },
+]);
 
 
 server.on('join', (username) => {
@@ -160,11 +207,19 @@ server.on('link', (username) => {
     console.info(`[info] [gno-2025] display ${id} linked`);
     server.send(username, {
       type: 'init',
-      data: {
+      payload: {
         worldSize: world.worldSize,
         controllers: world.getControllers(),
+        activations: world.getActiveActivations(),
       },
     })
+  } else {
+    console.info(`[info] [gno-2025] controller ${id} linked`);
+    const insideActivations = world.getInsideActivations(id);
+    server.send(username, {
+      type: 'activations',
+      payload: insideActivations,
+    });
   }
 })
 
@@ -187,5 +242,9 @@ server.on('message', (username, message) => {
     console.warn(`[warn] [gno-2025] ${username} sent unknown ${message.type} message`);
   }
 });
+
+setInterval(() => {
+  world.updateActivations();
+}, 1000 * 5); // Update activations every five seconds
 
 server.listen(8082);

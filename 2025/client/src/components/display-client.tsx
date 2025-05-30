@@ -1,41 +1,49 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { createClient, createStore } from '@krmx/client-react';
 import { randomDigits } from '@/utils/random-digits';
 import { Display } from '@/components/display';
+import { Activation } from '@/components/activation';
 
 type DisplayStoreState = {
   worldSize: number;
   controllers: Record<string, undefined | { x: number, y: number }>;
+  activations: Activation[];
 }
 
 export const { client: displayClient, useClient: useDisplayClient } = createClient();
 export const useDisplayStore = createStore(
   displayClient,
-  { worldSize: 1, controllers: {} } as DisplayStoreState,
+  { worldSize: 1, controllers: {}, activations: [] } satisfies DisplayStoreState as DisplayStoreState,
   (state, action) => {
     switch (action.type) {
       case 'init':
-        const initAction = action as { type: 'init', data: DisplayStoreState };
-        return initAction.data
+        const initAction = action as { type: 'init', payload: DisplayStoreState };
+        return initAction.payload
       case 'location':
-        const locationAction = action as { type: 'location', data: { controllerId: string, x: number, y: number } };
+        const locationAction = action as { type: 'location', payload: { controllerId: string, x: number, y: number } };
         return {
           ...state,
           controllers: {
             ...state.controllers,
-            [locationAction.data.controllerId]: {
-              x: locationAction.data.x,
-              y: locationAction.data.y,
+            [locationAction.payload.controllerId]: {
+              x: locationAction.payload.x,
+              y: locationAction.payload.y,
             },
           }
         };
       case 'delete':
-        const deleteAction = action as { type: 'delete', data: string };
+        const deleteAction = action as { type: 'delete', payload: string };
         const newState = { ...state };
-        delete newState.controllers[deleteAction.data];
+        delete newState.controllers[deleteAction.payload];
         return newState;
+      case 'activations':
+        const activationsAction = action as { type: 'activations', payload: Activation[] };
+        return {
+          ...state,
+          activations: activationsAction.payload,
+        };
       default:
         return state;
     }

@@ -8,10 +8,22 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
     <div className="p-3 space-y-4">
       <h1 className="text-4xl font-bold drop-shadow">GNO Dag 2025</h1>
       <p><b>Open deze pagina op een groot scherm!</b> Scan daarna de QR code met je mobiel om deel te nemen.</p>
-      <svg viewBox={`-0.5 -0.5 ${data.worldSize} ${data.worldSize}`}
-           className="w-[640px] h-[640px] bg-white rounded-lg shadow-lg border border-zinc-500 p-2"
+      <svg viewBox={`-0.6 -0.6 ${data.worldSize + 0.2} ${data.worldSize + 0.2}`}
+           className="w-[740px] h-[740px] bg-white rounded-lg shadow-lg border border-zinc-500 p-2"
       >
         <g transform='translate(-0.5, -0.5)'>
+          {data.activations.map(activation => (
+            <g key={activation.identifier}>
+              <rect
+                x={activation.xMin}
+                y={activation.yMin}
+                width={activation.xMax - activation.xMin + 1}
+                height={activation.yMax - activation.yMin + 1}
+                className="stroke-[0.05]"
+                fill={activation.color || 'rgba(255, 0, 0, 0.1)'}
+              />
+            </g>
+          ))}
           {Array.from({ length: data.worldSize + 1 }, (_, i) => (<g key={'g' + i}>
             <line
               x1={i}

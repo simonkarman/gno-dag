@@ -1,8 +1,26 @@
 import { useEffect, useState } from 'react';
-import { createClient } from '@krmx/client-react';
+import { createClient, createStore } from '@krmx/client-react';
 import { Controller } from '@/components/controller';
+import { Activation } from '@/components/activation';
 
 export const { client: controllerClient, useClient: useControllerClient } = createClient();
+export const useControllerStore = createStore(
+  controllerClient,
+  { activations: [] } as { activations: Activation[] },
+  (state, action) => {
+    switch (action.type) {
+      case 'activations':
+        const activationsAction = action as { type: 'activations', payload: Activation[] };
+        return {
+          ...state,
+          activations: activationsAction.payload,
+        }
+      default:
+        return state;
+    }
+  },
+  (s) => s,
+)
 
 const useLocalState = (key: string, initialValue: string) => {
   const [value, setValue] = useState(() => {

@@ -5,7 +5,7 @@ export function DisplayControllers() {
   const { users } = useDisplayClient();
   const controllers = users.filter(u => u.username.startsWith('c/'));
   if (controllers.length === 0) {
-    return <p>Er is hier op dit moment niemand</p>;
+    return <p>Er is hier op dit moment niemand.</p>;
   }
   return <>
     <div className='my-4 flex flex-wrap gap-2'>
