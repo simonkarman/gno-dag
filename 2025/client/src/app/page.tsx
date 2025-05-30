@@ -6,9 +6,7 @@ import { DisplayClient } from '@/components/display-client';
 import { ControllerClient } from '@/components/controller-client';
 
 function EnsureLargeScreen({ width, children }: { width: number, children: React.ReactNode }) {
-  const [windowWidth, setWindowWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : width + 1
-  );
+  const [windowWidth, setWindowWidth] = useState<number>(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

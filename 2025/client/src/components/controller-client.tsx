@@ -26,6 +26,7 @@ const useLocalState = (key: string, initialValue: string) => {
 export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, displayId: string }) {
   const { status } = useControllerClient();
   const [username, setUsername] = useLocalState('username', '');
+  const [failureReason, setFailureReason] = useState('');
   const isValidUsername = ['Govie', 'Jac.', 'Simon', 'Lisa', 'Marjolein', 'Tim'].includes(username);
   const showError = !isValidUsername && username.length >= 2;
   const [clickedToLink, setClickedToLink] = useState<boolean>(false);
@@ -42,14 +43,17 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
   }, [status, clickedToLink, serverUrl]);
 
   if (status === 'connected') {
-    return <div className='flex flex-col items-center gap-2 mt-8'>
+    return <div className='flex flex-col items-center text-center gap-2 mt-8'>
       <h1 className='font-bold text-2xl'>Hoi!</h1>
       <p>Je gaat nu verbinding maken met de GNO 2025 server.</p>
       <p>Wat is je naam?</p>
       <form action={() => {
         setClickedToLink(true);
         controllerClient.link('c/' + username)
-          .catch((e: Error) => console.error('error linking:', e.message));
+          .catch((e: Error) => {
+            console.error('error linking:', e.message)
+            setFailureReason(e.message)
+          });
       }}>
         <input
           className={`bg-white border p-1 rounded-l ${showError ? 'border-red-500' : ''}`}
@@ -76,7 +80,10 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
     return <Controller username={username} displayId={displayId} />;
   }
   if (status === 'closed') {
-    return <p className='p-2'>Display closed</p>;
+    return <>
+      <p className='p-4 text-center'>Oops, er ging iets mis. Ververs de pagina!</p>
+      <pre className='text-center text-sm bg-red-100 border-y py-2'>{failureReason}</pre>
+    </>;
   }
-  return <p className='p-2'>Connecting to {displayId} as {username}...</p>;
+  return <p className='p-4 text-center'>Connecting to {displayId} as {username}...</p>;
 }
