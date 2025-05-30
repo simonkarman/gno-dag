@@ -81,6 +81,11 @@ class World {
       type: 'activations',
       payload: activeActivations,
     });
+
+    // Trigger a location update for each controller
+    for (const controllerId in this.controllers) {
+      this.moveController(controllerId, 'none');
+    }
   }
 
   getControllers() {
@@ -145,6 +150,9 @@ class World {
       this.clampControllerPosition(controllerId);
       this.forwardLocation(controllerId);
       const insideActivations = this.getInsideActivations(controllerId);
+      if (insideActivations.length > 0) {
+        console.info(`[info] [gno-2025] ${controllerId} is now inside of activation(s): ${insideActivations.map(a => a.identifier).join(', ')}`);
+      }
       server.send(`c/${controllerId}`, {
         type: 'activations',
         payload: insideActivations,
