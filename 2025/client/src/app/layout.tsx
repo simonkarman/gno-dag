@@ -37,9 +37,9 @@ export default function RootLayout({
           </Suspense>
         </div>
         <footer className="mb-1 flex items-center gap-2 px-3 py-1">
-          <p className="text-center text-xs text-slate-800">
+          <p className="text-center text-xs text-zinc-800">
             <span className="">Build with</span>{' '}
-            <a href="https://github.com/simonkarman/krmx" className="font-semibold text-slate-900 hover:underline">Krmx</a>
+            <a href="https://github.com/simonkarman/krmx" className="font-semibold text-zinc-900 hover:underline">Krmx</a>
             {' '}by{' '}
             <a href="https://www.simonkarman.nl" className="text-green-900 hover:underline">simonkarman</a>
           </p>

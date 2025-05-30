@@ -8,15 +8,14 @@ export function DisplayControllers() {
     return <p>Er is hier op dit moment niemand</p>;
   }
   return <>
-    <p>Controllers</p>
-    <div className='flex flex-wrap gap-2'>
+    <div className='my-4 flex flex-wrap gap-2'>
       {controllers.map((user) => <div
-        className={`flex gap-2 px-2 py-0.5 border rounded ${user.isLinked ? 'bg-green-200' : 'bg-red-200 opacity-50'}`}
+        className={`flex gap-2 px-2 py-0.5 border rounded ${user.isLinked ? 'bg-green-600' : 'bg-red-600 opacity-75'}`}
         key={user.username}
       >
-        <p>
+        <p className='font-bold text-white'>
           {capitalize(user.username.replace('c/', ''))}
-          <span className='text-sm align-middle'>{user.isLinked ? ' 🟢' : ' 🔴'}</span>
+          <span className='ml-1 text-sm align-middle'>{user.isLinked ? ' 🟢' : ' 🔴'}</span>
         </p>
       </div>)}
     </div>

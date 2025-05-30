@@ -5,10 +5,12 @@ import { DisplayInformation, useDisplayStore } from '@/components/display-client
 export function Display({ displayInformation }: { displayInformation: DisplayInformation }) {
   const data = useDisplayStore();
   return <>
-    <div className="p-3 space-y-2 max-w-[480px]">
+    <div className="p-3 space-y-4">
       <h1 className="text-4xl font-bold drop-shadow">GNO Dag 2025</h1>
-      <p><b>Open deze pagina op een groot scherm!</b> Scan daarna de QR code me je mobile om deel te nemen.</p>
-      <svg viewBox={`-1 -1 ${data.worldSize + 1} ${data.worldSize + 1}`} className="w-[480px] h-[480px] bg-white rounded-lg shadow-lg">
+      <p><b>Open deze pagina op een groot scherm!</b> Scan daarna de QR code met je mobiel om deel te nemen.</p>
+      <svg viewBox={`-0.5 -0.5 ${data.worldSize} ${data.worldSize}`}
+           className="w-[640px] h-[640px] bg-white rounded-lg shadow-lg border border-zinc-500 p-2"
+      >
         <g transform='translate(-0.5, -0.5)'>
           {Array.from({ length: data.worldSize + 1 }, (_, i) => (<g key={'g' + i}>
             <line
@@ -16,14 +18,14 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
               y1={0}
               x2={i}
               y2={data.worldSize}
-              className="stroke-gray-200 stroke-[0.05]"
+              className="stroke-zinc-200 stroke-[0.05]"
             />
             <line
               x1={0}
               y1={i}
               x2={data.worldSize}
               y2={i}
-              className="stroke-gray-200 stroke-[0.05]"
+              className="stroke-zinc-200 stroke-[0.05]"
             />
           </g>))}
         </g>
@@ -34,10 +36,10 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
               cx={location?.x}
               cy={location?.y}
               r={0.4}
-              className="fill-blue-500 stroke-black stroke-[0.08]"
+              className="fill-green-500 stroke-black stroke-[0.04] hover:fill-green-600 active:fill-green-700"
             />
-            <g transform={`translate(${location?.x} ${location?.y}) scale(0.02)`}>
-              <text className='fill-white' textAnchor='middle' alignmentBaseline='middle'>{controllerId}</text>
+            <g transform={`translate(${location?.x} ${location ? location.y + 0.04 : location}) scale(0.02)`}>
+              <text className='pointer-events-none select-none fill-white font-bold text-2xl' textAnchor='middle' alignmentBaseline='middle'>{controllerId[0]}</text>
             </g>
           </g>
         ))}

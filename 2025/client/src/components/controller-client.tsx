@@ -43,9 +43,9 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
 
   if (status === 'connected') {
     return <div className='flex flex-col items-center gap-2 mt-8'>
-      <h1 className='font-bold text-2xl'>Hello!</h1>
-      <p>You&apos;re trying to access display {displayId}</p>
-      <p>What is your name?</p>
+      <h1 className='font-bold text-2xl'>Hoi!</h1>
+      <p>Je gaat nu verbinding maken met de GNO 2025 server.</p>
+      <p>Wat is je naam?</p>
       <form action={() => {
         setClickedToLink(true);
         controllerClient.link('c/' + username)
@@ -54,20 +54,21 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
         <input
           className={`bg-white border p-1 rounded-l ${showError ? 'border-red-500' : ''}`}
           type='text'
-          placeholder='Enter your username'
+          placeholder='Vul hier jouw naam in'
           value={username}
           onChange={(e) => {
             const value = e.target.value;
-            setUsername(value[0].toUpperCase() + value.slice(1).toLowerCase());
+            const capitalized = value.length > 1 ? value[0].toUpperCase() + value.slice(1).toLowerCase() : value;
+            setUsername(capitalized);
           }}
         />
         <button
-          className={`p-1 border bg-white rounded-r disabled:bg-gray-200 disabled:text-gray-400`}
+          className={`p-1 border bg-white rounded-r disabled:bg-zinc-200 disabled:text-zinc-400`}
           disabled={!isValidUsername} type='submit'
-        >Link!</button>
+        >Start!</button>
       </form>
       {showError && <p className='text-red-500 text-sm max-w-1/3'>
-        Invalid name, please only use your own name.
+        Gebruik je eigen naam.
       </p>}
     </div>
   }
