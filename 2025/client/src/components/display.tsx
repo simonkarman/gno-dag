@@ -1,6 +1,6 @@
 import { DisplayControllers } from '@/components/display-controllers';
 import { DisplayQR } from '@/components/display-qr';
-import { displayClient, DisplayInformation, useDisplayStore } from '@/components/display-client';
+import { DisplayInformation, useDisplayStore } from '@/components/display-client';
 
 export function Display({ displayInformation }: { displayInformation: DisplayInformation }) {
   const data = useDisplayStore();
