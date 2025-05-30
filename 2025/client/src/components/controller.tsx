@@ -1,7 +1,7 @@
 import { capitalize } from '@/utils/capitalize';
 import { controllerClient } from '@/components/controller-client';
 
-export function Controller({ username, displayId }: { username: string, displayId: string }) {
+export function Controller({ username }: { username: string, displayId: string }) {
   const move = (direction: string) => {
     controllerClient.send({ type: 'move', payload: direction });
   }
