@@ -153,10 +153,14 @@ class World {
       if (insideActivations.length > 0) {
         console.info(`[info] [gno-2025] ${controllerId} is now inside of activation(s): ${insideActivations.map(a => a.identifier).join(', ')}`);
       }
-      server.send(`c/${controllerId}`, {
-        type: 'activations',
-        payload: insideActivations,
-      });
+      try {
+        server.send(`c/${controllerId}`, {
+          type: 'activations',
+          payload: insideActivations,
+        });
+      } catch (e: unknown) {
+        console.error(`Sending activation to controller c/${controllerId} failed:`, e);
+      }
     }
   }
 
