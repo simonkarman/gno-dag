@@ -10,7 +10,7 @@ import { ActivationProps } from '@/components/activation-props';
 const components: { [identifier: string]: ((props: ActivationProps) => ReactElement) | undefined } = {
   'vroeg': (props) => <Vroeg {...props} />,
   'niks': (props) => <Niks {...props} />,
-  '35': (props) => <p>35 jaar!</p>,
+  '35': () => <p>35 jaar!</p>,
 }
 
 const requirements: { [identifier: string]: (() => ReactElement) | undefined } = {
