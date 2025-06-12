@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/v1/create-qr-code/**",
       },
+      new URL("https://media3.giphy.com/media/**"),
     ]
   }
 };
