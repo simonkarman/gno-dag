@@ -54,21 +54,35 @@ export interface DisplayInformation {
   id: string;
 }
 
+let lastId: undefined | string = undefined;
 export function DisplayClient({ serverUrl }: { serverUrl: string }) {
   const { status } = useDisplayClient();
   const [displayInformation, setDisplayInformation] = useState<undefined | DisplayInformation>(undefined);
 
   useEffect(() => {
-    // TODO: think about multiple of these components mounting and unmounting simultaneously
-    if (status === 'initializing' || status === 'closed') {
-      displayClient.connect(serverUrl)
-        .catch((e: Error) => console.error('error connecting:', e.message));
-    }
-    if (status === 'connected') {
-      const id = randomDigits(12);
-      setDisplayInformation({ id });
-      displayClient.link('d/' + id)
-        .catch((e: Error) => console.error('error linking:', e.message));
+    const id = randomDigits(12);
+    lastId = id;
+    setTimeout(() => {
+      if (lastId !== id) {
+        return;
+      }
+
+      if (status === 'initializing' || status === 'closed') {
+        displayClient.connect(serverUrl)
+          .catch((e: Error) => console.error('error connecting:', e.message));
+      }
+      if (status === 'connected') {
+        setDisplayInformation({ id });
+        displayClient.link('d/' + id)
+          .catch((e: Error) => console.error('error linking:', e.message));
+      }
+    }, 250);
+
+    return () => {
+      if (status === 'linked' && lastId === id) {
+        displayClient.disconnect(true)
+          .catch((e: Error) => console.error('error disconnecting:', e.message));
+      }
     }
   }, [status, serverUrl]);
 

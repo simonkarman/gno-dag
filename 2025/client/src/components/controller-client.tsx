@@ -58,6 +58,13 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
       controllerClient.disconnect()
         .catch((e: Error) => console.error('error disconnecting:', e.message));
     }
+    if (status === 'closed') {
+      setFailureReason(fr => (fr && fr.length > 0) ? fr : 'De verbinding met de server is verbroken.\nOver 5 seconden proberen we het opnieuw.');
+      // page refresh
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    }
   }, [status, clickedToLink, serverUrl]);
 
   if (status === 'connected') {
@@ -74,7 +81,7 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
           });
       }}>
         <input
-          className={`bg-white border p-1 rounded-l ${showError ? 'border-red-500' : ''}`}
+          className={`bg-white border border-zinc-700 text-zinc-700 p-1 rounded-l ${showError ? 'border-red-500' : ''} placeholder-zinc-400`}
           type='text'
           placeholder='Vul hier jouw naam in'
           value={username}
@@ -85,11 +92,11 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
           }}
         />
         <button
-          className={`p-1 border bg-white rounded-r disabled:bg-zinc-200 disabled:text-zinc-400`}
+          className={`p-1 border border-zinc-700 text-zinc-800 bg-white rounded-r disabled:bg-zinc-200 disabled:text-zinc-400 font-bold tracking-wide`}
           disabled={!isValidUsername} type='submit'
         >Start!</button>
       </form>
-      {showError && <p className='text-red-500 text-sm max-w-1/3'>
+      {showError && <p className='text-red-500 font-bold tracking-wide text-sm max-w-1/3'>
         Gebruik je eigen naam.
       </p>}
     </div>
@@ -100,7 +107,7 @@ export function ControllerClient({ serverUrl, displayId }: { serverUrl: string, 
   if (status === 'closed') {
     return <>
       <p className='p-4 text-center'>Oops, er ging iets mis. Ververs de pagina!</p>
-      <pre className='text-center text-sm bg-red-100 border-y py-2'>{failureReason}</pre>
+      <pre className='text-center text-sm bg-red-700 border-y border-red-300 py-2 font-bold tracking-wide'>{failureReason}</pre>
     </>;
   }
   return <p className='p-4 text-center'>Connecting to {displayId} as {username}...</p>;

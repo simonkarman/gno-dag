@@ -8,9 +8,9 @@ export function DisplayControllers() {
     return <p>Er is hier op dit moment niemand.</p>;
   }
   return <>
-    <div className='my-4 flex flex-wrap gap-2'>
+    <div className='mt-6 flex flex-wrap gap-4 text-white'>
       {controllers.map((user) => <div
-        className={`flex gap-2 px-2 py-0.5 border rounded ${user.isLinked ? 'bg-green-600' : 'bg-red-600 opacity-75'}`}
+        className={`flex gap-4 px-2 py-0.5 border rounded ${user.isLinked ? 'bg-green-600 active-hint' : 'bg-red-600 border-red-800'}`}
         key={user.username}
       >
         <p className='font-bold text-white'>

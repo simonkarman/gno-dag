@@ -6,4 +6,7 @@ export type Activation = {
   yMin: number;
   yMax: number;
   color: string;
+  isActive: boolean;
+  who: string[];
+  requirement: string;
 };

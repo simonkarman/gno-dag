@@ -57,6 +57,7 @@ interface Activation {
   yMin: number;
   yMax: number;
   color: string;
+  requirement: string;
 }
 
 class World {
@@ -67,19 +68,47 @@ class World {
     private readonly activations: Activation[],
   ) {}
 
-  getActiveActivations() {
+  getActivationState(): (Activation & { isActive: boolean, who: string[] })[] {
+    const validateActivation = (requirement: string, who: string[]) => {
+      switch (requirement) {
+        case 'one':
+          return who.length >= 1;
+        case 'two':
+          return who.length >= 2;
+        case 'three':
+          return who.length >= 3;
+        case 'four':
+          return who.length >= 4;
+        case 'five':
+          return who.length >= 5;
+        case 'all':
+          return who.length >= 6;
+        default:
+          return true; // No requirement or unknown requirement
+      }
+    }
+
     const now = new Date();
-    return this.activations.filter(activation => {
-      const activationDate = new Date(activation.when);
-      return activationDate <= now;
-    });
+    return this.activations
+      .filter(activation => new Date(activation.when) <= now)
+      .map(activation => {
+        const who = Object.entries(this.controllers).filter(([, controller]) => {
+          return controller.x >= activation.xMin && controller.x <= activation.xMax &&
+            controller.y >= activation.yMin && controller.y <= activation.yMax;
+        }).map(([name]) => name);
+        return {
+          ...activation,
+          isActive: validateActivation(activation.requirement, who),
+          who,
+        };
+      });
   }
 
   updateActivations() {
-    const activeActivations = this.getActiveActivations();
+    const activationState = this.getActivationState();
     this.broadcastToAllDisplays({
       type: 'activations',
-      payload: activeActivations,
+      payload: activationState,
     });
 
     // Trigger a location update for each controller
@@ -135,12 +164,12 @@ class World {
     }).map(([name]) => name).shift();
   }
 
-  getInsideActivations(controllerId: string) {
+  getInsideActivations(controllerId: string): Activation[] {
     const controller = this.controllers[controllerId];
     if (!controller) {
       return [];
     }
-    return this.getActiveActivations().filter(activation => {
+    return this.getActivationState().filter(activation => {
       return controller.x >= activation.xMin && controller.x <= activation.xMax &&
              controller.y >= activation.yMin && controller.y <= activation.yMax;
     });
@@ -155,6 +184,7 @@ class World {
   moveController(controllerId: string, direction: string) {
     const controller = this.controllers[controllerId];
     if (controller) {
+      const previousInsideActivations = this.getInsideActivations(controllerId);
       let newX = controller.x;
       let newY = controller.y;
       switch (direction) {
@@ -171,15 +201,20 @@ class World {
           newX = this.boundToWorldSize(newX + 1);
           break;
       }
-      if (this.getControllerAt(newX, newY)) {
+      if (direction !== 'none' && this.getControllerAt(newX, newY)) {
         return;
       }
       controller.x = newX;
       controller.y = newY;
       this.forwardLocation(controllerId);
       const insideActivations = this.getInsideActivations(controllerId);
-      if (insideActivations.length > 0) {
-        console.info(`[info] [gno-2025] ${controllerId} is now inside of activation(s): ${insideActivations.map(a => a.identifier).join(', ')}`);
+      if (direction !== 'none') {
+        // Get diff between previous and current inside activations
+        const addDiff = insideActivations.filter(a => !previousInsideActivations.some(pa => pa.identifier === a.identifier));
+        const removeDiff = previousInsideActivations.filter(pa => !insideActivations.some(a => a.identifier === pa.identifier));
+        if (addDiff.length > 1 || removeDiff.length > 1) {
+          console.info(`[info] [gno-2025] ${controllerId} is inside activation(s): ${insideActivations.map(a => a.identifier).join(', ')}`);
+        }
       }
       try {
         server.send(`c/${controllerId}`, {
@@ -221,8 +256,8 @@ class World {
 }
 
 const world = new World(13, [
-  { identifier: 'vroeg', when: '2025-01-01T00:00:00Z', xMin: 8, xMax: 10, yMin: 1, yMax: 3, color: 'rgba(25, 172, 0, 0.1)' },
-  { identifier: 'niks', when: '2025-05-01T00:00:00Z', xMin: 1, xMax: 2, yMin: 6, yMax: 6, color: 'rgba(173, 23, 236, 0.1)' },
+  { identifier: 'vroeg', when: '2025-01-01T00:00:00Z', xMin: 8, xMax: 10, yMin: 1, yMax: 2, color: 'rgba(25, 172, 0, 0.3)', requirement: 'one' },
+  { identifier: 'niks', when: '2025-05-01T00:00:00Z', xMin: 1, xMax: 2, yMin: 6, yMax: 6, color: 'rgba(173, 23, 236, 0.3)', requirement: 'two' },
 ]);
 
 
@@ -246,7 +281,7 @@ server.on('link', (username) => {
       payload: {
         worldSize: world.worldSize,
         controllers: world.getControllers(),
-        activations: world.getActiveActivations(),
+        activations: world.getActivationState(),
       },
     })
   } else {
@@ -274,6 +309,7 @@ server.on('message', (username, message) => {
     const direction = message.payload;
     console.debug(`[debug] [gno-2025] ${id} is trying to move ${direction}`);
     world.moveController(id, direction);
+    world.updateActivations();
   } else {
     console.warn(`[warn] [gno-2025] ${username} sent unknown ${message.type} message`);
   }

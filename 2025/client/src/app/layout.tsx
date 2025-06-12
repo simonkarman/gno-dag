@@ -26,8 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-blue-100 min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-blue-100 min-h-screen time-machine-bg`}
       >
+      <div className="grid-overlay"></div>
       <div
         className="flex min-h-[100svh] flex-col items-center justify-between"
       >
@@ -37,11 +38,11 @@ export default function RootLayout({
           </Suspense>
         </div>
         <footer className="mb-1 flex items-center gap-2 px-3 py-1">
-          <p className="text-center text-xs text-zinc-800">
+          <p className="text-center text-xs text-zinc-400">
             <span className="">Build with</span>{' '}
-            <a href="https://github.com/simonkarman/krmx" className="font-semibold text-zinc-900 hover:underline">Krmx</a>
+            <a href="https://github.com/simonkarman/krmx" className="font-semibold tracking-wide text-zinc-200 hover:underline">Krmx</a>
             {' '}by{' '}
-            <a href="https://www.simonkarman.nl" className="text-green-900 hover:underline">simonkarman</a>
+            <a href="https://www.simonkarman.nl" className="text-zinc-200 tracking-wide font-bold hover:underline">simonkarman</a>
           </p>
         </footer>
       </div>
