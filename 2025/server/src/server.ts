@@ -93,10 +93,26 @@ class World {
   }
 
   addController(controllerId: string) {
-    this.controllers[controllerId] = {
+    const center = {
       x: Math.floor(this.worldSize / 2),
       y: Math.floor(this.worldSize / 2),
     };
+    const options = [
+      // Try the center first
+      { x: 0, y: 0 },
+      // Try directly next to the center second
+      { x: 0, y: -1 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 },
+      // Try diagonally next to the center last
+      { x: 1, y: -1 }, { x: 1, y: 1 }, { x: 1, y: 1 }, { x: -1, y: -1 },
+    ]
+    const offset = options
+      .filter(o => {
+        const x = this.boundToWorldSize(center.x + o.x);
+        const y = this.boundToWorldSize(center.y + o.y);
+        return this.getControllerAt(x, y) === undefined;
+      })
+      .shift() ?? options[0];
+    this.controllers[controllerId] = { x: center.x + offset.x, y: center.y + offset.y };
     this.forwardLocation(controllerId);
     this.logControllers();
   }
@@ -111,6 +127,12 @@ class World {
       });
       this.logControllers();
     }
+  }
+
+  getControllerAt(x: number, y: number): string | undefined {
+    return Object.entries(this.controllers).filter(([, controller]) => {
+      return controller.x === x && controller.y === y;
+    }).map(([name]) => name).shift();
   }
 
   getInsideActivations(controllerId: string) {
@@ -133,21 +155,27 @@ class World {
   moveController(controllerId: string, direction: string) {
     const controller = this.controllers[controllerId];
     if (controller) {
+      let newX = controller.x;
+      let newY = controller.y;
       switch (direction) {
         case 'up':
-          controller.y -= 1;
+          newY = this.boundToWorldSize(newY - 1)
           break;
         case 'down':
-          controller.y += 1;
+          newY = this.boundToWorldSize(newY + 1);
           break;
         case 'left':
-          controller.x -= 1;
+          newX = this.boundToWorldSize(newX - 1);
           break;
         case 'right':
-          controller.x += 1;
+          newX = this.boundToWorldSize(newX + 1);
           break;
       }
-      this.clampControllerPosition(controllerId);
+      if (this.getControllerAt(newX, newY)) {
+        return;
+      }
+      controller.x = newX;
+      controller.y = newY;
       this.forwardLocation(controllerId);
       const insideActivations = this.getInsideActivations(controllerId);
       if (insideActivations.length > 0) {
@@ -164,12 +192,8 @@ class World {
     }
   }
 
-  clampControllerPosition(controllerId: string) {
-    const controller = this.controllers[controllerId];
-    if (controller) {
-      controller.x = Math.max(0, Math.min(controller.x, this.worldSize - 1));
-      controller.y = Math.max(0, Math.min(controller.y, this.worldSize - 1));
-    }
+  boundToWorldSize(value: number): number {
+    return Math.max(0, Math.min(value, this.worldSize - 1));
   }
 
   forwardLocation(controllerId: string) {
@@ -248,7 +272,7 @@ server.on('message', (username, message) => {
   const { type, id } = extract(username);
   if (type === 'controller' && message.type === 'move' && typeof message.payload === 'string') {
     const direction = message.payload;
-    console.debug(`[debug] [gno-2025] ${id} moved ${direction}`);
+    console.debug(`[debug] [gno-2025] ${id} is trying to move ${direction}`);
     world.moveController(id, direction);
   } else {
     console.warn(`[warn] [gno-2025] ${username} sent unknown ${message.type} message`);

@@ -59,6 +59,7 @@ export function DisplayClient({ serverUrl }: { serverUrl: string }) {
   const [displayInformation, setDisplayInformation] = useState<undefined | DisplayInformation>(undefined);
 
   useEffect(() => {
+    // TODO: think about multiple of these components mounting and unmounting simultaneously
     if (status === 'initializing' || status === 'closed') {
       displayClient.connect(serverUrl)
         .catch((e: Error) => console.error('error connecting:', e.message));
