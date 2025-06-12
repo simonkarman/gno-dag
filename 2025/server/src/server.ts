@@ -219,10 +219,12 @@ class World {
         }
       }
       try {
-        server.send(`c/${controllerId}`, {
-          type: 'activations',
-          payload: insideActivations,
-        });
+        if (server.getUsers().filter(u => u.username === `c/${controllerId}` && u.isLinked).length !== 0) {
+          server.send(`c/${controllerId}`, {
+            type: 'activations',
+            payload: insideActivations,
+          });
+        }
       } catch (e: unknown) {
         console.error(`Sending activation to controller c/${controllerId} failed:`, e);
       }
