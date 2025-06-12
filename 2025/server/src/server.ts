@@ -2,7 +2,7 @@ import './json-logging';
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
 import { createServer } from '@krmx/server';
-import { enableUnlinkedKicker} from './unlinked-kicker';
+import { enableUnlinkedKicker } from './unlinked-kicker';
 import { LogSeverity } from '@krmx/base/dist/src/log';
 import { setInterval } from 'node:timers';
 
@@ -32,7 +32,7 @@ const server = createServer({
   }
 });
 enableUnlinkedKicker(server, {
-  inactivitySeconds: 7,
+  inactivitySeconds: 120,
   logger: message => console.info(`[info] [unlinked-kicker] ${message}`),
 });
 
@@ -83,6 +83,8 @@ class World {
           return who.length >= 5;
         case 'all':
           return who.length >= 6;
+        case 'j&g':
+          return who.includes('Jac.') && who.includes('Govie');
         default:
           return true; // No requirement or unknown requirement
       }
@@ -258,6 +260,7 @@ class World {
 const world = new World(13, [
   { identifier: 'vroeg', when: '2025-01-01T00:00:00Z', xMin: 8, xMax: 10, yMin: 1, yMax: 2, color: 'rgba(25, 172, 0, 0.3)', requirement: 'one' },
   { identifier: 'niks', when: '2025-05-01T00:00:00Z', xMin: 1, xMax: 2, yMin: 6, yMax: 6, color: 'rgba(173, 23, 236, 0.3)', requirement: 'two' },
+  { identifier: '35', when: '2025-05-13T00:00:00Z', xMin: 12, xMax: 12, yMin: 8, yMax: 11, color: 'rgba(217, 141, 7, 0.3)', requirement: 'j&g' },
 ]);
 
 

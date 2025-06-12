@@ -10,15 +10,17 @@ import { ActivationProps } from '@/components/activation-props';
 const components: { [identifier: string]: ((props: ActivationProps) => ReactElement) | undefined } = {
   'vroeg': (props) => <Vroeg {...props} />,
   'niks': (props) => <Niks {...props} />,
+  '35': (props) => <p>35 jaar!</p>,
 }
 
 const requirements: { [identifier: string]: (() => ReactElement) | undefined } = {
-  'one': () => <p className='text-sm text-zinc-800'>⚠️ Minstens 1 controller moet binnen dit gebied zijn.</p>,
-  'two': () => <p className='text-sm text-zinc-800'>⚠️ Minstens 2 controllers moeten binnen dit gebied zijn.</p>,
-  'three': () => <p className='text-sm text-zinc-800'>⚠️ Minstens 3 controllers moeten binnen dit gebied zijn.</p>,
-  'four': () => <p className='text-sm text-zinc-800'>⚠️ Minstens 4 controllers moeten binnen dit gebied zijn.</p>,
-  'five': () => <p className='text-sm text-zinc-800'>⚠️ Minstens 5 controllers moeten binnen dit gebied zijn.</p>,
-  'all': () => <p className='text-sm text-zinc-800'>⚠️ Iedereen moeten binnen dit gebied zijn.</p>,
+  'one': () => <p className='text-sm text-zinc-800'>⚠️ Er moet iemand binnen dit gebied staan.</p>,
+  'two': () => <p className='text-sm text-zinc-800'>⚠️ Zorg ervoor dat je niet alleen in dit gebied staat.</p>,
+  'three': () => <p className='text-sm text-zinc-800'>⚠️ Er moeten op z&apos;n minst 3 personen binnen dit gebied staan.</p>,
+  'four': () => <p className='text-sm text-zinc-800'>⚠️ Het is nog niet druk genoeg. Er moeten minimaal 4 personen binnen dit gebied staan.</p>,
+  'five': () => <p className='text-sm text-zinc-800'>⚠️ In dit gebied moeten minstens 5 personen staan.</p>,
+  'all': () => <p className='text-sm text-zinc-800'>⚠️ Iedereen moeten binnen dit gebied staan.</p>,
+  'j&g': () => <p className='text-sm text-zinc-800'>⚠️ Jac. en Govie moeten allebei in dit gebied staan.</p>,
 }
 const defaultRequirement = () => <p className='text-sm text-zinc-800'>⚠️ Specifieke vereisten nodig voor dit gebied.</p>
 
