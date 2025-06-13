@@ -5,6 +5,7 @@ import { createClient, createStore } from '@krmx/client-react';
 import { randomDigits } from '@/utils/random-digits';
 import { Display } from '@/components/display';
 import { Activation } from '@/components/activation';
+import { useWakeLock } from '@/utils/use-wake-lock';
 
 type DisplayStoreState = {
   worldSize: number;
@@ -56,6 +57,7 @@ export interface DisplayInformation {
 
 let lastId: undefined | string = undefined;
 export function DisplayClient({ serverUrl }: { serverUrl: string }) {
+  useWakeLock();
   const { status } = useDisplayClient();
   const [displayInformation, setDisplayInformation] = useState<undefined | DisplayInformation>(undefined);
 
