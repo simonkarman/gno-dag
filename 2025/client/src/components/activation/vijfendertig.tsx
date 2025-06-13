@@ -21,6 +21,9 @@ export default function Vijfendertig(props: ActivationProps) {
         <li>
           <span className='font-bold'>JULLIE ROL</span>: Te bepalen tijdens activatie
         </li>
+        <li>
+          <span className='font-bold'>GETAL</span>: 35 (zegge Vijfendertig)
+        </li>
       </ul>
     </p>
   </>;
