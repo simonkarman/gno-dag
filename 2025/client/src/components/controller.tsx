@@ -3,14 +3,15 @@
 import { ReactElement } from 'react';
 import { capitalize } from '@/utils/capitalize';
 import { controllerClient, useControllerStore } from '@/components/controller-client';
+import { ActivationProps } from '@/components/activation-props';
 import Vroeg from '@/components/activation/vroeg';
 import Niks from '@/components/activation/niks';
-import { ActivationProps } from '@/components/activation-props';
+import Vijfendertig from '@/components/activation/vijfendertig';
 
 const components: { [identifier: string]: ((props: ActivationProps) => ReactElement) | undefined } = {
   'vroeg': (props) => <Vroeg {...props} />,
   'niks': (props) => <Niks {...props} />,
-  '35': () => <p>35 jaar!</p>,
+  '35': (props) => <Vijfendertig {...props} />,
 }
 
 const requirements: { [identifier: string]: (() => ReactElement) | undefined } = {
