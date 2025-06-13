@@ -70,8 +70,18 @@ function createConsoleOverride(defaultSeverity: Severity, logger: (...args: unkn
       }
     }
 
+    // if the message still starts with [something], remove it, and add it as a subdomain
+    let subdomain: string | undefined = undefined;
+    if (typeof args[0] === 'string' && args[0].startsWith('[')) {
+      const match = args[0].match(/^\[(.*?)]/);
+      if (match && match[1].length > 0) {
+        subdomain = match[1];
+        args[0] = (args[0] as string).replace(/^\[.*?]/, '').trim();
+      }
+    }
+
     const message = formatLog(...args);
-    logger(JSON.stringify({ severity, message, domain }));
+    logger(JSON.stringify({ severity, message, domain, subdomain }));
   };
 }
 
@@ -83,4 +93,4 @@ if (useJsonLogging) {
   console.warn = createConsoleOverride('WARNING', originalConsole.warn);
   console.error = createConsoleOverride('ERROR', originalConsole.error);
 }
-console.info(`[info] [json-logging] JSON logging is ${useJsonLogging ? 'enabled' : 'disabled'}`);
+console.info(`[info] [server] [json-logging] JSON logging is ${useJsonLogging ? 'enabled' : 'disabled'}`);

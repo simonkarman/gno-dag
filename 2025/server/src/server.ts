@@ -14,7 +14,7 @@ const httpServer = createHttpServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, _, next) => {
-  console.debug(`[debug] [http] ${req.ip} ${req.method} ${req.path}`);
+  console.debug(`[debug] [http] [${req.path}] ${req.ip} ${req.method} ${req.path}`);
   next();
 })
 app.get('/', (_, res) => {
@@ -24,16 +24,17 @@ const server = createServer({
   http: { server: httpServer, path: 'krmx', queryParams: { 'version': version } },
   logger: (_severity: LogSeverity, ...args: unknown[]) => {
     const severity = _severity === 'info' ? 'debug' : _severity;
-    console[severity](`[${severity}] [server]`, ...args);
+    console[severity](`[${severity}] [server] [krmx]`, ...args);
   },
   isValidUsername(username: string) {
     return /^d\/[0-9]{12}$/.test(username) // Display: d/123456789012
       || ['c/Govie', 'c/Jac.', 'c/Simon', 'c/Lisa', 'c/Marjolein', 'c/Tim'].includes(username) // Controller: Govie, Jac., Simon, Lisa, Marjolein, Tim
   }
 });
+
 enableUnlinkedKicker(server, {
   inactivitySeconds: 120,
-  logger: message => console.info(`[info] [unlinked-kicker] ${message}`),
+  logger: message => console.debug(`[info] [server] [unlinked-kicker] ${message}`),
 });
 
 const extract = (username: string) => {
@@ -180,7 +181,7 @@ class World {
   private logControllers = () => {
     // Log the amount of controllers on the display
     const controllerNames = Object.keys(this.controllers);
-    console.info(`[info] [gno-2025] World has ${controllerNames.length} controller(s):`, controllerNames);
+    console.info(`[info] [gno-2025] [world] World has ${controllerNames.length} controller(s):`, controllerNames);
   }
 
   moveController(controllerId: string, direction: string) {
@@ -214,8 +215,14 @@ class World {
         // Get diff between previous and current inside activations
         const addDiff = insideActivations.filter(a => !previousInsideActivations.some(pa => pa.identifier === a.identifier));
         const removeDiff = previousInsideActivations.filter(pa => !insideActivations.some(a => a.identifier === pa.identifier));
-        if (addDiff.length > 1 || removeDiff.length > 1) {
-          console.info(`[info] [gno-2025] ${controllerId} is inside activation(s): ${insideActivations.map(a => a.identifier).join(', ')}`);
+        if (addDiff.length > 0) {
+          console.info(`[info] [gno-2025] [controller] ${controllerId} entered activation(s): [${addDiff.map(a => a.identifier).join(', ')}]`);
+        }
+        if (removeDiff.length > 0) {
+          console.info(`[info] [gno-2025] [controller] ${controllerId} left activation(s): [${removeDiff.map(a => a.identifier).join(', ')}]`);
+        }
+        if (addDiff.length > 0 || removeDiff.length > 0) {
+          console.info(`[info] [gno-2025] [controller] ${controllerId} is now inside activation(s): [${insideActivations.map(a => a.identifier).join(', ')}]`);
         }
       }
       try {
@@ -226,7 +233,7 @@ class World {
           });
         }
       } catch (e: unknown) {
-        console.error(`Sending activation to controller c/${controllerId} failed:`, e);
+        console.error(`[error] [gno-2025] [controller] Sending activation to controller c/${controllerId} failed:`, e);
       }
     }
   }
@@ -270,7 +277,7 @@ server.on('join', (username) => {
   const { type, id } = extract(username);
 
   if (type === 'display') {
-    console.info(`[info] [gno-2025] display ${id} created`);
+    console.info(`[info] [gno-2025] [display] display ${id} created`);
   } else {
     world.addController(id);
   }
@@ -280,7 +287,7 @@ server.on('link', (username) => {
   const { type, id } = extract(username);
 
   if (type === 'display') {
-    console.info(`[info] [gno-2025] display ${id} linked`);
+    console.info(`[info] [gno-2025] [display] display ${id} linked`);
     server.send(username, {
       type: 'init',
       payload: {
@@ -290,7 +297,7 @@ server.on('link', (username) => {
       },
     })
   } else {
-    console.info(`[info] [gno-2025] controller ${id} linked`);
+    console.info(`[info] [gno-2025] [controller] controller ${id} linked`);
     const insideActivations = world.getInsideActivations(id);
     server.send(username, {
       type: 'activations',
@@ -302,7 +309,7 @@ server.on('link', (username) => {
 server.on('leave', (username) => {
   const { type, id } = extract(username);
   if (type === 'display') {
-    console.info(`[info] [gno-2025] display ${id} left`);
+    console.info(`[info] [gno-2025] [display] display ${id} left`);
   } else {
     world.deleteController(id);
   }
@@ -312,7 +319,7 @@ server.on('message', (username, message) => {
   const { type, id } = extract(username);
   if (type === 'controller' && message.type === 'move' && typeof message.payload === 'string') {
     const direction = message.payload;
-    console.debug(`[debug] [gno-2025] ${id} is trying to move ${direction}`);
+    console.debug(`[debug] [gno-2025] [controller] ${id} is trying to move ${direction}`);
     world.moveController(id, direction);
     world.updateActivations();
   } else {
