@@ -1,5 +1,4 @@
 import { ActivationProps } from '@/components/activation-props';
-import Image from 'next/image';
 
 export default function Vijfendertig(props: ActivationProps) {
   const others = props.who.filter(w => w !== 'Jac.' && w !== 'Govie');
