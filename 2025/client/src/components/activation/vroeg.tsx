@@ -8,8 +8,8 @@ export default function Vroeg(props: ActivationProps) {
     <p>Kom je terug op zondag 29 juni?</p>
     <p>Zorg dan dat je om 9:00 uur gedoucht klaar zit aan de keukentafel in Bodegraven voor een ontbijt.</p>
     <hr className='text-zinc-200 my-4' />
-    {props.who.length === 1 && <p>Je bent alleen...</p>}
-    {props.who.length === 2 && <p>Jullie zijn met z&apos;n tweeën...</p>}
+    {props.who.length === 1 && <p>Je bent hier alleen... Wat zou er gebeuren als je hier niet alleen was?</p>}
+    {props.who.length === 2 && <p>Jullie zijn met z&apos;n tweeën... Nog steeds niet genoeg</p>}
     {props.who.length >= 3 && props.who.length <= 5 && (<>
         <p>Het wordt hier al aardig gezellig!</p>
         <ul>

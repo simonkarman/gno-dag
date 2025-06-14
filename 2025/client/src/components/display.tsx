@@ -2,12 +2,13 @@ import { DisplayControllers } from '@/components/display-controllers';
 import { DisplayQR } from '@/components/display-qr';
 import { DisplayInformation, useDisplayStore } from '@/components/display-client';
 import { Random } from '@/utils/random';
+import Dashboard from '@/components/display-dashboard';
 
 export function Display({ displayInformation }: { displayInformation: DisplayInformation }) {
   const data = useDisplayStore();
   const r = Random.fromSeed("abc123");
   return <>
-    <div className="p-2 pt-20 flex items-start justify-between gap-4">
+    <div className="p-2 pt-20 flex justify-between gap-4">
       <div className="time-particles">
         {Array.from({ length: 100 }, (_, i) => (
           <div key={i} className="particle" style={{
@@ -37,7 +38,7 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
                 className="stroke-white stroke-[0.003] animate-pulse"
               />
             </g>))}
-            {data.activations.map(activation => (
+            {data.activations.visible.map(activation => (
               <g key={activation.identifier}>
                 <rect
                   x={activation.xMin + 0.01}
@@ -70,9 +71,12 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
         </svg>
         <DisplayControllers />
       </div>
-      <div className="p-2 bg-zinc-200 rounded-lg shadow flex flex-col gap-2 active-hint text-black text-center">
-        <DisplayQR displayInformation={displayInformation}/>
-        <h2 className="font-bold">GNO Dag 2025</h2>
+      <div className='flex flex-col gap-4'>
+        <div className="p-2 bg-zinc-200 rounded-lg shadow flex flex-col gap-2 active-hint text-black text-center">
+          <DisplayQR displayInformation={displayInformation}/>
+          <h2 className="font-bold">GNO Dag 2025</h2>
+        </div>
+        <Dashboard data={data} />
       </div>
     </div>
   </>

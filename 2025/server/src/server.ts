@@ -1,10 +1,11 @@
 import './json-logging';
 import express from 'express';
+import { setInterval } from 'node:timers';
 import { createServer as createHttpServer } from 'http';
 import { createServer } from '@krmx/server';
+import { LogSeverity } from '@krmx/base';
 import { enableUnlinkedKicker } from './unlinked-kicker';
-import { LogSeverity } from '@krmx/base/dist/src/log';
-import { setInterval } from 'node:timers';
+import { Activation, activations } from './activations';
 
 // get version from package.json
 const version = require('../package.json').version;
@@ -50,26 +51,18 @@ interface Controller {
   y: number;
 }
 
-interface Activation {
-  identifier: string;
-  when: string;
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-  color: string;
-  requirement: string;
-}
-
 class World {
   private readonly controllers: Record<string, Controller> = {};
 
   constructor(
     public readonly worldSize: number,
     private readonly activations: Activation[],
-  ) {}
+  ) {
+    // Sort activations by date
+    this.activations.sort((a, b) => new Date(a.when).getTime() - new Date(b.when).getTime());
+  }
 
-  getActivationState(): (Activation & { isActive: boolean, who: string[] })[] {
+  getActivationState(): { next: string | undefined, visible: (Activation & { isActive: boolean, who: string[] })[] } {
     const validateActivation = (requirement: string, who: string[]) => {
       switch (requirement) {
         case 'one':
@@ -92,19 +85,23 @@ class World {
     }
 
     const now = new Date();
-    return this.activations
-      .filter(activation => new Date(activation.when) <= now)
-      .map(activation => {
-        const who = Object.entries(this.controllers).filter(([, controller]) => {
-          return controller.x >= activation.xMin && controller.x <= activation.xMax &&
-            controller.y >= activation.yMin && controller.y <= activation.yMax;
-        }).map(([name]) => name);
-        return {
-          ...activation,
-          isActive: validateActivation(activation.requirement, who),
-          who,
-        };
-      });
+    const next = this.activations.filter(activation => new Date(activation.when) >= now).shift()
+    return {
+      next: next?.when,
+      visible: this.activations
+        .filter(activation => process.env.NODE_ENV !== 'production' || new Date(activation.when) <= now)
+        .map(activation => {
+          const who = Object.entries(this.controllers).filter(([, controller]) => {
+            return controller.x >= activation.xMin && controller.x <= activation.xMax &&
+              controller.y >= activation.yMin && controller.y <= activation.yMax;
+          }).map(([name]) => name);
+          return {
+            ...activation,
+            isActive: validateActivation(activation.requirement, who),
+            who,
+          };
+        }),
+    };
   }
 
   updateActivations() {
@@ -125,9 +122,9 @@ class World {
   }
 
   addController(controllerId: string) {
-    const center = {
-      x: Math.floor(this.worldSize / 2),
-      y: Math.floor(this.worldSize / 2),
+    const spawn = {
+      x: this.worldSize - 3,
+      y: 2,
     };
     const options = [
       // Try the center first
@@ -139,12 +136,12 @@ class World {
     ]
     const offset = options
       .filter(o => {
-        const x = this.boundToWorldSize(center.x + o.x);
-        const y = this.boundToWorldSize(center.y + o.y);
+        const x = this.boundToWorldSize(spawn.x + o.x);
+        const y = this.boundToWorldSize(spawn.y + o.y);
         return this.getControllerAt(x, y) === undefined;
       })
       .shift() ?? options[0];
-    this.controllers[controllerId] = { x: center.x + offset.x, y: center.y + offset.y };
+    this.controllers[controllerId] = { x: spawn.x + offset.x, y: spawn.y + offset.y };
     this.forwardLocation(controllerId);
     this.logControllers();
   }
@@ -172,7 +169,7 @@ class World {
     if (!controller) {
       return [];
     }
-    return this.getActivationState().filter(activation => {
+    return this.getActivationState().visible.filter(activation => {
       return controller.x >= activation.xMin && controller.x <= activation.xMax &&
              controller.y >= activation.yMin && controller.y <= activation.yMax;
     });
@@ -266,11 +263,7 @@ class World {
   }
 }
 
-const world = new World(13, [
-  { identifier: 'vroeg', when: '2025-01-01T00:00:00Z', xMin: 8, xMax: 10, yMin: 1, yMax: 2, color: 'rgba(25, 172, 0, 0.3)', requirement: 'one' },
-  { identifier: 'niks', when: '2025-05-01T00:00:00Z', xMin: 1, xMax: 2, yMin: 6, yMax: 6, color: 'rgba(173, 23, 236, 0.3)', requirement: 'two' },
-  { identifier: '35', when: '2025-05-13T00:00:00Z', xMin: 12, xMax: 12, yMin: 8, yMax: 11, color: 'rgba(217, 141, 7, 0.3)', requirement: 'j&g' },
-]);
+const world = new World(15, activations);
 
 
 server.on('join', (username) => {

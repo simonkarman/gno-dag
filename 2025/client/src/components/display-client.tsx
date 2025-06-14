@@ -7,16 +7,16 @@ import { Display } from '@/components/display';
 import { Activation } from '@/components/activation';
 import { useWakeLock } from '@/utils/use-wake-lock';
 
-type DisplayStoreState = {
+export type DisplayStoreState = {
   worldSize: number;
   controllers: Record<string, undefined | { x: number, y: number }>;
-  activations: Activation[];
+  activations: { next: string | undefined, visible: Activation[] };
 }
 
 export const { client: displayClient, useClient: useDisplayClient } = createClient();
 export const useDisplayStore = createStore(
   displayClient,
-  { worldSize: 1, controllers: {}, activations: [] } satisfies DisplayStoreState as DisplayStoreState,
+  { worldSize: 1, controllers: {}, activations: { next: undefined, visible: [] } } satisfies DisplayStoreState as DisplayStoreState,
   (state, action) => {
     switch (action.type) {
       case 'init':
@@ -40,7 +40,7 @@ export const useDisplayStore = createStore(
         delete newState.controllers[deleteAction.payload];
         return newState;
       case 'activations':
-        const activationsAction = action as { type: 'activations', payload: Activation[] };
+        const activationsAction = action as { type: 'activations', payload: DisplayStoreState['activations'] };
         return {
           ...state,
           activations: activationsAction.payload,
