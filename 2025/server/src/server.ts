@@ -89,7 +89,7 @@ class World {
     return {
       next: next?.when,
       visible: this.activations
-        .filter(activation => process.env.NODE_ENV !== 'production' || new Date(activation.when) <= now)
+        .filter(activation => /*process.env.NODE_ENV !== 'production' ||*/ new Date(activation.when) <= now)
         .map(activation => {
           const who = Object.entries(this.controllers).filter(([, controller]) => {
             return controller.x >= activation.xMin && controller.x <= activation.xMax &&
