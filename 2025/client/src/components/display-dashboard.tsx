@@ -58,8 +58,6 @@ export default function Dashboard({ data }: { data: DisplayStoreState }) {
     return () => clearInterval(interval);
   }, []);
 
-  const nextDate = data.activations.next;
-
   return (
     <div className="grow-1 backdrop-blur-md rounded-lg active-hint p-4 shadow space-y-2 flex flex-col gap-3 text-zinc-300">
       {/* Header */}
