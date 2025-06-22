@@ -16,6 +16,7 @@ export const activations: Activation[] = [
   { identifier: 'niks', when: '2025-06-01T17:48:02', xMin: 2, xMax: 3, yMin: 4, yMax: 4, color: 'rgba(173, 23, 236, 0.3)', requirement: 'two' },
   { identifier: '35', when: '2025-06-13T14:07:03', xMin: 13, xMax: 13, yMin: 9, yMax: 12, color: 'rgba(217, 141, 7, 0.3)', requirement: 'j&g' },
   { identifier: 'contact', when: '2025-06-22T08:54:04', xMin: 8, xMax: 9, yMin: 8, yMax: 9, color: 'rgba(65, 105, 225, 0.2)', requirement: 'one' },
+  { identifier: 'contact2', when: '2025-06-29T08:59:59', xMin: 8, xMax: 9, yMin: 8, yMax: 9, color: 'rgba(65, 105, 225, 0.2)', requirement: 'one' },
 
   // Three
   // { identifier: 'a', when: '2025-06-29T00:00:00', xMin: three.x(0), xMax: three.x(1), yMin: three.y(1), yMax: three.y(1), color: 'rgba(0, 0, 0, 0.2)', requirement: 'one' },
