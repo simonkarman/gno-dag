@@ -8,6 +8,20 @@ import Vroeg from '@/components/activation/vroeg';
 import Niks from '@/components/activation/niks';
 import Vijfendertig from '@/components/activation/vijfendertig';
 import Contact from '@/components/activation/contact';
+import Ontbijt from '@/components/activation/ontbijt';
+import TerugInDeTijd from '@/components/activation/terug-in-de-tijd';
+import Cyanotype from '@/components/activation/cyanotype';
+import Vastleggen from '@/components/activation/vastleggen';
+import Tikken from '@/components/activation/tikken';
+import Lunch from '@/components/activation/lunch';
+import Getik from '@/components/activation/getik';
+import Ontmantelen from '@/components/activation/ontmantelen';
+import Analyse from '@/components/activation/analyse';
+import Gelukkig from '@/components/activation/gelukkig';
+import Capsule from '@/components/activation/capsule';
+import Voorwaarts from '@/components/activation/voorwaarts';
+import Feest from '@/components/activation/feest';
+import Cu2030 from '@/components/activation/cu2030';
 
 const sendAnswer = (value: string) => {
   controllerClient.send({
@@ -21,6 +35,20 @@ const components: { [identifier: string]: ((props: ActivationProps) => ReactElem
   'niks': (props) => <Niks {...props} />,
   '35': (props) => <Vijfendertig {...props} />,
   'contact': (props) => <Contact {...props} />,
+  'ontbijt': (props) => <Ontbijt {...props} />,
+  'terug-in-de-tijd': (props) => <TerugInDeTijd {...props} />,
+  'cyanotype': (props) => <Cyanotype {...props} />,
+  'vastleggen': (props) => <Vastleggen {...props} />,
+  'tikken': (props) => <Tikken {...props} />,
+  'lunch': (props) => <Lunch {...props} />,
+  'getik': (props) => <Getik {...props} />,
+  'ontmantelen': (props) => <Ontmantelen {...props} />,
+  'analyse': (props) => <Analyse {...props} />,
+  'gelukkig': (props) => <Gelukkig {...props} />,
+  'capsule': (props) => <Capsule {...props} />,
+  'voorwaarts': (props) => <Voorwaarts {...props} />,
+  'feest': (props) => <Feest {...props} />,
+  'cu2030': (props) => <Cu2030 {...props} />,
 }
 
 const requirements: { [identifier: string]: ((() => string) | undefined) } = {
@@ -32,7 +60,13 @@ const requirements: { [identifier: string]: ((() => string) | undefined) } = {
   'all': () => "⚠️ Iedereen moeten binnen dit gebied staan.",
   'j&g': () => "⚠️ Jac. en Govie moeten allebei in dit gebied staan.",
 }
-const defaultRequirement = () => "⚠️ Specifieke vereisten nodig voor dit gebied."
+const defaultRequirement = () => "⚠️ Specifieke vereisten nodig voor dit gebied.";
+
+const kebabCaseToWords = (str: string) => {
+  return str
+    .replace(/-/g, ' ') // Replace hyphens with spaces
+    .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize the first letter of each word
+}
 
 export function Controller({ username }: { username: string, displayId: string }) {
   const state = useControllerStore();
@@ -69,9 +103,9 @@ export function Controller({ username }: { username: string, displayId: string }
       }
       return (
         <div key={a.identifier} className="mb-12 border border-zinc-800 rounded-lg bg-white shadow-md w-full overflow-hidden text-zinc-800">
-          <div className="w-full p-3 border-b-1 border-zinc-800" style={{ backgroundColor: a.color.slice(0, -2) + "5)" || 'rgba(255, 0, 0, 0.1)' }}>
+          <div className="w-full text-shadow-lg p-3 border-b-1 border-zinc-800" style={{ backgroundColor: a.color.slice(0, -2) + "5)" || 'rgba(255, 0, 0, 0.1)' }}>
             <h2 className="font-mono font-bold text-sm text-center tracking-wide text-white mb-1">
-              {a.isActive ? a.identifier[0].toUpperCase() + a.identifier.slice(1) : 'Onbekend'}<br/>
+              {a.isActive ? kebabCaseToWords(a.identifier) : 'Onbekend'}<br/>
               (x: {a.xMin}{a.xMin !== a.xMax && `~${a.xMax}`}, y: {a.yMin}{a.yMin !== a.yMax && ` to ${a.yMax}`})
             </h2>
             <p className='font-mono text-sm text-center tracking-wide text-white opacity-70'>[Ontvangen op {new Date(a.when).toLocaleString()}]</p>
