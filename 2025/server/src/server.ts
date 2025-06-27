@@ -110,7 +110,7 @@ class World {
           return {
             ...activation,
             isActive: validateActivation(activation.requirement, who),
-            isAnswered: activation.secret === undefined || correctAnswers >= 4,
+            isAnswered: activation.secret === undefined || correctAnswers >= (isDev ? 1 : 4),
             answers,
             who,
           };

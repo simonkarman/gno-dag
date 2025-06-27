@@ -54,7 +54,7 @@ const components: { [identifier: string]: ((props: ActivationProps) => ReactElem
 const requirements: { [identifier: string]: ((() => string) | undefined) } = {
   'one': () => "⚠️ Er moet iemand binnen dit gebied staan.",
   'two': () => "⚠️ Zorg ervoor dat je niet alleen in dit gebied staat.",
-  'three': () => "⚠️ Er moeten op z&apos;n minst 3 personen binnen dit gebied staan.",
+  'three': () => "⚠️ Er moeten op z'n minst 3 personen binnen dit gebied staan.",
   'four': () => "⚠️ Het is nog niet druk genoeg. Er moeten minimaal 4 personen binnen dit gebied staan.",
   'five': () => "⚠️ In dit gebied moeten minstens 5 personen staan.",
   'all': () => "⚠️ Iedereen moeten binnen dit gebied staan.",

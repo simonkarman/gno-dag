@@ -1,3 +1,5 @@
+const isDev = process.env.NODE_ENV === 'development';
+
 export interface Activation {
   identifier: string;
   when: string;
@@ -22,7 +24,7 @@ export const activations: Activation[] = [
 
   // Ontbijt
   { identifier: 'ontbijt', when: '2025-06-29T08:59:59', xMin: 1, xMax: 2, yMin: 8, yMax: 8, color: 'rgb(186, 43, 112, 0.2)', requirement: 'one' },
-  { identifier: 'terug-in-de-tijd', when: '2025-06-29T09:12:00', xMin: 1, xMax: 5, yMin: 0, yMax: 0, color: 'rgb(155, 48, 188, 0.2)', requirement: 'one' },
+  { identifier: 'terug-in-de-tijd', when: '2025-06-29T09:32:00', xMin: 1, xMax: 5, yMin: 0, yMax: 0, color: 'rgb(155, 48, 188, 0.2)', requirement: 'three', secret: '19e' },
 
   // Activiteit 1 - Cyanotype
   { identifier: 'cyanotype', when: '2025-06-29T10:00:00', xMin: 8, xMax: 9, yMin: 6, yMax: 7, color: 'rgb(217, 99, 46, 0.2)', requirement: 'j&g' },
@@ -70,5 +72,10 @@ export const activations: Activation[] = [
     { identifier: 'l', when: '2025-06-29T00:00:00', xMin: five.x(1), xMax: five.x(5), yMin: five.y(8), yMax: five.y(8), color: 'rgba(0, 0, 0, 0.2)', requirement: 'one' },
     { identifier: 'm', when: '2025-06-29T00:00:00', xMin: five.x(0), xMax: five.x(1), yMin: five.y(7), yMax: five.y(7), color: 'rgba(0, 0, 0, 0.2)', requirement: 'one' },
   ] : []),
-];
+].map((activation) => {
+  if (isDev) {
+    // TODO
+  }
+  return activation;
+});
 console.info(`[info] [gno-2025] [world] Loaded ${activations.length} activations`);

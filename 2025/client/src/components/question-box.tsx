@@ -23,7 +23,7 @@ export function QuestionBox({ question, isAnswered, answers, sendAnswer }: Quest
   return <div className={`space-y-2 border border-2 rounded-lg py-2 px-3 ${isAnswered ? 'border-green-500' : 'border-red-500'}`}>
     {!showOpen && <>
       <p className="text-green-700">
-        Goed gedaan! Jullie hebben het juiste antwoord gegeven.
+        Goed gedaan! Jullie hebben samen het juiste antwoord gegeven.
       </p>
       <div className="flex justify-end">
         <button className="px-2 py-0.5 border rounded-sm" onClick={() => setIsOpen(!isOpen)}>Toon antwoorden</button>
@@ -35,7 +35,7 @@ export function QuestionBox({ question, isAnswered, answers, sendAnswer }: Quest
         Het is helaas nog fout. Het zou kunnen dat sommige van jullie al wel het goede antwoord gegeven hebben, maar er is een <b>meerderheid</b> (4 of meer) aan goede antwoorden nodig!
       </p>}
       {isAnswered && <p className="text-green-700">
-        Goed gedaan! Jullie hebben het juiste antwoord gegeven.
+        Goed gedaan! Jullie hebben samen het juiste antwoord gegeven.
       </p>}
       <div>
         <h2 className="underline">Gegeven Antwoorden</h2>
