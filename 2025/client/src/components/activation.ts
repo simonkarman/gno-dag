@@ -9,4 +9,6 @@ export type Activation = {
   isActive: boolean;
   who: string[];
   requirement: string;
+  isAnswered: boolean;
+  answers?: { controller: string, value: string }[];
 };

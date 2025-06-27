@@ -1,4 +1,5 @@
 import { ActivationProps } from '@/components/activation-props';
+import { QuestionBox } from '@/components/question-box';
 
 export default function Contact(props: ActivationProps) {
   return (<>
@@ -29,5 +30,17 @@ export default function Contact(props: ActivationProps) {
     <div className="text-xs font-mono text-green-700">
       [VERBINDING ONDERBROKEN - HERVERBINDING GEPLAND]
     </div>
+
+    <hr className='text-zinc-200 my-4' />
+    <QuestionBox question={"Oefenvraag: Wat krijg je als je 'diehgillezeg' omdraait?"} isAnswered={props.isAnswered} answers={props.answers} sendAnswer={props.sendAnswer} />
+    {props.isAnswered && <>
+      <hr className='text-zinc-200 my-4' />
+      <p>
+        Goed gedaan! Jullie hebben het juiste antwoord gegeven. Dit geeft me vertrouwen in de volgende stap!
+      </p>
+      <p>
+        Kijk in het dashboard wanneer de volgende activatie is gepland.
+      </p>
+    </>}
   </>);
 }

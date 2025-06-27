@@ -9,6 +9,13 @@ import Niks from '@/components/activation/niks';
 import Vijfendertig from '@/components/activation/vijfendertig';
 import Contact from '@/components/activation/contact';
 
+const sendAnswer = (value: string) => {
+  controllerClient.send({
+    type: 'answer',
+    payload: value,
+  });
+}
+
 const components: { [identifier: string]: ((props: ActivationProps) => ReactElement) | undefined } = {
   'vroeg': (props) => <Vroeg {...props} />,
   'niks': (props) => <Niks {...props} />,
@@ -56,6 +63,9 @@ export function Controller({ username }: { username: string, displayId: string }
       const requirement = requirements[a.requirement] ?? defaultRequirement;
       const props: ActivationProps = {
         who: a.who,
+        isAnswered: a.isAnswered,
+        sendAnswer,
+        answers: a.answers,
       }
       return (
         <div key={a.identifier} className="mb-12 border border-zinc-800 rounded-lg bg-white shadow-md w-full overflow-hidden text-zinc-800">

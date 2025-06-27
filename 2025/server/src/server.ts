@@ -7,6 +7,8 @@ import { LogSeverity } from '@krmx/base';
 import { enableUnlinkedKicker } from './unlinked-kicker';
 import { Activation, activations } from './activations';
 
+const isDev = process.env.LOCAL_DEVELOPMENT === 'true';
+
 // get version from package.json
 const version = require('../package.json').version;
 
@@ -53,6 +55,7 @@ interface Controller {
 
 class World {
   private readonly controllers: Record<string, Controller> = {};
+  private readonly answers: Record<string, ({ controller: string, value: string}[]) | undefined> = {};
 
   constructor(
     public readonly worldSize: number,
@@ -62,7 +65,12 @@ class World {
     this.activations.sort((a, b) => new Date(a.when).getTime() - new Date(b.when).getTime());
   }
 
-  getActivationState(): { next: string | undefined, visible: (Activation & { isActive: boolean, who: string[] })[] } {
+  getActivationState(): { next: string | undefined, visible: (Activation & {
+    isActive: boolean,
+    who: string[],
+    isAnswered: boolean,
+    answers?: { controller: string, value: string }[],
+  })[] } {
     const validateActivation = (requirement: string, who: string[]) => {
       switch (requirement) {
         case 'one':
@@ -89,15 +97,21 @@ class World {
     return {
       next: next?.when,
       visible: this.activations
-        .filter(activation => /*process.env.NODE_ENV !== 'production' ||*/ new Date(activation.when) <= now)
+        .filter(activation => isDev || new Date(activation.when) <= now)
         .map(activation => {
           const who = Object.entries(this.controllers).filter(([, controller]) => {
             return controller.x >= activation.xMin && controller.x <= activation.xMax &&
               controller.y >= activation.yMin && controller.y <= activation.yMax;
           }).map(([name]) => name);
+          const answers = this.answers[activation.identifier];
+          const correctAnswers = answers === undefined
+            ? 0
+            : answers.filter(a => a.value.trim().toLowerCase() === activation.secret?.trim().toLowerCase()).length;
           return {
             ...activation,
             isActive: validateActivation(activation.requirement, who),
+            isAnswered: activation.secret === undefined || correctAnswers >= 4,
+            answers,
             who,
           };
         }),
@@ -261,6 +275,25 @@ class World {
         server.send(displayId, message);
       });
   }
+
+  answer(controllerId: string, activations: Activation[], answer: string) {
+    activations.forEach(activation => {
+      if (!this.answers[activation.identifier]) {
+        this.answers[activation.identifier] = [];
+      }
+      const existingAnswer = this.answers[activation.identifier]?.find(a => a.controller === controllerId);
+      if (existingAnswer) {
+        existingAnswer.value = answer;
+      } else {
+        this.answers[activation.identifier]?.push({ controller: controllerId, value: answer });
+      }
+    });
+
+    // Trigger a location update for each controller
+    for (const controllerId in this.controllers) {
+      this.moveController(controllerId, 'none');
+    }
+  }
 }
 
 const world = new World(15, activations);
@@ -315,6 +348,11 @@ server.on('message', (username, message) => {
     console.debug(`[debug] [gno-2025] [controller] ${id} is trying to move ${direction}`);
     world.moveController(id, direction);
     world.updateActivations();
+  } else if (type === 'controller' && message.type === 'answer' && typeof message.payload === 'string') {
+    const answer = message.payload;
+    const insideActivations = world.getInsideActivations(id);
+    console.debug(`[debug] [gno-2025] [controller] ${id} is answering with "${answer}"`);
+    world.answer(id, insideActivations, answer);
   } else {
     console.warn(`[warn] [gno-2025] ${username} sent unknown ${message.type} message`);
   }
