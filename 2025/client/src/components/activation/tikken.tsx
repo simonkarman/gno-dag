@@ -5,6 +5,10 @@ export default function Tikken(props: ActivationProps) {
     <div className="text-amber-600 mb-2">[ANOMALIE DETECTIE]</div>
 
     <p>
+      Dag {props.who.join(' en ')},
+    </p>
+
+    <p>
       De chronometers lopen precies op schema, maar... er is iets anders.
     </p>
 

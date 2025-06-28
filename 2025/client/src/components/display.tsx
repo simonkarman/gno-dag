@@ -10,6 +10,7 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
   const r = Random.fromSeed("abc123");
   const controllerLocations: { [location: string]: { x: number, y: number, controllers: string[] } } = {};
   Object.entries(data.controllers).forEach(([controllerId, location]) => {
+    if (location === undefined) return;
     const key = `${location.x},${location.y}`;
     if (!controllerLocations[key]) {
       controllerLocations[key] = { x: location.x, y: location.y, controllers: [] };

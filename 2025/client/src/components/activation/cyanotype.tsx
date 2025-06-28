@@ -14,12 +14,12 @@ export default function Cyanotype(props: ActivationProps) {
 
     <p>
       Maar hier ligt een probleem: hoe documenteren we jullie aanwezigheid in deze tijdlijn
-      zonder de fotografische technologie van jullie eigen tijd? Gewone camera's bestaan hier simpelweg nog niet.
+      zonder de fotografische technologie van jullie eigen tijd? Gewone camera&apos;s bestaan hier simpelweg nog niet.
     </p>
 
     <p>
       Wacht... ik detecteer iets interessants. Een zekere Anna Atkins heeft dit jaar
-      een baanbrekende ontdekking gedaan. Zij heeft een proces ontwikkeld genaamd 'cyanotype' -
+      een baanbrekende ontdekking gedaan. Zij heeft een proces ontwikkeld genaamd &lsquo;cyanotype&rsquo; -
       een methode om silhouetten vast te leggen met behulp van chemicaliën en zonlicht.
     </p>
 

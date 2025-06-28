@@ -8,6 +8,10 @@ export default function Feest(props: ActivationProps) {
     <div className="text-green-700 mb-2">[TIJDREIS COÖRDINATIE SYSTEEM]</div>
 
     <p>
+      Hoi {props.who.join(' en ')},
+    </p>
+
+    <p>
       Uitstekend werk, tijdreizigers! Mijn sensoren registreren dat jullie
       lekker bezig zijn met de culinaire experimenten. De pasta-productie
       verloopt volgens planning.

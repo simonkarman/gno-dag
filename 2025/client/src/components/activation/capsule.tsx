@@ -58,7 +58,7 @@ export default function Capsule(props: ActivationProps) {
 
             <p>
               Fascineerend! Mijn detectiesystemen hebben een object geïdentificeerd
-              dat niet in mijn oorspronkelijke manifests stond. Er lijkt iets extra's
+              dat niet in mijn oorspronkelijke manifests stond. Er lijkt iets extra&apos;s
               toegevoegd te zijn tijdens jullie afwezigheid.
             </p>
 

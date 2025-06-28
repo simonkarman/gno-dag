@@ -1,10 +1,7 @@
 import { ActivationProps } from '@/components/activation-props';
 import { QuestionBox } from '@/components/question-box';
-import { useState } from 'react';
 
 export default function Getik(props: ActivationProps) {
-  const [showSearch, setShowSearch] = useState(true);
-
   return (
     <>
       <div className="text-orange-600 mb-2">[URGENTIE NIVEAU: VERHOOGD]</div>
@@ -24,23 +21,21 @@ export default function Getik(props: ActivationProps) {
         bepalen - jullie fysieke aanwezigheid ter plaatse is noodzakelijk.
       </p>
 
-      {showSearch && (
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-3 my-3 space-y-2">
-          <p className="font-bold text-blue-800">
-            MISSIE OPDRACHT: Coördinatie Verkenning
-          </p>
-          <p className="text-blue-700">
-            Ga <span className="font-bold">samen</span> op onderzoek naar de bron van dit geluid.
-            Werk als team - verdeel jullie niet. Mijn projecties suggereren dat het waarschijnlijk
-            een onschuldige oorsprong heeft, maar verificatie is essentieel.
-          </p>
-          <p className="text-blue-700">
-            Ik zou dit ook gezegd
-            hebben als het een gevaarlijke bron was, omdat ik jullie gerust wil stellen.
-            Of ... misschien had ik dat niet moeten zeggen.
-          </p>
-        </div>
-      )}
+      <div className="bg-blue-50 border-l-4 border-blue-400 p-3 my-3 space-y-2">
+        <p className="font-bold text-blue-800">
+          MISSIE OPDRACHT: Coördinatie Verkenning
+        </p>
+        <p className="text-blue-700">
+          Ga <span className="font-bold">samen</span> op onderzoek naar de bron van dit geluid.
+          Werk als team - verdeel jullie niet. Mijn projecties suggereren dat het waarschijnlijk
+          een onschuldige oorsprong heeft, maar verificatie is essentieel.
+        </p>
+        <p className="text-blue-700">
+          Ik zou dit ook gezegd
+          hebben als het een gevaarlijke bron was, omdat ik jullie gerust wil stellen.
+          Of ... misschien had ik dat niet moeten zeggen.
+        </p>
+      </div>
 
       <p>
         Neem je mobiele communicatiesystemen mee en blijf in contact. <b>Zet je telefoon niet uit</b>.

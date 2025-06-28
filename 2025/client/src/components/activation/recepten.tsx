@@ -5,6 +5,10 @@ export default function Recepten(props: ActivationProps) {
     <div className="text-cyan-400 mb-2 font-mono">[TEMPORALE NAVIGATIE ACTIEF]</div>
 
     <p>
+      Hallo {props.who.join(' en ')},
+    </p>
+
+    <p>
       Mijn chronometer geeft aan dat jullie energieniveaus kritiek laag zijn na de intensieve
       tijdscapsule operaties. Een tactische pauze voor voedselinname is nu essentieel.
     </p>
