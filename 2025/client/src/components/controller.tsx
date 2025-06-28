@@ -11,7 +11,7 @@ import Contact from '@/components/activation/contact';
 import Ontbijt from '@/components/activation/ontbijt';
 import TerugInDeTijd from '@/components/activation/terug-in-de-tijd';
 import Cyanotype from '@/components/activation/cyanotype';
-import Vastleggen from '@/components/activation/vastleggen';
+import Recepten from '@/components/activation/recepten';
 import Tikken from '@/components/activation/tikken';
 import Lunch from '@/components/activation/lunch';
 import Getik from '@/components/activation/getik';
@@ -38,7 +38,6 @@ const components: { [identifier: string]: ((props: ActivationProps) => ReactElem
   'ontbijt': (props) => <Ontbijt {...props} />,
   'terug-in-de-tijd': (props) => <TerugInDeTijd {...props} />,
   'cyanotype': (props) => <Cyanotype {...props} />,
-  'vastleggen': (props) => <Vastleggen {...props} />,
   'tikken': (props) => <Tikken {...props} />,
   'lunch': (props) => <Lunch {...props} />,
   'getik': (props) => <Getik {...props} />,
@@ -47,6 +46,7 @@ const components: { [identifier: string]: ((props: ActivationProps) => ReactElem
   'gelukkig': (props) => <Gelukkig {...props} />,
   'capsule': (props) => <Capsule {...props} />,
   'voorwaarts': (props) => <Voorwaarts {...props} />,
+  'recepten': (props) => <Recepten {...props} />,
   'feest': (props) => <Feest {...props} />,
   'cu2030': (props) => <Cu2030 {...props} />,
 }
@@ -112,7 +112,7 @@ export function Controller({ username }: { username: string, displayId: string }
           </div>
           {
             component
-              ? <div className="p-4 space-y-2 leading-relaxed">
+              ? <div className="p-4 space-y-3 leading-relaxed">
                   {a.isActive ? component(props) : requirement()}
                 </div>
               : <p className='bg-red-600 border border-red-400 text-xs font-mono font-bold text-white p-4 text-center'>

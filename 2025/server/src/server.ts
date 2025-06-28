@@ -152,7 +152,7 @@ class World {
       .filter(o => {
         const x = this.boundToWorldSize(spawn.x + o.x);
         const y = this.boundToWorldSize(spawn.y + o.y);
-        return this.getControllerAt(x, y) === undefined;
+        return this.getControllersAt(x, y).length === 0;
       })
       .shift() ?? options[0];
     this.controllers[controllerId] = { x: spawn.x + offset.x, y: spawn.y + offset.y };
@@ -172,10 +172,10 @@ class World {
     }
   }
 
-  getControllerAt(x: number, y: number): string | undefined {
+  getControllersAt(x: number, y: number): string[] {
     return Object.entries(this.controllers).filter(([, controller]) => {
       return controller.x === x && controller.y === y;
-    }).map(([name]) => name).shift();
+    }).map(([name]) => name);
   }
 
   getInsideActivations(controllerId: string): Activation[] {
@@ -215,7 +215,7 @@ class World {
           newX = this.boundToWorldSize(newX + 1);
           break;
       }
-      if (direction !== 'none' && this.getControllerAt(newX, newY)) {
+      if (direction !== 'none' && this.getControllersAt(newX, newY).length > 1) {
         return;
       }
       controller.x = newX;

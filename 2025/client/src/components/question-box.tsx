@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 export type QuestionBoxProps = {
   question: string,
-  isAnswered: boolean,
+  isAnswered: boolean | 'open',
   answers?: { controller: string, value: string }[],
   sendAnswer: (value: string) => void
 };
 
 export function QuestionBox({ question, isAnswered, answers, sendAnswer }: QuestionBoxProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(isAnswered === 'open');
   const [localAnswer, setLocalAnswer] = useState('');
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function QuestionBox({ question, isAnswered, answers, sendAnswer }: Quest
       {!isAnswered && atLeastOneAnswer && <p className="text-red-700">
         Het is helaas nog fout. Het zou kunnen dat sommige van jullie al wel het goede antwoord gegeven hebben, maar er is een <b>meerderheid</b> (4 of meer) aan goede antwoorden nodig!
       </p>}
-      {isAnswered && <p className="text-green-700">
+      {isAnswered === true && <p className="text-green-700">
         Goed gedaan! Jullie hebben samen het juiste antwoord gegeven.
       </p>}
       <div>
@@ -59,7 +59,7 @@ export function QuestionBox({ question, isAnswered, answers, sendAnswer }: Quest
           Antwoord
         </button>
       </div>
-      {isAnswered &&
+      {isAnswered === true &&
         <div className="flex justify-end">
           <button className="px-2 py-0.5 border rounded-sm" onClick={() => setIsOpen(!isOpen)}>Verberg antwoorden</button>
         </div>

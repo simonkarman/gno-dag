@@ -4,9 +4,19 @@ import { DisplayInformation, useDisplayStore } from '@/components/display-client
 import { Random } from '@/utils/random';
 import Dashboard from '@/components/display-dashboard';
 
+const order = ['g','j','s','l','m','t'];
 export function Display({ displayInformation }: { displayInformation: DisplayInformation }) {
   const data = useDisplayStore();
   const r = Random.fromSeed("abc123");
+  const controllerLocations: { [location: string]: { x: number, y: number, controllers: string[] } } = {};
+  Object.entries(data.controllers).forEach(([controllerId, location]) => {
+    const key = `${location.x},${location.y}`;
+    if (!controllerLocations[key]) {
+      controllerLocations[key] = { x: location.x, y: location.y, controllers: [] };
+    }
+    controllerLocations[key].controllers.push(controllerId);
+    controllerLocations[key].controllers.sort((a, b) => order.indexOf(a[0].toLowerCase()) - order.indexOf(b[0].toLowerCase()));
+  });
   return <>
     <div className="p-2 pt-20 flex justify-between gap-4">
       <div className="time-particles">
@@ -54,17 +64,18 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
               </g>
             ))}
           </g>
-          {Object.entries(data.controllers).map(([controllerId, location]) => (
-            <g key={controllerId}>
+          {Object.entries(controllerLocations).map(([locationId, info]) => (
+            <g key={locationId}>
               <circle
-                key={controllerId}
-                cx={location?.x}
-                cy={location?.y}
-                r={0.4}
-                className="fill-green-500 stroke-white stroke-[0.04] hover:fill-green-600 active:fill-green-700"
+                cx={info?.x}
+                cy={info?.y}
+                r={info.controllers.length === 1 ? 0.4 : 0.46}
+                className={`fill-green-500 stroke-white ${info.controllers.length === 1 ? 'stroke-[0.04]' : 'stroke-[0.048]'} hover:fill-green-600 active:fill-green-700`}
               />
-              <g transform={`translate(${location?.x} ${location ? location.y + 0.04 : location}) scale(0.02)`}>
-                <text className='pointer-events-none select-none fill-white font-bold text-2xl' textAnchor='middle' alignmentBaseline='middle'>{controllerId[0]}</text>
+              <g transform={`translate(${info?.x} ${info ? info.y + 0.04 : info}) scale(0.02)`}>
+                <text className='pointer-events-none select-none fill-white font-bold text-xl' textAnchor='middle' alignmentBaseline='middle'>
+                  {info.controllers.map(cId => cId[0]).join('/')}
+                </text>
               </g>
             </g>
           ))}

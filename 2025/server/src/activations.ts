@@ -28,16 +28,15 @@ export const activations: Activation[] = [
 
   // Activiteit 1 - Cyanotype
   { identifier: 'cyanotype', when: '2025-06-29T10:00:00', xMin: 8, xMax: 9, yMin: 6, yMax: 7, color: 'rgb(217, 99, 46, 0.2)', requirement: 'j&g' },
-  { identifier: 'vastleggen', when: '2025-06-29T10:03:00', xMin: 13, xMax: 14, yMin: 13, yMax: 13, color: 'rgb(217, 99, 46, 0.2)', requirement: 'one' },
   { identifier: 'tikken', when: '2025-06-29T11:11:11', xMin: 14, xMax: 14, yMin: 10, yMax: 12, color: 'rgb(217, 99, 46, 0.2)', requirement: 'two' },
 
   // Lunch
-  { identifier: 'lunch', when: '2025-06-29T12:00:00', xMin: 0, xMax: 1, yMin: 7, yMax: 7, color: 'rgba(145, 145, 0, 0.2)', requirement: 'one' },
-  { identifier: 'getik', when: '2025-06-29T12:52:27', xMin: 5, xMax: 6, yMin: 5, yMax: 7, color: 'rgba(145, 145, 0, 0.2)', requirement: 'all', secret: 'bom' },
+  { identifier: 'lunch', when: '2025-06-29T11:45:00', xMin: 0, xMax: 1, yMin: 7, yMax: 7, color: 'rgba(145, 145, 0, 0.2)', requirement: 'one' },
+  { identifier: 'getik', when: '2025-06-29T12:47:27', xMin: 5, xMax: 6, yMin: 5, yMax: 7, color: 'rgba(145, 145, 0, 0.2)', requirement: 'all', secret: 'B.O.M.' },
 
-  // Activiteit 2 - Keep Talking and Nobody Explodes
-  { identifier: 'ontmantelen', when: '2025-06-29T13:00:00', xMin: 10, xMax: 12, yMin: 9, yMax: 9, color: 'rgba(25, 172, 0, 0.2)', requirement: 'one' },
-  { identifier: 'analyse', when: '2025-06-29T13:45:00', xMin: 8, xMax: 9, yMin: 13, yMax: 13, color: 'rgba(25, 172, 0, 0.2)', requirement: 'two' },
+  // // Activiteit 2 - Keep Talking and Nobody Explodes
+  { identifier: 'ontmantelen', when: '2025-06-29T13:04:07', xMin: 10, xMax: 12, yMin: 9, yMax: 9, color: 'rgba(25, 172, 0, 0.2)', requirement: 'one' },
+  { identifier: 'analyse', when: '2025-06-29T13:45:00', xMin: 8, xMax: 9, yMin: 13, yMax: 13, color: 'rgba(25, 172, 0, 0.2)', requirement: 'two', secret: 'Bewaarde Opgeslagen Momenten' },
 
   // Rusten
 
@@ -45,12 +44,13 @@ export const activations: Activation[] = [
   { identifier: 'gelukkig', when: '2025-06-29T14:45:00', xMin: 10, xMax: 14, yMin: 6, yMax: 6, color: 'rgba(255, 0, 255, 0.2)', requirement: 'one', secret: 'taart' },
 
   // Activiteit 3 - Tijdcapsule
-  { identifier: 'capsule', when: '2025-06-29T15:00:00', xMin: 3, xMax: 5, yMin: 8, yMax: 8, color: 'rgb(209, 50, 26, 0.2)', requirement: 'three' },
+  { identifier: 'capsule', when: '2025-06-29T15:00:00', xMin: 3, xMax: 5, yMin: 8, yMax: 8, color: 'rgb(209, 50, 26, 0.2)', requirement: 'three', secret: 'tegoedbon' },
   { identifier: 'voorwaarts', when: '2025-06-29T15:57:00', xMin: 0, xMax: 1, yMin: 1, yMax: 1, color: 'rgb(209, 50, 26, 0.2)', requirement: 'one' },
 
   // Activiteit 4 - Pasta Maken
-  { identifier: 'feest', when: '2025-06-29T16:07:00', xMin: 9, xMax: 13, yMin: 14, yMax: 14, color: 'rgba(0, 155, 255, 0.2)', requirement: 'j&g' },
-  { identifier: 'cu2030', when: '2025-06-29T18:00:00', xMin: 4, xMax: 5, yMin: 4, yMax: 4, color: 'rgba(0, 155, 255, 0.2)', requirement: 'one', secret: '35' },
+  { identifier: 'recepten', when: '2025-06-29T16:03:34', xMin: 13, xMax: 14, yMin: 13, yMax: 13, color: 'rgb(217, 99, 46, 0.2)', requirement: 'one' },
+  { identifier: 'feest', when: '2025-06-29T17:52:15', xMin: 9, xMax: 13, yMin: 14, yMax: 14, color: 'rgba(0, 155, 255, 0.2)', requirement: 'j&g' },
+  { identifier: 'cu2030', when: '2025-06-29T19:13:50', xMin: 4, xMax: 5, yMin: 4, yMax: 4, color: 'rgba(0, 155, 255, 0.2)', requirement: 'one', secret: '35' },
 
   // Three
   ...(drawNumbers ? [
