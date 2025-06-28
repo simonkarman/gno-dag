@@ -49,7 +49,7 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
                 className="stroke-white stroke-[0.003] animate-pulse"
               />
             </g>))}
-            {data.activations.visible.map(activation => (
+            {data.activations.visible.map((activation, i) => (
               <g key={activation.identifier}>
                 <rect
                   x={activation.xMin + 0.01}
@@ -62,6 +62,15 @@ export function Display({ displayInformation }: { displayInformation: DisplayInf
                   }}
                   fill={activation.color || 'rgba(255, 0, 0, 0.1)'}
                 />
+                {i === data.activations.visible.length - 1 && (
+                  <rect
+                    x={activation.xMin + 0.01}
+                    y={activation.yMin + 0.01}
+                    width={activation.xMax - activation.xMin + 1 - 0.02}
+                    height={activation.yMax - activation.yMin + 1 - 0.02}
+                    className={`stroke-white stroke-[0.04] fill-transparent animate-pulse`}
+                  />
+                )}
               </g>
             ))}
           </g>
