@@ -92,7 +92,10 @@ class World {
       }
     }
 
-    const now = new Date();
+    const now = new Date(new Date().toLocaleString('sv-SE', {
+      timeZone: 'Europe/Amsterdam'
+    }));
+    console.info(`[info] [gno-2025] [world] Getting activation state at ${now.toISOString()}`);
     const next = this.activations.filter(activation => new Date(activation.when) >= now).shift()
     return {
       next: next?.when,
@@ -359,6 +362,7 @@ server.on('message', (username, message) => {
 });
 
 setInterval(() => {
+  console.info("[info] [gno-2025] [server] Activations update triggered");
   world.updateActivations();
 }, 1000 * 5); // Update activations every five seconds
 
