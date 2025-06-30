@@ -3,7 +3,8 @@
   "version": "0.0.2",
   "private": true,
   "scripts": {
-    "dev": "nodemon --exec \"ts-node src/server.ts\" src/server.ts"
+    "dev": "nodemon --exec \"ts-node src/server.ts\" src/server.ts",
+    "process-logs": "ts-node logs/process.ts"
   },
   "author": "Simon Karman",
   "devDependencies": {
