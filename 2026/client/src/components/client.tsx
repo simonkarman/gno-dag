@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPersonWalking, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { createClient, createStore } from '@krmx/client-react';
 import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE } from '@/components/geo';
 import { GameMap } from '@/components/map';
@@ -42,6 +44,11 @@ export const useStore = createStore(
 
 const VALID_PLAYERS = ['Govie', 'Jac.'] as const;
 type PlayerName = typeof VALID_PLAYERS[number];
+
+const PLAYER_COLORS: Record<PlayerName, string> = {
+  'Govie': '#f59e0b',
+  'Jac.':  '#3b82f6',
+};
 
 // ---------------------------------------------------------------------------
 // Shared: build a position handler that sends location updates to the server
@@ -107,25 +114,37 @@ function PlayerViewContent({ username, positions, inRange, currentPos, devBadge 
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      {devBadge}
-      <p className="text-sm text-zinc-400">
-        Speler: <span className="font-bold text-zinc-200">{username}</span>
-      </p>
+    <>
       <GameMap positions={positions} self={username as PlayerName} />
-      {devBadge && (
-        <div className="text-xs text-zinc-500 font-mono space-y-1 text-center">
-          {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
-            const p = positions[name];
-            return (
-              <p key={name}>
-                {name}: {p ? `(${p.x.toFixed(3)}, ${p.y.toFixed(3)})` : 'wacht...'}
-              </p>
-            );
-          })}
+      {/* Overlay: floats above the map */}
+      <div className="fixed inset-0 z-10 pointer-events-none">
+        {/* Player pill — top-right */}
+        <div className="absolute top-4 right-4 pointer-events-none">
+          <div
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 bg-zinc-900/75 backdrop-blur-sm border shadow-lg"
+            style={{ borderColor: PLAYER_COLORS[username as PlayerName] + '55' }}
+          >
+            <FontAwesomeIcon
+              icon={faPersonWalking}
+              className="w-3.5 h-3.5"
+              style={{ color: PLAYER_COLORS[username as PlayerName] }}
+            />
+            <span
+              className="text-sm font-bold tracking-wide"
+              style={{ color: PLAYER_COLORS[username as PlayerName] }}
+            >
+              {username}
+            </span>
+          </div>
         </div>
-      )}
-    </div>
+        {/* Dev badge — bottom-left, collapsed by default */}
+        {devBadge && (
+          <div className="absolute bottom-4 left-4 pointer-events-auto">
+            {devBadge}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -172,43 +191,56 @@ function DevBadge({ useReal, simPos, onToggle, onReset, onMove }: {
   onReset: () => void;
   onMove: (dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => void;
 }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col items-center gap-2 rounded-md bg-amber-900/60 border border-amber-600 px-3 py-2 text-xs text-amber-300 font-mono">
-      <div className="flex flex-wrap items-center gap-2">
-        <span>DEV</span>
-        <span className="text-amber-500">·</span>
-        {useReal ? (
-          <span>echte GPS</span>
-        ) : (
-          <span>{simPos.lat.toFixed(6)}, {simPos.lng.toFixed(6)}</span>
-        )}
-        <span className="text-amber-500">·</span>
-        <button
-          className="underline hover:text-amber-100 transition-colors cursor-pointer"
-          onClick={onToggle}
-        >
-          {useReal ? 'gebruik simulatie' : 'gebruik echte GPS'}
-        </button>
-        {!useReal && (
-          <>
+    <div className="flex flex-col items-start gap-2">
+      {/* Collapsed toggle — always visible */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-amber-900/50 border border-amber-700/50 text-amber-400/70 text-xs font-mono hover:bg-amber-900/70 hover:text-amber-300 transition-all cursor-pointer"
+      >
+        <FontAwesomeIcon icon={open ? faChevronDown : faChevronUp} className="w-2.5 h-2.5" />
+        DEV
+      </button>
+
+      {/* Expanded panel */}
+      {open && (
+        <div className="flex flex-col gap-2 rounded-lg bg-amber-900/70 border border-amber-600 px-3 py-2 text-xs text-amber-300 font-mono backdrop-blur-sm shadow-lg">
+          <div className="flex flex-wrap items-center gap-2">
+            {useReal ? (
+              <span>echte GPS</span>
+            ) : (
+              <span>{simPos.lat.toFixed(6)}, {simPos.lng.toFixed(6)}</span>
+            )}
             <span className="text-amber-500">·</span>
             <button
               className="underline hover:text-amber-100 transition-colors cursor-pointer"
-              onClick={onReset}
+              onClick={onToggle}
             >
-              reset
+              {useReal ? 'gebruik simulatie' : 'gebruik echte GPS'}
             </button>
-          </>
-        )}
-      </div>
-      {!useReal && (
-        <div className="grid grid-cols-3 gap-1">
-          <div />
-          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowUp')}>↑</button>
-          <div />
-          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowLeft')}>←</button>
-          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowDown')}>↓</button>
-          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowRight')}>→</button>
+            {!useReal && (
+              <>
+                <span className="text-amber-500">·</span>
+                <button
+                  className="underline hover:text-amber-100 transition-colors cursor-pointer"
+                  onClick={onReset}
+                >
+                  reset
+                </button>
+              </>
+            )}
+          </div>
+          {!useReal && (
+            <div className="grid grid-cols-3 gap-1">
+              <div />
+              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowUp')}>↑</button>
+              <div />
+              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowLeft')}>←</button>
+              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowDown')}>↓</button>
+              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowRight')}>→</button>
+            </div>
+          )}
         </div>
       )}
     </div>

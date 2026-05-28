@@ -29,7 +29,7 @@ export default function RootLayout({
           <div className="w-full grow">
             {children}
           </div>
-          <footer className="mb-1 flex items-center gap-2 px-3 py-1">
+          <footer className="relative z-10 mb-1 flex items-center gap-2 px-3 py-1">
             <p className="text-center text-xs text-zinc-500">
               <span>Built with</span>{' '}
               <a href="https://github.com/simonkarman/krmx" className="font-semibold tracking-wide text-zinc-400 hover:underline">Krmx</a>

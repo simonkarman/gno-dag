@@ -1,6 +1,7 @@
 'use client';
 
 import { Point } from '@/components/geo';
+import { ROADS } from '@/components/road-data';
 
 type PlayerName = 'Govie' | 'Jac.';
 
@@ -14,75 +15,75 @@ const PLAYER_COLORS: Record<PlayerName, string> = {
   'Jac.': '#3b82f6',   // blue
 };
 
-const MAP_SIZE = 320; // px, square SVG viewBox
+const ROAD_STYLES: Record<string, { stroke: string; width: number; opacity: number }> = {
+  tertiary:    { stroke: '#a1a1aa', width: 2.5, opacity: 0.9 },
+  residential: { stroke: '#71717a', width: 1.8, opacity: 0.85 },
+  service:     { stroke: '#52525b', width: 1.2, opacity: 0.7 },
+  cycleway:    { stroke: '#22c55e', width: 1.0, opacity: 0.65 },
+  footway:     { stroke: '#3f3f46', width: 0.8, opacity: 0.6 },
+  pedestrian:  { stroke: '#3f3f46', width: 1.2, opacity: 0.65 },
+  unclassified:{ stroke: '#71717a', width: 1.5, opacity: 0.75 },
+};
+const DEFAULT_ROAD_STYLE = { stroke: '#3f3f46', width: 0.8, opacity: 0.5 };
+
+// Real-world aspect ratio of the game bounding box.
+// lng_span * cos(lat_mid) / lat_span ≈ 1.817 → width is ~1.8× the height.
+const MAP_W = 320;
+const MAP_H = 176; // ≈ MAP_W / 1.817
+
+// Inset the viewBox slightly to hide messy road edges near the bounding-box border.
+const INSET = 0.05; // 5% on every side
+const VB_X = MAP_W * INSET;
+const VB_Y = MAP_H * INSET;
+const VB_W = MAP_W * (1 - 2 * INSET);
+const VB_H = MAP_H * (1 - 2 * INSET);
 
 export function GameMap({ positions, self }: Props) {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-700 shadow-lg">
-      <svg
-        width={MAP_SIZE}
-        height={MAP_SIZE}
-        viewBox={`0 0 ${MAP_SIZE} ${MAP_SIZE}`}
-        className="bg-zinc-900"
-      >
-        {/* ----------------------------------------------------------------
-            TODO: Replace this placeholder rectangle with the real train
-            network SVG (streets and stops around Jac. and Govie's house).
-            Normalised coordinates: x and y are in [0, 1], multiply by
-            MAP_SIZE to get pixel positions.
-        ---------------------------------------------------------------- */}
-        <rect
-          x={8} y={8}
-          width={MAP_SIZE - 16} height={MAP_SIZE - 16}
-          rx={6}
-          fill="none"
-          stroke="#3f3f46"
-          strokeWidth={2}
-          strokeDasharray="6 4"
-        />
-        <text
-          x={MAP_SIZE / 2} y={MAP_SIZE / 2}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill="#52525b"
-          fontSize={13}
-          fontFamily="monospace"
-        >
-          TODO: treinnetwerk kaart
-        </text>
+    <svg
+      viewBox={`${VB_X} ${VB_Y} ${VB_W} ${VB_H}`}
+      preserveAspectRatio="xMidYMid meet"
+      className="fixed inset-0 w-full h-full z-0 bg-zinc-900"
+    >
+        {/* Roads from OpenStreetMap (pre-baked in road-data.ts) */}
+        {ROADS.map((road, i) => {
+          const style = ROAD_STYLES[road.type] ?? DEFAULT_ROAD_STYLE;
+          const pts = road.points.map(p => `${p.x * MAP_W},${p.y * MAP_H}`).join(' ');
+          return (
+            <polyline
+              key={i}
+              points={pts}
+              fill="none"
+              stroke={style.stroke}
+              strokeWidth={style.width}
+              strokeOpacity={style.opacity}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          );
+        })}
 
         {/* Player dots */}
         {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
           const pos = positions[name];
           if (!pos) return null;
-          const cx = pos.x * MAP_SIZE;
-          const cy = pos.y * MAP_SIZE;
+          const cx = pos.x * MAP_W;
+          const cy = pos.y * MAP_H;
           const color = PLAYER_COLORS[name];
           const isSelf = name === self;
           return (
             <g key={name}>
               {/* Outer ring for self */}
               {isSelf && (
-                <circle cx={cx} cy={cy} r={16} fill={color} opacity={0.15} />
+                <circle cx={cx} cy={cy} r={5} fill={color} opacity={0.25} />
               )}
-              <circle cx={cx} cy={cy} r={10} fill={color} opacity={0.9} />
-              <text
-                x={cx} y={cy}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="white"
-                fontSize={9}
-                fontWeight="bold"
-                fontFamily="monospace"
-              >
-                {name[0]}
-              </text>
+              <circle cx={cx} cy={cy} r={3} fill={color} opacity={0.9} />
               {/* Name label below the dot */}
               <text
-                x={cx} y={cy + 18}
+                x={cx} y={cy + 6}
                 textAnchor="middle"
                 fill={color}
-                fontSize={10}
+                fontSize={3.5}
                 fontFamily="monospace"
               >
                 {name}
@@ -91,6 +92,5 @@ export function GameMap({ positions, self }: Props) {
           );
         })}
       </svg>
-    </div>
   );
 }
