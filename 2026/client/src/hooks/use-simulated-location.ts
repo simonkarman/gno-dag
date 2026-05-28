@@ -33,27 +33,30 @@ export function useSimulatedLocation(onPosition: (pos: LatLng) => void) {
     onPositionRef.current(pos);
   }, [pos]);
 
+  const reset = useCallback(() => setPos(START), []);
+
+  const move = useCallback((dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => {
+    setPos((prev) => {
+      switch (dir) {
+        case 'ArrowUp':    return { ...prev, lat: prev.lat + STEP_LAT };
+        case 'ArrowDown':  return { ...prev, lat: prev.lat - STEP_LAT };
+        case 'ArrowLeft':  return { ...prev, lng: prev.lng - STEP_LNG };
+        case 'ArrowRight': return { ...prev, lng: prev.lng + STEP_LNG };
+      }
+    });
+  }, []);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      setPos((prev) => {
-        switch (e.key) {
-          case 'ArrowUp':    return { ...prev, lat: prev.lat + STEP_LAT };
-          case 'ArrowDown':  return { ...prev, lat: prev.lat - STEP_LAT };
-          case 'ArrowLeft':  return { ...prev, lng: prev.lng - STEP_LNG };
-          case 'ArrowRight': return { ...prev, lng: prev.lng + STEP_LNG };
-          default:           return prev;
-        }
-      });
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault();
+        move(e.key as 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight');
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [move]);
 
-  const reset = useCallback(() => setPos(START), []);
-
-  return { pos, reset };
+  return { pos, reset, move };
 }

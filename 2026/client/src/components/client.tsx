@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient, createStore } from '@krmx/client-react';
 import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE } from '@/components/geo';
 import { GameMap } from '@/components/map';
@@ -69,15 +69,16 @@ function usePositionHandler() {
 }
 
 // ---------------------------------------------------------------------------
-// Production view: real GPS only
+// Shared render tree for both production and dev views
 // ---------------------------------------------------------------------------
 
-function PlayerView({ username }: { username: string }) {
-  const { positions } = useStore();
-  const { inRange, currentPos, handlePosition } = usePositionHandler();
-
-  useGeolocation(handlePosition);
-
+function PlayerViewContent({ username, positions, inRange, currentPos, devBadge }: {
+  username: string;
+  positions: Positions;
+  inRange: boolean | null;
+  currentPos: LatLng | null;
+  devBadge?: React.ReactNode;
+}) {
   if (inRange === null) {
     return (
       <div className="flex flex-col items-center gap-3 mt-12 px-4 text-center">
@@ -90,6 +91,7 @@ function PlayerView({ username }: { username: string }) {
     const distance = currentPos ? distanceTo(currentPos, HOUSE) : null;
     return (
       <div className="flex flex-col items-center gap-4 mt-12 px-6 text-center">
+        {devBadge}
         <div className="text-4xl">📍</div>
         <h2 className="font-bold text-xl">Je bent er nog niet!</h2>
         <p className="text-zinc-400 max-w-xs">
@@ -106,12 +108,38 @@ function PlayerView({ username }: { username: string }) {
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
+      {devBadge}
       <p className="text-sm text-zinc-400">
         Speler: <span className="font-bold text-zinc-200">{username}</span>
       </p>
       <GameMap positions={positions} self={username as PlayerName} />
+      {devBadge && (
+        <div className="text-xs text-zinc-500 font-mono space-y-1 text-center">
+          {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
+            const p = positions[name];
+            return (
+              <p key={name}>
+                {name}: {p ? `(${p.x.toFixed(3)}, ${p.y.toFixed(3)})` : 'wacht...'}
+              </p>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Production view: real GPS only
+// ---------------------------------------------------------------------------
+
+function PlayerView({ username }: { username: string }) {
+  const { positions } = useStore();
+  const { inRange, currentPos, handlePosition } = usePositionHandler();
+
+  useGeolocation(handlePosition);
+
+  return <PlayerViewContent username={username} positions={positions} inRange={inRange} currentPos={currentPos} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -123,89 +151,65 @@ function DevPlayerView({ username }: { username: string }) {
   const [useReal, setUseReal] = useState(false);
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
-  const { pos: simPos, reset: resetSimPos } = useSimulatedLocation(useReal ? () => {} : handlePosition);
+  const { pos: simPos, reset: resetSimPos, move } = useSimulatedLocation(useReal ? () => {} : handlePosition);
   useGeolocation(useReal ? handlePosition : () => {});
 
-  if (inRange === null) {
-    return (
-      <div className="flex flex-col items-center gap-3 mt-12 px-4 text-center">
-        <p className="text-zinc-400">Locatie ophalen...</p>
-      </div>
-    );
-  }
-
-  if (!inRange) {
-    const distance = currentPos ? distanceTo(currentPos, HOUSE) : null;
-    return (
-      <div className="flex flex-col items-center gap-4 mt-12 px-6 text-center">
-        <DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} />
-        <div className="text-4xl">📍</div>
-        <h2 className="font-bold text-xl">Je bent er nog niet!</h2>
-        <p className="text-zinc-400 max-w-xs">
-          Je bevindt je nog niet op de juiste locatie. Ga naar het huis van Jac. en Govie om te beginnen.
-        </p>
-        {distance !== null && (
-          <p className="text-zinc-300 font-mono text-sm">
-            Afstand: <span className="font-bold text-white">{formatDistance(distance)}</span>
-          </p>
-        )}
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      <DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} />
-      <p className="text-sm text-zinc-400">
-        Speler: <span className="font-bold text-zinc-200">{username}</span>
-      </p>
-      <GameMap positions={positions} self={username as PlayerName} />
-      <div className="text-xs text-zinc-500 font-mono space-y-1 text-center">
-        {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
-          const p = positions[name];
-          return (
-            <p key={name}>
-              {name}: {p ? `(${p.x.toFixed(3)}, ${p.y.toFixed(3)})` : 'wacht...'}
-            </p>
-          );
-        })}
-      </div>
-    </div>
+    <PlayerViewContent
+      username={username}
+      positions={positions}
+      inRange={inRange}
+      currentPos={currentPos}
+      devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} />}
+    />
   );
 }
 
-function DevBadge({ useReal, simPos, onToggle, onReset }: {
+function DevBadge({ useReal, simPos, onToggle, onReset, onMove }: {
   useReal: boolean;
   simPos: LatLng;
   onToggle: () => void;
   onReset: () => void;
+  onMove: (dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-md bg-amber-900/60 border border-amber-600 px-3 py-1 text-xs text-amber-300 font-mono">
-      <span>DEV</span>
-      <span className="text-amber-500">·</span>
-      {useReal ? (
-        <span>echte GPS</span>
-      ) : (
-        <span>↑ ↓ ← → to move · {simPos.lat.toFixed(6)}, {simPos.lng.toFixed(6)}</span>
-      )}
-      <span className="text-amber-500">·</span>
-      <button
-        className="underline hover:text-amber-100 transition-colors cursor-pointer"
-        onClick={onToggle}
-      >
-        {useReal ? 'gebruik simulatie' : 'gebruik echte GPS'}
-      </button>
+    <div className="flex flex-col items-center gap-2 rounded-md bg-amber-900/60 border border-amber-600 px-3 py-2 text-xs text-amber-300 font-mono">
+      <div className="flex flex-wrap items-center gap-2">
+        <span>DEV</span>
+        <span className="text-amber-500">·</span>
+        {useReal ? (
+          <span>echte GPS</span>
+        ) : (
+          <span>{simPos.lat.toFixed(6)}, {simPos.lng.toFixed(6)}</span>
+        )}
+        <span className="text-amber-500">·</span>
+        <button
+          className="underline hover:text-amber-100 transition-colors cursor-pointer"
+          onClick={onToggle}
+        >
+          {useReal ? 'gebruik simulatie' : 'gebruik echte GPS'}
+        </button>
+        {!useReal && (
+          <>
+            <span className="text-amber-500">·</span>
+            <button
+              className="underline hover:text-amber-100 transition-colors cursor-pointer"
+              onClick={onReset}
+            >
+              reset
+            </button>
+          </>
+        )}
+      </div>
       {!useReal && (
-        <>
-          <span className="text-amber-500">·</span>
-          <button
-            className="underline hover:text-amber-100 transition-colors cursor-pointer"
-            onClick={onReset}
-          >
-            reset
-          </button>
-        </>
+        <div className="grid grid-cols-3 gap-1">
+          <div />
+          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowUp')}>↑</button>
+          <div />
+          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowLeft')}>←</button>
+          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowDown')}>↓</button>
+          <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowRight')}>→</button>
+        </div>
       )}
     </div>
   );
