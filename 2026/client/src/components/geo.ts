@@ -67,3 +67,11 @@ export function toPoint(pos: LatLng): Point {
     y: Math.max(0, Math.min(1, y)),
   };
 }
+
+/** Convert a normalised {x, y} point in [0, 1] back to a GPS coordinate (inverse of toPoint). */
+export function fromPoint(point: Point): LatLng {
+  return {
+    lng: GAME_BOUNDS.nw.lng + point.x * (GAME_BOUNDS.se.lng - GAME_BOUNDS.nw.lng),
+    lat: GAME_BOUNDS.nw.lat + point.y * (GAME_BOUNDS.se.lat - GAME_BOUNDS.nw.lat),
+  };
+}

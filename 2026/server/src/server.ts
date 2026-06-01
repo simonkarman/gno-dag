@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import './json-logging';
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
@@ -5,8 +6,22 @@ import { createServer } from '@krmx/server';
 import { LogSeverity } from '@krmx/base';
 import { enableUnlinkedKicker } from './unlinked-kicker';
 import { LatLng, Point, geoTransform } from './geo-transform';
+import { StateStore, PUZZLE_PROXIMITY_METERS } from './state';
+import { tryComplete, toClientGameState } from './puzzles';
 
 const version = require('../package.json').version;
+
+// ---------------------------------------------------------------------------
+// Persistent state (GCS-backed, in-memory authoritative)
+// ---------------------------------------------------------------------------
+
+const GCS_BUCKET = process.env.GCS_BUCKET;
+const GCS_BLOB = process.env.GCS_BLOB ?? 'state.json';
+if (!GCS_BUCKET) {
+  console.error('[error] [gno-2026] [state] GCS_BUCKET environment variable is required');
+  process.exit(1);
+}
+const stateStore = new StateStore(GCS_BUCKET, GCS_BLOB);
 
 // ---------------------------------------------------------------------------
 // HTTP + Krmx server setup
@@ -73,6 +88,33 @@ function broadcastPositions() {
     });
 }
 
+/** Broadcast the current game state (puzzles + scores) to every connected player. */
+function broadcastGameState() {
+  const payload = toClientGameState(stateStore.get(), positions);
+  lastGameStateSignature = JSON.stringify(payload);
+  server.getUsers()
+    .filter(u => u.isLinked)
+    .forEach(u => {
+      server.send(u.username, { type: 'game-state', payload });
+    });
+}
+
+/**
+ * The derived game state (open/locked) depends on player positions, so it can
+ * change without any persisted mutation. We track a signature of the last
+ * broadcast and only re-broadcast when the derived state actually changes.
+ */
+let lastGameStateSignature = '';
+
+/** Broadcasts the game state only if its derived form changed since last broadcast. */
+function maybeBroadcastGameState() {
+  const payload = toClientGameState(stateStore.get(), positions);
+  const signature = JSON.stringify(payload);
+  if (signature !== lastGameStateSignature) {
+    broadcastGameState();
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Krmx event handlers
 // ---------------------------------------------------------------------------
@@ -87,6 +129,7 @@ server.on('link', (username) => {
     'Jac.': positions['Jac.'] ? geoTransform.toPoint(positions['Jac.']) : null,
   };
   server.send(username, { type: 'positions', payload });
+  server.send(username, { type: 'game-state', payload: toClientGameState(stateStore.get(), positions) });
 });
 
 server.on('leave', (username) => {
@@ -94,6 +137,7 @@ server.on('leave', (username) => {
   console.info(`[info] [gno-2026] [player] ${player} left — clearing position`);
   positions[player] = null;
   broadcastPositions();
+  maybeBroadcastGameState();
 });
 
 server.on('message', (username, message) => {
@@ -108,10 +152,29 @@ server.on('message', (username, message) => {
     console.debug(`[debug] [gno-2026] [player] ${player} location update: ${lat}, ${lng}`);
     positions[player] = { lat, lng };
     broadcastPositions();
+    maybeBroadcastGameState();
   } else if (message.type === 'clear-location') {
     console.debug(`[debug] [gno-2026] [player] ${player} cleared location (out of range)`);
     positions[player] = null;
     broadcastPositions();
+    maybeBroadcastGameState();
+  } else if (message.type === 'complete-puzzle') {
+    const { id, answer } = message.payload as { id: string; answer: string };
+    if (typeof id !== 'string' || typeof answer !== 'string') {
+      console.warn(`[warn] [gno-2026] [player] ${player} sent invalid complete-puzzle payload`);
+      return;
+    }
+    const result = tryComplete(stateStore.get(), positions, player, id, answer, PUZZLE_PROXIMITY_METERS);
+    server.send(username, {
+      type: 'puzzle-result',
+      payload: { id, success: result.success, message: result.message },
+    });
+    if (result.mutated) {
+      console.info(`[info] [gno-2026] [player] ${player} completed puzzle ${id}`);
+      stateStore.save();
+      // Completing a puzzle changes scores, which may unlock other puzzles.
+      broadcastGameState();
+    }
   } else {
     console.warn(`[warn] [gno-2026] ${username} sent unknown message type: ${message.type}`);
   }
@@ -121,5 +184,7 @@ server.on('message', (username, message) => {
 // Start
 // ---------------------------------------------------------------------------
 
-server.listen(8082);
-console.info(`[info] [gno-2026] [server] GNO Dag 2026 server v${version} started on port 8082`);
+stateStore.load().then(() => {
+  server.listen(8082);
+  console.info(`[info] [gno-2026] [server] GNO Dag 2026 server v${version} started on port 8082`);
+});

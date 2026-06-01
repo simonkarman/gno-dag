@@ -1,13 +1,18 @@
 'use client';
 
-import { Point } from '@/components/geo';
+import { Point, toPoint } from '@/components/geo';
 import { ROADS } from '@/components/road-data';
+import { ClientPuzzle, PUZZLE_STATE_COLORS, secondaryLocations, derivePuzzleState } from '@/components/puzzles';
 
 type PlayerName = 'Govie' | 'Jac.';
 
 interface Props {
   positions: Record<PlayerName, Point | null>;
   self: PlayerName;
+  puzzles?: ClientPuzzle[];
+  scores?: Record<PlayerName, number>;
+  /** Id of the puzzle the player is currently viewing — its secondary locations get highlighted. */
+  activePuzzleId?: string | null;
 }
 
 const PLAYER_COLORS: Record<PlayerName, string> = {
@@ -38,7 +43,8 @@ const VB_Y = MAP_H * INSET;
 const VB_W = MAP_W * (1 - 2 * INSET);
 const VB_H = MAP_H * (1 - 2 * INSET);
 
-export function GameMap({ positions, self }: Props) {
+export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 'Jac.': 0 }, activePuzzleId = null }: Props) {
+  const secondaries = secondaryLocations(puzzles);
   return (
     <svg
       viewBox={`${VB_X} ${VB_Y} ${VB_W} ${VB_H}`}
@@ -60,6 +66,47 @@ export function GameMap({ positions, self }: Props) {
               strokeLinejoin="round"
               strokeLinecap="round"
             />
+          );
+        })}
+
+        {/* Secondary locations (from other-player-at-location requirements) — diamonds */}
+        {secondaries.map((sec, i) => {
+          const p = toPoint(sec.location);
+          const cx = p.x * MAP_W;
+          const cy = p.y * MAP_H;
+          const highlighted = activePuzzleId != null && sec.puzzleId === activePuzzleId;
+          const r = highlighted ? 4 : 3;
+          return (
+            <g key={`sec-${i}`} transform={`translate(${cx} ${cy}) rotate(45)`}>
+              <rect
+                x={-r} y={-r} width={r * 2} height={r * 2}
+                fill={highlighted ? '#fbbf24' : 'none'}
+                stroke={highlighted ? '#fbbf24' : '#a1a1aa'}
+                strokeWidth={0.8}
+                opacity={highlighted ? 0.95 : 0.7}
+              />
+            </g>
+          );
+        })}
+
+        {/* Puzzle markers */}
+        {puzzles.map((puzzle) => {
+          const p = toPoint(puzzle.location);
+          const cx = p.x * MAP_W;
+          const cy = p.y * MAP_H;
+          const color = PUZZLE_STATE_COLORS[derivePuzzleState(puzzle, scores[puzzle.assignedTo])];
+          return (
+            <g key={`puzzle-${puzzle.id}`}>
+              <circle cx={cx} cy={cy} r={4.5} fill={color} opacity={0.9} />
+              <circle cx={cx} cy={cy} r={4.5} fill="none" stroke="#18181b" strokeWidth={0.6} />
+              <text
+                x={cx} y={cy + 1.4}
+                textAnchor="middle"
+                fontSize={4}
+              >
+                {puzzle.icon}
+              </text>
+            </g>
           );
         })}
 

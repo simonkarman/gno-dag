@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPersonWalking, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { createClient, createStore } from '@krmx/client-react';
 import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE } from '@/components/geo';
 import { GameMap } from '@/components/map';
+import { ClientPuzzle, GameState, PUZZLE_PROXIMITY_METERS, deriveScores, derivePuzzleState } from '@/components/puzzles';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { useSimulatedLocation } from '@/hooks/use-simulated-location';
 
 const isDev = process.env.NEXT_PUBLIC_LOCAL_DEVELOPMENT === 'true';
+const START_DATETIME = process.env.NEXT_PUBLIC_START_DATETIME ?? '';
 
 // ---------------------------------------------------------------------------
 // Krmx client + store
@@ -22,14 +24,38 @@ interface Positions {
   'Jac.': Point | null;
 }
 
+interface PuzzleResult {
+  id: string;
+  success: boolean;
+  message?: string;
+}
+
+interface StoreState {
+  positions: Positions;
+  puzzles: ClientPuzzle[];
+  lastResult: PuzzleResult | null;
+}
+
 export const useStore = createStore(
   client,
-  { positions: { 'Govie': null, 'Jac.': null } } as { positions: Positions },
+  {
+    positions: { 'Govie': null, 'Jac.': null },
+    puzzles: [],
+    lastResult: null,
+  } as StoreState,
   (state, action) => {
     switch (action.type) {
       case 'positions': {
         const a = action as { type: 'positions'; payload: Positions };
         return { ...state, positions: a.payload };
+      }
+      case 'game-state': {
+        const a = action as { type: 'game-state'; payload: GameState };
+        return { ...state, puzzles: a.payload.puzzles };
+      }
+      case 'puzzle-result': {
+        const a = action as { type: 'puzzle-result'; payload: PuzzleResult };
+        return { ...state, lastResult: a.payload };
       }
       default:
         return state;
@@ -79,13 +105,23 @@ function usePositionHandler() {
 // Shared render tree for both production and dev views
 // ---------------------------------------------------------------------------
 
-function PlayerViewContent({ username, positions, inRange, currentPos, devBadge }: {
+function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, devBadge }: {
   username: string;
   positions: Positions;
+  puzzles: ClientPuzzle[];
   inRange: boolean | null;
   currentPos: LatLng | null;
   devBadge?: React.ReactNode;
 }) {
+  const self = username as PlayerName;
+  const scores = useMemo(() => deriveScores(puzzles), [puzzles]);
+
+  // Waiting screen — shown regardless of location until the game starts.
+  const started = useGameStarted();
+  if (!started) {
+    return <WaitingScreen devBadge={devBadge} />;
+  }
+
   if (inRange === null) {
     return (
       <div className="flex flex-col items-center gap-3 mt-12 px-4 text-center">
@@ -113,30 +149,41 @@ function PlayerViewContent({ username, positions, inRange, currentPos, devBadge 
     );
   }
 
+  // Puzzle the player can currently interact with: open, assigned to them, within range.
+  const activePuzzle = currentPos
+    ? puzzles.find(p =>
+        p.assignedTo === self &&
+        derivePuzzleState(p, scores[p.assignedTo]) === 'open' &&
+        distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS,
+      ) ?? null
+    : null;
+
   return (
     <>
-      <GameMap positions={positions} self={username as PlayerName} />
+      <GameMap positions={positions} self={self} puzzles={puzzles} scores={scores} activePuzzleId={activePuzzle?.id ?? null} />
       {/* Overlay: floats above the map */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         {/* Player pill — top-right */}
         <div className="absolute top-4 right-4 pointer-events-none">
           <div
             className="flex items-center gap-2 rounded-full px-3 py-1.5 bg-zinc-900/75 backdrop-blur-sm border shadow-lg"
-            style={{ borderColor: PLAYER_COLORS[username as PlayerName] + '55' }}
+            style={{ borderColor: PLAYER_COLORS[self] + '55' }}
           >
             <FontAwesomeIcon
               icon={faPersonWalking}
               className="w-3.5 h-3.5"
-              style={{ color: PLAYER_COLORS[username as PlayerName] }}
+              style={{ color: PLAYER_COLORS[self] }}
             />
             <span
               className="text-sm font-bold tracking-wide"
-              style={{ color: PLAYER_COLORS[username as PlayerName] }}
+              style={{ color: PLAYER_COLORS[self] }}
             >
               {username}
             </span>
           </div>
         </div>
+        {/* Scoreboard — top-left */}
+        <ScoreBoard scores={scores} />
         {/* Dev badge — bottom-left, collapsed by default */}
         {devBadge && (
           <div className="absolute bottom-4 left-4 pointer-events-auto">
@@ -144,7 +191,150 @@ function PlayerViewContent({ username, positions, inRange, currentPos, devBadge 
           </div>
         )}
       </div>
+      {/* Puzzle panel — slides up when at an open puzzle */}
+      {activePuzzle && <PuzzlePanel puzzle={activePuzzle} />}
     </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Waiting screen — shown before START_DATETIME, regardless of location.
+// ---------------------------------------------------------------------------
+
+/** Returns true once the current time has passed START_DATETIME. */
+function useGameStarted(): boolean {
+  const compute = () => {
+    if (!START_DATETIME) return true; // no start time configured → always started
+    const start = new Date(START_DATETIME).getTime();
+    if (Number.isNaN(start)) return true;
+    return Date.now() >= start;
+  };
+  const [started, setStarted] = useState(compute);
+  useEffect(() => {
+    if (started) return;
+    const id = setInterval(() => setStarted(compute()), 1000);
+    return () => clearInterval(id);
+  }, [started]);
+  return started;
+}
+
+function WaitingScreen({ devBadge }: { devBadge?: React.ReactNode }) {
+  const target = START_DATETIME ? new Date(START_DATETIME) : null;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  let countdown = '';
+  if (target) {
+    const ms = Math.max(0, target.getTime() - now);
+    const s = Math.floor(ms / 1000);
+    const days = Math.floor(s / 86400);
+    const hours = Math.floor((s % 86400) / 3600);
+    const mins = Math.floor((s % 3600) / 60);
+    const secs = s % 60;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    countdown = days > 0
+      ? `${days}d ${pad(hours)}:${pad(mins)}:${pad(secs)}`
+      : `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  }
+
+  // Placeholder content — to be themed later.
+  return (
+    <div className="flex flex-col items-center justify-center gap-6 min-h-[70vh] px-6 text-center">
+      {devBadge}
+      <div className="text-5xl">⏳</div>
+      <h1 className="font-bold text-2xl">GNO Dag 2026</h1>
+      <p className="text-zinc-400 max-w-xs">Het avontuur is nog niet begonnen. Kom op tijd terug!</p>
+      {countdown && (
+        <p className="font-mono text-3xl font-bold tracking-widest text-white">{countdown}</p>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Scoreboard
+// ---------------------------------------------------------------------------
+
+function ScoreBoard({ scores }: { scores: Record<PlayerName, number> }) {
+  return (
+    <div className="absolute top-4 left-4 pointer-events-none">
+      <div className="flex flex-col gap-1 rounded-lg px-3 py-2 bg-zinc-900/75 backdrop-blur-sm border border-zinc-700 shadow-lg text-sm font-mono">
+        {(VALID_PLAYERS as readonly PlayerName[]).map((name) => (
+          <div key={name} className="flex items-center justify-between gap-3">
+            <span style={{ color: PLAYER_COLORS[name] }} className="font-bold">{name}</span>
+            <span className="text-white font-bold">{scores[name] ?? 0}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Puzzle panel — content + answer input
+// ---------------------------------------------------------------------------
+
+function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
+  const { lastResult } = useStore();
+  const [answer, setAnswer] = useState('');
+
+  // Reset the input when switching to a different puzzle.
+  useEffect(() => { setAnswer(''); }, [puzzle.id]);
+
+  const result = lastResult && lastResult.id === puzzle.id ? lastResult : null;
+
+  const submit = () => {
+    if (!answer.trim()) return;
+    client.send({ type: 'complete-puzzle', payload: { id: puzzle.id, answer } });
+  };
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-20 pointer-events-auto">
+      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800 border-t border-x border-zinc-600 shadow-2xl px-5 py-4 max-h-[70vh] overflow-y-auto">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">{puzzle.icon}</span>
+          <h2 className="font-bold text-lg">Puzzel</h2>
+        </div>
+
+        {/* Content elements */}
+        <div className="flex flex-col gap-3">
+          {puzzle.content.map((el, i) => {
+            if (el.type === 'text') {
+              return <p key={i} className="text-zinc-200 whitespace-pre-wrap">{el.value}</p>;
+            }
+            if (el.type === 'image') {
+              // eslint-disable-next-line @next/next/no-img-element
+              return <img key={i} src={el.url} alt={el.alt ?? ''} className="rounded-lg w-full" />;
+            }
+            return null;
+          })}
+        </div>
+
+        {/* Answer input */}
+        <div className="mt-4 flex gap-2">
+          <input
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+            placeholder="Jouw antwoord..."
+            className="flex-1 rounded-lg bg-zinc-900 border border-zinc-600 px-3 py-2 text-white focus:outline-none focus:border-zinc-400"
+          />
+          <button
+            onClick={submit}
+            className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-bold transition-colors"
+          >
+            OK
+          </button>
+        </div>
+
+        {result && !result.success && (
+          <p className="mt-2 text-red-400 text-sm">{result.message ?? 'Fout antwoord.'}</p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -153,12 +343,12 @@ function PlayerViewContent({ username, positions, inRange, currentPos, devBadge 
 // ---------------------------------------------------------------------------
 
 function PlayerView({ username }: { username: string }) {
-  const { positions } = useStore();
+  const { positions, puzzles } = useStore();
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
   useGeolocation(handlePosition);
 
-  return <PlayerViewContent username={username} positions={positions} inRange={inRange} currentPos={currentPos} />;
+  return <PlayerViewContent username={username} positions={positions} puzzles={puzzles} inRange={inRange} currentPos={currentPos} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -166,7 +356,7 @@ function PlayerView({ username }: { username: string }) {
 // ---------------------------------------------------------------------------
 
 function DevPlayerView({ username }: { username: string }) {
-  const { positions } = useStore();
+  const { positions, puzzles } = useStore();
   const [useReal, setUseReal] = useState(false);
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
@@ -177,6 +367,7 @@ function DevPlayerView({ username }: { username: string }) {
     <PlayerViewContent
       username={username}
       positions={positions}
+      puzzles={puzzles}
       inRange={inRange}
       currentPos={currentPos}
       devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} />}
