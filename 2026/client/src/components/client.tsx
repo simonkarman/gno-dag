@@ -22,6 +22,7 @@ export const { client, useClient } = createClient();
 interface Positions {
   'Govie': Point | null;
   'Jac.': Point | null;
+  trails: Record<'Govie' | 'Jac.', Point[]>;
 }
 
 interface PuzzleResult {
@@ -39,7 +40,7 @@ interface StoreState {
 export const useStore = createStore(
   client,
   {
-    positions: { 'Govie': null, 'Jac.': null },
+    positions: { 'Govie': null, 'Jac.': null, trails: { 'Govie': [], 'Jac.': [] } },
     puzzles: [],
     lastResult: null,
   } as StoreState,
@@ -158,9 +159,20 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       ) ?? null
     : null;
 
+  // Other nearby puzzles (within range) that are NOT the active one — shown as
+  // passive info chips so the player understands what's around them.
+  const nearbyChips = currentPos
+    ? puzzles.filter(p =>
+        p.id !== activePuzzle?.id &&
+        distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS &&
+        // Other player's puzzle (any state), or your own still-locked puzzle.
+        (p.assignedTo !== self || derivePuzzleState(p, scores[p.assignedTo]) === 'locked'),
+      )
+    : [];
+
   return (
     <>
-      <GameMap positions={positions} self={self} puzzles={puzzles} scores={scores} activePuzzleId={activePuzzle?.id ?? null} />
+      <GameMap positions={positions} trails={positions.trails} self={self} puzzles={puzzles} scores={scores} activePuzzleId={activePuzzle?.id ?? null} />
       {/* Overlay: floats above the map */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         {/* Player pill — top-right */}
@@ -193,6 +205,16 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       </div>
       {/* Puzzle panel — slides up when at an open puzzle */}
       {activePuzzle && <PuzzlePanel puzzle={activePuzzle} />}
+      {/* Passive chips for nearby puzzles you can't act on right now */}
+      {nearbyChips.length > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-10 pointer-events-none px-4 pb-4 flex flex-col items-center gap-2"
+          style={{ marginBottom: activePuzzle ? '70vh' : 0 }}
+        >
+          {nearbyChips.map(p => (
+            <ProximityChip key={p.id} puzzle={p} self={self} score={scores[p.assignedTo]} />
+          ))}
+        </div>
+      )}
     </>
   );
 }
@@ -332,6 +354,45 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
 
         {result && !result.success && (
           <p className="mt-2 text-red-400 text-sm">{result.message ?? 'Fout antwoord.'}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Proximity chip — passive info for a nearby puzzle the player can't act on.
+// ---------------------------------------------------------------------------
+
+const STATE_BADGE: Record<'locked' | 'open' | 'completed', { label: string; color: string }> = {
+  locked:    { label: 'vergrendeld', color: '#71717a' },
+  open:      { label: 'open',        color: '#ffffff' },
+  completed: { label: 'voltooid',    color: '#22c55e' },
+};
+
+function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: PlayerName; score: number }) {
+  const state = derivePuzzleState(puzzle, score);
+  const isOwn = puzzle.assignedTo === self;
+  const badge = STATE_BADGE[state];
+
+  // Own locked puzzle: tell the player how many more points they need.
+  const pointsNeeded = isOwn && state === 'locked' ? puzzle.minimumPoints - score : 0;
+
+  return (
+    <div className="pointer-events-auto flex items-center gap-2.5 rounded-full px-4 py-2 bg-zinc-900/85 backdrop-blur-sm border border-zinc-700 shadow-lg max-w-md">
+      <span className="text-xl">{puzzle.icon}</span>
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-zinc-200">
+          {isOwn ? 'Jouw puzzel' : `Puzzel van ${puzzle.assignedTo}`}
+        </span>
+        {pointsNeeded > 0 ? (
+          <span className="text-xs text-zinc-400">
+            Nog {pointsNeeded} punt{pointsNeeded === 1 ? '' : 'en'} nodig
+          </span>
+        ) : (
+          <span className="text-xs font-medium" style={{ color: badge.color }}>
+            {badge.label}
+          </span>
         )}
       </div>
     </div>

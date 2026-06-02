@@ -5,7 +5,7 @@ import { createServer as createHttpServer } from 'http';
 import { createServer } from '@krmx/server';
 import { LogSeverity } from '@krmx/base';
 import { enableUnlinkedKicker } from './unlinked-kicker';
-import { LatLng, Point, geoTransform } from './geo-transform';
+import { LatLng, Point, geoTransform, distanceTo } from './geo-transform';
 import { StateStore, PUZZLE_PROXIMITY_METERS } from './state';
 import { tryComplete, toClientGameState } from './puzzles';
 
@@ -37,6 +37,24 @@ app.use((req, _, next) => {
 });
 app.get('/', (_, res) => {
   res.send({ message: 'Hello GNO Dag 2026!', version });
+});
+
+/**
+ * Reloads the in-memory state from GCS (e.g. after editing it via the admin
+ * dashboard) and re-broadcasts it to connected clients. Read-only — it only
+ * re-reads the existing blob, so no auth is required.
+ */
+app.post('/admin/reload', async (_, res) => {
+  try {
+    await stateStore.load();
+    broadcastGameState();
+    const puzzleCount = stateStore.get().puzzles.length;
+    console.info(`[info] [gno-2026] [state] reloaded ${puzzleCount} puzzles via /admin/reload`);
+    res.send({ ok: true, puzzleCount });
+  } catch (e) {
+    console.error(`[error] [gno-2026] [state] /admin/reload failed: ${(e as Error).message}`);
+    res.status(500).send({ ok: false, error: (e as Error).message });
+  }
 });
 
 /** The two players allowed to connect. */
@@ -72,14 +90,58 @@ const positions: Record<PlayerName, LatLng | null> = {
 };
 
 /**
+ * Recent movement trail per player, as normalised map points (oldest first).
+ * Transient, in-memory only — not persisted. A new point is only appended once
+ * the player has moved at least TRAIL_MIN_DIST_METERS, so the trail length is
+ * distance-based and independent of GPS update frequency.
+ */
+const trails: Record<PlayerName, Point[]> = {
+  'Govie': [],
+  'Jac.': [],
+};
+/** GPS position of each trail's most recent point, used for distance sampling. */
+const trailAnchors: Record<PlayerName, LatLng | null> = {
+  'Govie': null,
+  'Jac.': null,
+};
+const TRAIL_MAX_POINTS = 45;
+const TRAIL_MIN_DIST_METERS = 5;
+
+/** Appends the player's new position to their trail when they've moved far enough. */
+function updateTrail(player: PlayerName, pos: LatLng) {
+  const anchor = trailAnchors[player];
+  if (anchor && distanceTo(anchor, pos) < TRAIL_MIN_DIST_METERS) {
+    return;
+  }
+  const trail = trails[player];
+  trail.push(geoTransform.toPoint(pos));
+  if (trail.length > TRAIL_MAX_POINTS) {
+    trail.splice(0, trail.length - TRAIL_MAX_POINTS);
+  }
+  trailAnchors[player] = pos;
+}
+
+/** Clears a player's trail (e.g. when they leave or go out of range). */
+function clearTrail(player: PlayerName) {
+  trails[player] = [];
+  trailAnchors[player] = null;
+}
+
+/** Builds the positions broadcast payload (current positions + trails). */
+function positionsPayload() {
+  return {
+    'Govie': positions['Govie'] ? geoTransform.toPoint(positions['Govie']) : null,
+    'Jac.': positions['Jac.'] ? geoTransform.toPoint(positions['Jac.']) : null,
+    trails,
+  };
+}
+
+/**
  * Broadcast the current positions (converted to virtual map coordinates) to
  * every connected player.
  */
 function broadcastPositions() {
-  const payload: Record<PlayerName, Point | null> = {
-    'Govie': positions['Govie'] ? geoTransform.toPoint(positions['Govie']) : null,
-    'Jac.': positions['Jac.'] ? geoTransform.toPoint(positions['Jac.']) : null,
-  };
+  const payload = positionsPayload();
 
   server.getUsers()
     .filter(u => u.isLinked)
@@ -124,11 +186,7 @@ server.on('link', (username) => {
   console.info(`[info] [gno-2026] [player] ${player} linked`);
 
   // Send current state immediately so the joining player sees the map right away.
-  const payload: Record<PlayerName, Point | null> = {
-    'Govie': positions['Govie'] ? geoTransform.toPoint(positions['Govie']) : null,
-    'Jac.': positions['Jac.'] ? geoTransform.toPoint(positions['Jac.']) : null,
-  };
-  server.send(username, { type: 'positions', payload });
+  server.send(username, { type: 'positions', payload: positionsPayload() });
   server.send(username, { type: 'game-state', payload: toClientGameState(stateStore.get(), positions) });
 });
 
@@ -136,6 +194,7 @@ server.on('leave', (username) => {
   const player = username as PlayerName;
   console.info(`[info] [gno-2026] [player] ${player} left — clearing position`);
   positions[player] = null;
+  clearTrail(player);
   broadcastPositions();
   maybeBroadcastGameState();
 });
@@ -151,11 +210,13 @@ server.on('message', (username, message) => {
     }
     console.debug(`[debug] [gno-2026] [player] ${player} location update: ${lat}, ${lng}`);
     positions[player] = { lat, lng };
+    updateTrail(player, { lat, lng });
     broadcastPositions();
     maybeBroadcastGameState();
   } else if (message.type === 'clear-location') {
     console.debug(`[debug] [gno-2026] [player] ${player} cleared location (out of range)`);
     positions[player] = null;
+    clearTrail(player);
     broadcastPositions();
     maybeBroadcastGameState();
   } else if (message.type === 'complete-puzzle') {
