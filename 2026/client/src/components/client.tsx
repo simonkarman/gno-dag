@@ -421,7 +421,7 @@ function DevPlayerView({ username }: { username: string }) {
   const [useReal, setUseReal] = useState(false);
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
-  const { pos: simPos, reset: resetSimPos, move } = useSimulatedLocation(useReal ? () => {} : handlePosition);
+  const { pos: simPos, reset: resetSimPos, move, stepMeters, setStepMeters } = useSimulatedLocation(useReal ? () => {} : handlePosition);
   useGeolocation(useReal ? handlePosition : () => {});
 
   return (
@@ -431,17 +431,19 @@ function DevPlayerView({ username }: { username: string }) {
       puzzles={puzzles}
       inRange={inRange}
       currentPos={currentPos}
-      devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} />}
+      devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} stepMeters={stepMeters} onStepChange={setStepMeters} />}
     />
   );
 }
 
-function DevBadge({ useReal, simPos, onToggle, onReset, onMove }: {
+function DevBadge({ useReal, simPos, onToggle, onReset, onMove, stepMeters, onStepChange }: {
   useReal: boolean;
   simPos: LatLng;
   onToggle: () => void;
   onReset: () => void;
-  onMove: (dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => void;
+  onMove: (dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', fine?: boolean) => void;
+  stepMeters: number;
+  onStepChange: (meters: number) => void;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -484,14 +486,32 @@ function DevBadge({ useReal, simPos, onToggle, onReset, onMove }: {
             )}
           </div>
           {!useReal && (
-            <div className="grid grid-cols-3 gap-1">
-              <div />
-              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowUp')}>↑</button>
-              <div />
-              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowLeft')}>←</button>
-              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowDown')}>↓</button>
-              <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={() => onMove('ArrowRight')}>→</button>
-            </div>
+            <>
+              <div className="flex items-center gap-2">
+                <label htmlFor="dev-step">stap (m)</label>
+                <input
+                  id="dev-step"
+                  type="number"
+                  min={0.5}
+                  step={0.5}
+                  value={stepMeters}
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    onStepChange(Number.isFinite(v) ? Math.max(0.5, v) : 0.5);
+                  }}
+                  className="w-16 rounded bg-amber-950/60 border border-amber-700 px-1.5 py-0.5 text-amber-100 focus:outline-none focus:border-amber-400"
+                />
+                <span className="text-amber-500/80">Shift = 1/10 stap</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <div />
+                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowUp', e.shiftKey)}>↑</button>
+                <div />
+                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowLeft', e.shiftKey)}>←</button>
+                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowDown', e.shiftKey)}>↓</button>
+                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowRight', e.shiftKey)}>→</button>
+              </div>
+            </>
           )}
         </div>
       )}
