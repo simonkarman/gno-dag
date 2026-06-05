@@ -29,7 +29,10 @@ function guard(req: NextRequest): NextResponse | null {
 }
 
 function file() {
-  return new Storage().bucket(GCS_BUCKET!).file(GCS_BLOB);
+  // Pass the project explicitly to avoid the GCP client probing the (locally
+  // unreachable) GCE metadata server to discover it, which stalls ~5s. This is
+  // a server-side route handler, so a plain process.env var is fine.
+  return new Storage({ projectId: process.env.GOOGLE_CLOUD_PROJECT }).bucket(GCS_BUCKET!).file(GCS_BLOB);
 }
 
 export async function GET(req: NextRequest) {

@@ -122,7 +122,11 @@ function normalise(raw: Partial<PersistedState> | undefined | null): AppState {
 
 export class StateStore {
   private state: AppState = emptyState();
-  private readonly storage = new Storage();
+  // Pass the project explicitly so the GCP client never has to discover it via
+  // the GCE metadata server. Off-GCP (local dev) that probe is unreachable and
+  // hangs ~5s before timing out. When GOOGLE_CLOUD_PROJECT is unset this is
+  // `{ projectId: undefined }` — identical to the default behaviour.
+  private readonly storage = new Storage({ projectId: process.env.GOOGLE_CLOUD_PROJECT });
 
   constructor(
     private readonly bucket: string,
