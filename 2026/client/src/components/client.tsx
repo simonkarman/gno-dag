@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPersonWalking, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { createClient, createStore } from '@krmx/client-react';
-import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE } from '@/components/geo';
+import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE, fromPoint } from '@/components/geo';
 import { GameMap } from '@/components/map';
 import { ClientPuzzle, GameState, PUZZLE_PROXIMITY_METERS, deriveScores, derivePuzzleState } from '@/components/puzzles';
 import { useGeolocation } from '@/hooks/use-geolocation';
@@ -170,9 +170,21 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       )
     : [];
 
+  // Puzzles whose owner is currently standing at them (open + within proximity),
+  // derived from the broadcast positions of BOTH players. Their secondary
+  // locations are shown to everyone, so a teammate knows where to walk.
+  const activePuzzleIds = puzzles
+    .filter(p => {
+      if (derivePuzzleState(p, scores[p.assignedTo]) !== 'open') return false;
+      const ownerPos = positions[p.assignedTo];
+      if (!ownerPos) return false;
+      return distanceTo(fromPoint(ownerPos), p.location) <= PUZZLE_PROXIMITY_METERS;
+    })
+    .map(p => p.id);
+
   return (
     <>
-      <GameMap positions={positions} trails={positions.trails} self={self} puzzles={puzzles} scores={scores} activePuzzleId={activePuzzle?.id ?? null} />
+      <GameMap positions={positions} trails={positions.trails} self={self} puzzles={puzzles} scores={scores} activePuzzleIds={activePuzzleIds} />
       {/* Overlay: floats above the map */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         {/* Player pill — top-right */}

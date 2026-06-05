@@ -13,8 +13,8 @@ interface Props {
   scores?: Record<PlayerName, number>;
   /** Recent movement trail per player (oldest point first). */
   trails?: Record<PlayerName, Point[]>;
-  /** Id of the puzzle the player is currently viewing — its secondary locations get shown. */
-  activePuzzleId?: string | null;
+  /** Ids of puzzles whose secondary locations should be shown (owner present at an open puzzle). */
+  activePuzzleIds?: string[];
 }
 
 const PLAYER_COLORS: Record<PlayerName, string> = {
@@ -22,38 +22,58 @@ const PLAYER_COLORS: Record<PlayerName, string> = {
   'Jac.': '#3b82f6',   // blue
 };
 
+// Toned-down team colors used for locked puzzles ("yours/theirs, but not yet").
+const MUTED_PLAYER_COLORS: Record<PlayerName, string> = {
+  'Govie': '#8a6a33',  // muted amber
+  'Jac.': '#3f5273',   // muted blue
+};
+
 const PUZZLE_FILL = {
-  locked: '#27272a',    // zinc-800 (dark)
+  lockedOwn: '#27272a', // zinc-800 (dark body for your locked pin)
   open: '#ffffff',      // white
   completed: '#22c55e', // green
 } as const;
 
+/**
+ * A puzzle marker is drawn either as a `pin` (a spiked map pin floating above
+ * the location — used for the viewer's OWN puzzles) or a `dot` (a small circle
+ * centered on the location — used for the other team and for completed puzzles,
+ * so they stay unobtrusive).
+ */
 interface MarkerStyle {
+  form: 'pin' | 'dot';
   r: number;
-  spike: boolean;
+  /** Body fill color. */
   fill: string;
-  ringOpacity: number;
+  /** Body fill opacity (used to fade faint dots). */
+  fillOpacity: number;
+  /** Accent color: the pin's spike/ring, or a dot's outline. */
+  accent: string;
+  /** Accent opacity; 0 means a dot has no outline. */
+  accentOpacity: number;
   showEmoji: boolean;
 }
 
 /**
- * Visual hierarchy for a puzzle marker, encoding how much it deserves the
- * viewer's attention via size + spike + ring opacity. `isOwn` = assigned to the
- * viewing player.
+ * Visual encoding for a puzzle marker. Pins = your puzzles, dots = ambient info
+ * (other team + anything completed). Bright team color = open, muted team color
+ * = locked, green = completed. `team`/`muted` are the assigned player's colors.
  */
-function markerStyle(state: PuzzleState, isOwn: boolean): MarkerStyle {
+function markerStyle(state: PuzzleState, isOwn: boolean, team: string, muted: string): MarkerStyle {
   if (state === 'completed') {
-    return { r: 3, spike: false, fill: PUZZLE_FILL.completed, ringOpacity: 0.3, showEmoji: false };
+    return { form: 'dot', r: 2.5, fill: PUZZLE_FILL.completed, fillOpacity: 0.9, accent: PUZZLE_FILL.completed, accentOpacity: 0, showEmoji: false };
   }
   if (state === 'open') {
     return isOwn
-      ? { r: 5.5, spike: true, fill: PUZZLE_FILL.open, ringOpacity: 1.0, showEmoji: true }
-      : { r: 4, spike: true, fill: PUZZLE_FILL.open, ringOpacity: 0.6, showEmoji: true };
+      ? { form: 'pin', r: 5.5, fill: PUZZLE_FILL.open, fillOpacity: 1, accent: team, accentOpacity: 1.0, showEmoji: true }
+      // Other team's open puzzle: a bright team-colored dot with a thin light
+      // outline to set it apart from a live player dot.
+      : { form: 'dot', r: 3.5, fill: team, fillOpacity: 0.95, accent: '#ffffff', accentOpacity: 0.7, showEmoji: false };
   }
   // locked
   return isOwn
-    ? { r: 4, spike: true, fill: PUZZLE_FILL.locked, ringOpacity: 0.4, showEmoji: true }
-    : { r: 3, spike: true, fill: PUZZLE_FILL.locked, ringOpacity: 0.25, showEmoji: false };
+    ? { form: 'pin', r: 4.5, fill: PUZZLE_FILL.lockedOwn, fillOpacity: 1, accent: muted, accentOpacity: 0.9, showEmoji: false }
+    : { form: 'dot', r: 2.5, fill: muted, fillOpacity: 0.55, accent: muted, accentOpacity: 0, showEmoji: false };
 }
 
 const ROAD_STYLES: Record<string, { stroke: string; width: number; opacity: number }> = {
@@ -79,7 +99,7 @@ const VB_Y = MAP_H * INSET;
 const VB_W = MAP_W * (1 - 2 * INSET);
 const VB_H = MAP_H * (1 - 2 * INSET);
 
-export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 'Jac.': 0 }, trails = { 'Govie': [], 'Jac.': [] }, activePuzzleId = null }: Props) {
+export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 'Jac.': 0 }, trails = { 'Govie': [], 'Jac.': [] }, activePuzzleIds = [] }: Props) {
   const secondaries = secondaryLocations(puzzles);
   return (
     <svg
@@ -131,9 +151,9 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
           );
         })}
 
-        {/* Secondary locations — only shown for the puzzle currently being viewed. */}
+        {/* Secondary locations — shown for puzzles whose owner is currently at them. */}
         {secondaries
-          .filter(sec => activePuzzleId != null && sec.puzzleId === activePuzzleId)
+          .filter(sec => activePuzzleIds.includes(sec.puzzleId))
           .map((sec, i) => {
             const p = toPoint(sec.location);
             const cx = p.x * MAP_W;
@@ -152,36 +172,48 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
             );
           })}
 
-        {/* Puzzle markers — pin shape, sized/colored by relevance to the viewer. */}
+        {/* Puzzle markers — pins for your puzzles, dots for the other team / completed. */}
         {puzzles.map((puzzle) => {
           const p = toPoint(puzzle.location);
           const cx = p.x * MAP_W;
           const cy = p.y * MAP_H;
-          const ring = PLAYER_COLORS[puzzle.assignedTo];
+          const team = PLAYER_COLORS[puzzle.assignedTo];
+          const muted = MUTED_PLAYER_COLORS[puzzle.assignedTo];
           const state = derivePuzzleState(puzzle, scores[puzzle.assignedTo]);
           const isOwn = puzzle.assignedTo === self;
-          const m = markerStyle(state, isOwn);
-          // Markers with a spike are proper map pins: the circle body floats
-          // above the location and a triangle points down to it. Spike-less
-          // markers (completed) are simply centered on the location.
-          const bodyY = m.spike ? cy - m.r * 2.2 : cy;
+          const m = markerStyle(state, isOwn, team, muted);
+
+          // Dots sit directly on the location; an optional thin outline keeps the
+          // other team's open dot distinct from a live player dot.
+          if (m.form === 'dot') {
+            return (
+              <g key={`puzzle-${puzzle.id}`}>
+                <circle cx={cx} cy={cy} r={m.r} fill={m.fill} fillOpacity={m.fillOpacity} />
+                {m.accentOpacity > 0 && (
+                  <circle cx={cx} cy={cy} r={m.r} fill="none" stroke={m.accent} strokeOpacity={m.accentOpacity} strokeWidth={0.8} />
+                )}
+              </g>
+            );
+          }
+
+          // Pins are proper map pins: the circle body floats above the location
+          // and a triangle spike points down to it.
+          const bodyY = cy - m.r * 2.2;
           return (
             <g key={`puzzle-${puzzle.id}`}>
               {/* Spike — a triangle from just below the circle down to the location. */}
-              {m.spike && (
-                <path
-                  d={`M ${cx - m.r * 0.5} ${bodyY + m.r * 0.6} L ${cx} ${cy} L ${cx + m.r * 0.5} ${bodyY + m.r * 0.6} Z`}
-                  fill={ring}
-                  fillOpacity={m.ringOpacity}
-                  stroke={ring}
-                  strokeOpacity={m.ringOpacity}
-                  strokeWidth={1}
-                  strokeLinejoin="round"
-                />
-              )}
+              <path
+                d={`M ${cx - m.r * 0.5} ${bodyY + m.r * 0.6} L ${cx} ${cy} L ${cx + m.r * 0.5} ${bodyY + m.r * 0.6} Z`}
+                fill={m.accent}
+                fillOpacity={m.accentOpacity}
+                stroke={m.accent}
+                strokeOpacity={m.accentOpacity}
+                strokeWidth={1}
+                strokeLinejoin="round"
+              />
               {/* Circle body */}
               <circle cx={cx} cy={bodyY} r={m.r} fill={m.fill} />
-              <circle cx={cx} cy={bodyY} r={m.r} fill="none" stroke={ring} strokeOpacity={m.ringOpacity} strokeWidth={1.4} />
+              <circle cx={cx} cy={bodyY} r={m.r} fill="none" stroke={m.accent} strokeOpacity={m.accentOpacity} strokeWidth={1.4} />
               {m.showEmoji && (
                 <text
                   x={cx} y={bodyY}
