@@ -417,19 +417,31 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
 // Proximity chip — passive info for a nearby puzzle the player can't act on.
 // ---------------------------------------------------------------------------
 
-const STATE_BADGE: Record<'locked' | 'open' | 'completed', { label: string; color: string }> = {
-  locked:    { label: 'vergrendeld', color: '#71717a' },
-  open:      { label: 'open',        color: '#ffffff' },
-  completed: { label: 'voltooid',    color: '#22c55e' },
-};
-
 function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: PlayerName; score: number }) {
   const state = derivePuzzleState(puzzle, score);
   const isOwn = puzzle.assignedTo === self;
-  const badge = STATE_BADGE[state];
+  const remaining = Math.max(0, puzzle.minimumPoints - score);
+  const puzzelWord = remaining === 1 ? 'puzzel' : 'puzzels';
 
-  // Own locked puzzle: tell the player how many more points they need.
-  const pointsNeeded = isOwn && state === 'locked' ? puzzle.minimumPoints - score : 0;
+  // Descriptive, perspective-aware message per state. Own open puzzles never
+  // reach here (they show as the active panel), so 'open' always refers to the
+  // other player's puzzle. Locked puzzles also show solve-progress.
+  let message: string;
+  let messageClass: string;
+  let progress: string | null = null;
+  if (state === 'completed') {
+    message = 'Voltooid';
+    messageClass = 'text-green-500';
+  } else if (state === 'open') {
+    message = `${puzzle.assignedTo} kan deze oplossen`;
+    messageClass = 'text-white';
+  } else {
+    message = isOwn
+      ? `Los eerst nog ${remaining} ${puzzelWord} op`
+      : `${puzzle.assignedTo} moet eerst nog ${remaining} ${puzzelWord} oplossen`;
+    messageClass = 'text-zinc-400';
+    progress = `${score} / ${puzzle.minimumPoints} opgelost`;
+  }
 
   return (
     <div className="pointer-events-auto flex items-center gap-2.5 rounded-full px-4 py-2 bg-zinc-900/85 backdrop-blur-sm border border-zinc-700 shadow-lg max-w-md">
@@ -438,14 +450,9 @@ function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: Pl
         <span className="text-sm font-semibold text-zinc-200">
           {isOwn ? 'Jouw puzzel' : `Puzzel van ${puzzle.assignedTo}`}
         </span>
-        {pointsNeeded > 0 ? (
-          <span className="text-xs text-zinc-400">
-            Nog {pointsNeeded} punt{pointsNeeded === 1 ? '' : 'en'} nodig
-          </span>
-        ) : (
-          <span className="text-xs font-medium" style={{ color: badge.color }}>
-            {badge.label}
-          </span>
+        <span className={`text-xs font-medium ${messageClass}`}>{message}</span>
+        {progress && (
+          <span className="text-[11px] text-zinc-500">{progress}</span>
         )}
       </div>
     </div>
