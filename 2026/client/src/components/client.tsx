@@ -13,6 +13,9 @@ import { useSimulatedLocation } from '@/hooks/use-simulated-location';
 const isDev = process.env.NEXT_PUBLIC_LOCAL_DEVELOPMENT === 'true';
 const START_DATETIME = process.env.NEXT_PUBLIC_START_DATETIME ?? '';
 
+/** After a wrong (failed) answer, a puzzle's answer input is locked for this long. */
+const WRONG_ANSWER_COOLDOWN_MS = 60_000;
+
 // ---------------------------------------------------------------------------
 // Krmx client + store
 // ---------------------------------------------------------------------------
@@ -35,6 +38,8 @@ interface StoreState {
   positions: Positions;
   puzzles: ClientPuzzle[];
   lastResult: PuzzleResult | null;
+  /** Per-puzzle wrong-answer lockout deadlines (puzzle id → epoch ms). In-memory only; resets on reload. */
+  cooldowns: Record<string, number>;
 }
 
 export const useStore = createStore(
@@ -43,6 +48,7 @@ export const useStore = createStore(
     positions: { 'Govie': null, 'Jac.': null, trails: { 'Govie': [], 'Jac.': [] } },
     puzzles: [],
     lastResult: null,
+    cooldowns: {},
   } as StoreState,
   (state, action) => {
     switch (action.type) {
@@ -56,7 +62,14 @@ export const useStore = createStore(
       }
       case 'puzzle-result': {
         const a = action as { type: 'puzzle-result'; payload: PuzzleResult };
-        return { ...state, lastResult: a.payload };
+        // Per-puzzle wrong-answer lockout: arm on failure, clear on success.
+        const cooldowns = { ...state.cooldowns };
+        if (a.payload.success) {
+          delete cooldowns[a.payload.id];
+        } else {
+          cooldowns[a.payload.id] = Date.now() + WRONG_ANSWER_COOLDOWN_MS;
+        }
+        return { ...state, lastResult: a.payload, cooldowns };
       }
       default:
         return state;
@@ -312,7 +325,7 @@ function ScoreBoard({ scores }: { scores: Record<PlayerName, number> }) {
 // ---------------------------------------------------------------------------
 
 function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
-  const { lastResult } = useStore();
+  const { lastResult, cooldowns } = useStore();
   const [answer, setAnswer] = useState('');
 
   // Reset the input when switching to a different puzzle.
@@ -320,7 +333,28 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
 
   const result = lastResult && lastResult.id === puzzle.id ? lastResult : null;
 
+  // Per-puzzle wrong-answer lockout. The deadline lives in the store keyed by
+  // puzzle id, so each puzzle cools down independently and the timer survives
+  // this panel remounting (e.g. walking away from the puzzle and back).
+  const cooldownUntil = cooldowns[puzzle.id] ?? 0;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (Date.now() >= cooldownUntil) return;
+    setNow(Date.now());
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (t >= cooldownUntil) clearInterval(id);
+    }, 250);
+    return () => clearInterval(id);
+  }, [cooldownUntil]);
+
+  const remainingMs = Math.max(0, cooldownUntil - now);
+  const isCoolingDown = remainingMs > 0;
+  const remainingSec = Math.ceil(remainingMs / 1000);
+
   const submit = () => {
+    if (isCoolingDown) return;
     if (!answer.trim()) return;
     client.send({ type: 'complete-puzzle', payload: { id: puzzle.id, answer } });
   };
@@ -353,19 +387,26 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+            disabled={isCoolingDown}
             placeholder="Jouw antwoord..."
-            className="flex-1 rounded-lg bg-zinc-900 border border-zinc-600 px-3 py-2 text-white focus:outline-none focus:border-zinc-400"
+            className="flex-1 rounded-lg bg-zinc-900 border border-zinc-600 px-3 py-2 text-white focus:outline-none focus:border-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             onClick={submit}
-            className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-bold transition-colors"
+            disabled={isCoolingDown}
+            className={`px-4 py-2 rounded-lg font-bold transition-colors ${isCoolingDown ? 'bg-zinc-600 text-zinc-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'}`}
           >
-            OK
+            {isCoolingDown ? `${remainingSec}s` : 'OK'}
           </button>
         </div>
 
         {result && !result.success && (
-          <p className="mt-2 text-red-400 text-sm">{result.message ?? 'Fout antwoord.'}</p>
+          <div className="mt-2 text-sm">
+            <p className="text-red-400">{result.message ?? 'Fout antwoord.'}</p>
+            {isCoolingDown && (
+              <p className="text-zinc-400">Wacht nog {remainingSec}s voordat je het opnieuw kunt proberen.</p>
+            )}
+          </div>
         )}
       </div>
     </div>
