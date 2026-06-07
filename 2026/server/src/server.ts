@@ -185,6 +185,16 @@ server.on('link', (username) => {
   const player = username as PlayerName;
   console.info(`[info] [gno-2026] [player] ${player} linked`);
 
+  // Send the player's last-known position FIRST, before anything else. A
+  // (re)joining client (notably the dev simulator) waits for this message and
+  // resumes exactly where it left off, instead of snapping to a default
+  // position and drawing a spurious jump in its trail. `null` means we have no
+  // prior position for this player (fresh server or kicked after going idle).
+  server.send(username, {
+    type: 'last-position',
+    payload: positions[player] ? geoTransform.toPoint(positions[player]!) : null,
+  });
+
   // Send current state immediately so the joining player sees the map right away.
   server.send(username, { type: 'positions', payload: positionsPayload() });
   server.send(username, { type: 'game-state', payload: toClientGameState(stateStore.get(), positions) });

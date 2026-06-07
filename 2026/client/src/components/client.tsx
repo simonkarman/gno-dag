@@ -40,6 +40,13 @@ interface StoreState {
   lastResult: PuzzleResult | null;
   /** Per-puzzle wrong-answer lockout deadlines (puzzle id → epoch ms). In-memory only; resets on reload. */
   cooldowns: Record<string, number>;
+  /**
+   * The player's last-known position as broadcast by the server right after
+   * linking. `undefined` = not yet received; `null` = server has no prior
+   * position; otherwise the resume point. Consumed by the dev simulator so a
+   * reload continues where you left off instead of snapping to the house.
+   */
+  lastPosition: Point | null | undefined;
 }
 
 export const useStore = createStore(
@@ -49,12 +56,19 @@ export const useStore = createStore(
     puzzles: [],
     lastResult: null,
     cooldowns: {},
+    lastPosition: undefined,
   } as StoreState,
   (state, action) => {
     switch (action.type) {
       case 'positions': {
         const a = action as { type: 'positions'; payload: Positions };
         return { ...state, positions: a.payload };
+      }
+      case 'last-position': {
+        // Sent once, first, right after linking — the player's resume point
+        // (or null if the server has no prior position for them).
+        const a = action as { type: 'last-position'; payload: Point | null };
+        return { ...state, lastPosition: a.payload };
       }
       case 'game-state': {
         const a = action as { type: 'game-state'; payload: GameState };
@@ -477,11 +491,21 @@ function PlayerView({ username }: { username: string }) {
 // ---------------------------------------------------------------------------
 
 function DevPlayerView({ username }: { username: string }) {
-  const { positions, puzzles } = useStore();
+  const { positions, puzzles, lastPosition } = useStore();
   const [useReal, setUseReal] = useState(false);
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
-  const { pos: simPos, reset: resetSimPos, move, stepMeters, setStepMeters } = useSimulatedLocation(useReal ? () => {} : handlePosition);
+  // Resume the simulator from the server's last-known position (sent first on
+  // link) so a reload continues where you left off instead of snapping to the
+  // house and tearing a jump through the trail. `undefined` = not yet received
+  // (keep waiting); `null` = no prior position (fall back to the house).
+  const resumeReady = lastPosition !== undefined;
+  const resume = {
+    ready: resumeReady,
+    position: resumeReady ? (lastPosition ? fromPoint(lastPosition) : HOUSE) : null,
+  };
+
+  const { pos: simPos, reset: resetSimPos, move, stepMeters, setStepMeters } = useSimulatedLocation(useReal ? () => {} : handlePosition, resume);
   useGeolocation(useReal ? handlePosition : () => {});
 
   return (

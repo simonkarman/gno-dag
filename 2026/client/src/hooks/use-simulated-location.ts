@@ -20,17 +20,33 @@ const DEFAULT_STEP_METERS = 10;
 type Direction = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight';
 
 /**
+ * Resume info for the simulator, sourced from the server's `last-position`
+ * message (relayed via the store). `ready` flips true once that message has
+ * arrived; `position` is where to resume (or null when the server has no prior
+ * position, in which case we keep the house default).
+ */
+export interface SimulatorResume {
+  ready: boolean;
+  position: LatLng | null;
+}
+
+/**
  * Development-only hook that simulates GPS movement via arrow keys.
  *
  * Starts at the house of Jac. and Govie. Each arrow-key press moves the
  * simulated position by `stepMeters` (configurable). Holding Shift while moving
  * uses a fine step of 1/10th of `stepMeters`.
  *
- * Calls `onPosition` immediately with the initial position, then on every
- * key-driven update.
+ * Broadcasting is gated on `resume`: until the server has told us where the
+ * player left off, the hook stays silent (so a reload doesn't broadcast the
+ * house and draw a spurious jump in the trail). Once resume info arrives it
+ * seeds itself from it — resuming exactly where you left off, or keeping the
+ * house default when there's no prior position — and then broadcasts `pos` on
+ * every change. Omitting `resume` arms broadcasting immediately (no gating).
  */
-export function useSimulatedLocation(onPosition: (pos: LatLng) => void) {
+export function useSimulatedLocation(onPosition: (pos: LatLng) => void, resume?: SimulatorResume) {
   const [pos, setPos] = useState<LatLng>(START);
+  const [armed, setArmed] = useState(false);
   const [stepMeters, setStepMeters] = useState<number>(DEFAULT_STEP_METERS);
 
   const onPositionRef = useRef(onPosition);
@@ -40,9 +56,21 @@ export function useSimulatedLocation(onPosition: (pos: LatLng) => void) {
   const stepRef = useRef(stepMeters);
   useEffect(() => { stepRef.current = stepMeters; }, [stepMeters]);
 
+  // Seed from the server's last-known position, then arm broadcasting. Until
+  // armed we never call `onPosition`, so the house is not broadcast on (re)join.
   useEffect(() => {
+    if (armed) return;
+    if (resume === undefined) { setArmed(true); return; } // no gating requested
+    if (!resume.ready) return;                            // still waiting for the server
+    if (resume.position) setPos(resume.position);         // resume where we left off
+    setArmed(true);
+  }, [armed, resume]);
+
+  // Broadcast every position change, but only once armed.
+  useEffect(() => {
+    if (!armed) return;
     onPositionRef.current(pos);
-  }, [pos]);
+  }, [pos, armed]);
 
   const reset = useCallback(() => setPos(START), []);
 

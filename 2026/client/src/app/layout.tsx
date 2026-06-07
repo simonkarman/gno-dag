@@ -25,19 +25,19 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased app-bg min-h-screen`}>
-        <div className="flex min-h-[100svh] flex-col items-center justify-between">
-          <div className="w-full grow">
-            {children}
-          </div>
-          <footer className="relative z-10 mb-1 self-end flex items-center gap-2 px-3 py-1">
-            <p className="text-right text-xs text-zinc-500">
-              <span>Built with</span>{' '}
-              <a href="https://github.com/simonkarman/krmx" className="font-semibold tracking-wide text-zinc-400 hover:underline">Krmx</a>
-              {' '}by{' '}
-              <a href="https://www.simonkarman.nl" className="text-zinc-400 tracking-wide font-bold hover:underline">simonkarman</a>
-            </p>
-          </footer>
-        </div>
+        {children}
+        {/* Credit — pinned to the bottom-right corner. Fixed, so it never moves
+            while the page scrolls (just like the other corner overlays). Low
+            z-index keeps it under overlays such as the puzzle panel (z-20), and
+            pointer-events are limited to the text so it never blocks the map. */}
+        <footer className="fixed bottom-1 right-2 z-10 flex items-center gap-2 pointer-events-none">
+          <p className="text-right text-xs text-zinc-500 pointer-events-auto">
+            <span>Built with</span>{' '}
+            <a href="https://github.com/simonkarman/krmx" className="font-semibold tracking-wide text-zinc-400 hover:underline">Krmx</a>
+            {' '}by{' '}
+            <a href="https://www.simonkarman.nl" className="text-zinc-400 tracking-wide font-bold hover:underline">simonkarman</a>
+          </p>
+        </footer>
       </body>
     </html>
   );
