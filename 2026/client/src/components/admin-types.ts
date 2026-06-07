@@ -54,6 +54,41 @@ export function derivedDisplayState(
   return scores[puzzle.assignedTo] >= puzzle.minimumPoints ? 'open' : 'locked';
 }
 
+/** A puzzle plus its computed reachability within its owner's column. */
+export interface PlayerColumnRow {
+  puzzle: AdminPuzzle;
+  /**
+   * The number of the SAME player's puzzles with a strictly lower
+   * `minimumPoints` — i.e. the maximum score that player can have accumulated
+   * by the time this puzzle's threshold is checked.
+   */
+  availableBefore: number;
+  /** Whether the threshold can ever be met: `availableBefore >= minimumPoints`. */
+  achievable: boolean;
+}
+
+/**
+ * Groups puzzles per player and, within each column, sorts them ascending by
+ * `minimumPoints`. For each puzzle it computes `availableBefore` and whether the
+ * puzzle is therefore `achievable`. Display-only: never mutates the input.
+ */
+export function buildPlayerColumns(
+  puzzles: AdminPuzzle[],
+): Record<PlayerName, PlayerColumnRow[]> {
+  const byPlayer: Record<PlayerName, AdminPuzzle[]> = { 'Govie': [], 'Jac.': [] };
+  for (const p of puzzles) byPlayer[p.assignedTo].push(p);
+
+  const result: Record<PlayerName, PlayerColumnRow[]> = { 'Govie': [], 'Jac.': [] };
+  for (const name of PLAYERS) {
+    const sorted = [...byPlayer[name]].sort((a, b) => a.minimumPoints - b.minimumPoints);
+    result[name] = sorted.map((puzzle) => {
+      const availableBefore = byPlayer[name].filter(q => q.minimumPoints < puzzle.minimumPoints).length;
+      return { puzzle, availableBefore, achievable: availableBefore >= puzzle.minimumPoints };
+    });
+  }
+  return result;
+}
+
 /** Creates a new puzzle with sensible defaults at a given location. */
 export function newPuzzle(location: LatLng): AdminPuzzle {
   return {

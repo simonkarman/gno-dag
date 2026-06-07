@@ -205,6 +205,22 @@ export function PuzzleForm({
 // requirement's deviation content.
 // ---------------------------------------------------------------------------
 
+/**
+ * Estimates a sensible starting row count for a content textarea so that opening
+ * a puzzle shows its text at a reasonable height. Counts explicit line breaks
+ * plus a rough wrap estimate, clamped so it never starts tiny or absurdly tall.
+ * The field stays manually resizable — dragging sets an inline height that
+ * overrides this starting value.
+ */
+function estimateTextareaRows(value: string): number {
+  const CHARS_PER_ROW = 40;
+  let rows = 0;
+  for (const line of value.split('\n')) {
+    rows += Math.max(1, Math.ceil(line.length / CHARS_PER_ROW));
+  }
+  return Math.min(20, Math.max(2, rows));
+}
+
 function ContentEditor({ content, onChange }: {
   content: ContentElement[];
   onChange: (content: ContentElement[]) => void;
@@ -255,6 +271,7 @@ function ContentEditor({ content, onChange }: {
             {el.type === 'text' ? (
               <textarea
                 className={`${input} resize-y min-h-16`}
+                rows={estimateTextareaRows(el.value)}
                 value={el.value}
                 onChange={(e) => updateContent(i, { ...el, value: e.target.value })}
                 placeholder="Tekst..."

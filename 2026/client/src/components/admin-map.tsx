@@ -27,7 +27,7 @@ interface Props {
   /** When true the cursor is a crosshair and a plain click calls onMapClick. */
   placing: boolean;
   onMapClick: (loc: LatLng) => void;
-  onSelectPuzzle: (id: string) => void;
+  onSelectPuzzle: (id: string | null) => void;
   onMovePuzzle: (id: string, loc: LatLng) => void;
   onMoveSecondary: (puzzleId: string, reqIndex: number, loc: LatLng) => void;
 }
@@ -44,6 +44,9 @@ export function AdminMap({
     | { kind: 'secondary'; puzzleId: string; reqIndex: number }
     | null
   >(null);
+  // Distinguishes a click from a drag: set on the first pointer move so the
+  // trailing click can keep (never deselect) a marker the user just dragged.
+  const moved = useRef(false);
 
   /** Converts a pointer event to a normalised LatLng within the game bounds. */
   function eventToLatLng(e: React.PointerEvent | React.MouseEvent): LatLng | null {
@@ -76,12 +79,14 @@ export function AdminMap({
     e.stopPropagation();
     (e.target as Element).setPointerCapture?.(e.pointerId);
     drag.current = target;
+    moved.current = false;
   }
 
   function onPointerMove(e: React.PointerEvent) {
     if (!drag.current) return;
     const loc = eventToLatLng(e);
     if (!loc) return;
+    moved.current = true;
     if (drag.current.kind === 'puzzle') {
       onMovePuzzle(drag.current.id, loc);
     } else {
@@ -166,7 +171,12 @@ export function AdminMap({
             key={`puzzle-${puzzle.id}`}
             className="cursor-move"
             onPointerDown={(e) => startDrag(e, { kind: 'puzzle', id: puzzle.id })}
-            onClick={(e) => { e.stopPropagation(); onSelectPuzzle(puzzle.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              // A drag (or a click while placing) selects but must never deselect.
+              if (moved.current || placing) { onSelectPuzzle(puzzle.id); return; }
+              onSelectPuzzle(selectedId === puzzle.id ? null : puzzle.id);
+            }}
           >
             {selected && (
               <circle cx={cx} cy={cy} r={7} fill="none" stroke={PLAYER_COLORS[puzzle.assignedTo]} strokeWidth={1} opacity={0.9} />

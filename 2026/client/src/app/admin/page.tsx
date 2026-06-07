@@ -5,7 +5,7 @@ import { LatLng } from '@/components/geo';
 import { PLAYER_COLORS } from '@/components/colors';
 import { AdminMap } from '@/components/admin-map';
 import { PuzzleForm } from '@/components/puzzle-form';
-import { AdminPuzzle, AdminState, PLAYERS, derivedScores, emptyAdminState, newPuzzle } from '@/components/admin-types';
+import { AdminPuzzle, AdminState, PLAYERS, buildPlayerColumns, derivedScores, emptyAdminState, newPuzzle } from '@/components/admin-types';
 
 type Placing =
   | { kind: 'new' }
@@ -51,6 +51,7 @@ export default function AdminPage() {
   );
 
   const scores = useMemo(() => derivedScores(state.puzzles), [state.puzzles]);
+  const columns = useMemo(() => buildPlayerColumns(state.puzzles), [state.puzzles]);
 
   // ---- API ----
   const fetchRemote = useCallback(async (): Promise<{ data: AdminState; blob: string }> => {
@@ -282,7 +283,7 @@ export default function AdminPage() {
         </div>
 
         {/* Sidebar */}
-        <aside className="w-[28rem] shrink-0 border-l border-zinc-800 overflow-y-auto p-4 flex flex-col gap-4">
+        <aside className="w-[32rem] shrink-0 border-l border-zinc-800 overflow-y-auto p-4 flex flex-col gap-4">
           {/* Scores (derived, read-only) */}
           <section>
             <div className="flex items-center justify-between mb-2">
@@ -301,7 +302,7 @@ export default function AdminPage() {
             </div>
           </section>
 
-          {/* Puzzle list */}
+          {/* Achievability board (per player, sorted by required points) */}
           <section>
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-bold text-sm">Puzzels ({state.puzzles.length})</h2>
@@ -312,26 +313,49 @@ export default function AdminPage() {
                 + Puzzel (klik op kaart)
               </button>
             </div>
-            <div className="flex flex-col gap-1">
-              {state.puzzles.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedId(p.id)}
-                  className={`flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors ${
-                    p.id === selectedId ? 'bg-zinc-700' : 'bg-zinc-900 hover:bg-zinc-800'
-                  }`}
-                >
-                  <span className="text-base">{p.icon}</span>
-                  <span style={{ color: PLAYER_COLORS[p.assignedTo] }} className="font-semibold">{p.assignedTo}</span>
-                  <span className="text-zinc-400">·</span>
-                  <span className={p.completed ? 'text-green-400' : 'text-zinc-300'}>
-                    {p.completed ? 'voltooid' : 'open'}
-                  </span>
-                  <span className="text-zinc-500 text-xs">·</span>
-                  <span className="text-zinc-500 font-mono text-xs truncate">{p.id}</span>
-                </button>
+            <div className="grid grid-cols-2 gap-2">
+              {PLAYERS.map((name) => (
+                <div key={name} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between px-1 pb-0.5">
+                    <span style={{ color: PLAYER_COLORS[name] }} className="font-bold text-xs">{name}</span>
+                    <span className="font-mono text-xs text-zinc-400">{scores[name]}</span>
+                  </div>
+                  {columns[name].map(({ puzzle, achievable }) => {
+                    const isSelected = puzzle.id === selectedId;
+                    const unreachable = !puzzle.completed && !achievable;
+                    return (
+                      <button
+                        key={puzzle.id}
+                        onClick={() => setSelectedId(prev => (prev === puzzle.id ? null : puzzle.id))}
+                        title={puzzle.id}
+                        className={`flex items-center gap-1.5 rounded border px-2 py-1.5 text-left text-sm transition-colors ${
+                          puzzle.completed
+                            ? 'bg-green-900/40 border-green-700/60'
+                            : unreachable
+                              ? 'bg-red-900/30 border-red-800/60'
+                              : 'bg-zinc-900 border-transparent hover:bg-zinc-800'
+                        } ${isSelected ? 'ring-2 ring-white/70' : ''}`}
+                      >
+                        <span className="text-base">{puzzle.icon}</span>
+                        <span
+                          className={`font-mono text-xs ${
+                            puzzle.completed ? 'text-green-400' : unreachable ? 'text-red-400' : 'text-zinc-300'
+                          }`}
+                        >
+                          {puzzle.minimumPoints}
+                        </span>
+                        <span className="flex-1" />
+                        {puzzle.completed
+                          ? <span className="text-green-400 text-xs">✓</span>
+                          : unreachable
+                            ? <span className="text-red-400 text-xs">⚠</span>
+                            : null}
+                      </button>
+                    );
+                  })}
+                  {columns[name].length === 0 && <p className="text-xs text-zinc-500 px-1">Geen puzzels.</p>}
+                </div>
               ))}
-              {state.puzzles.length === 0 && <p className="text-xs text-zinc-500">Nog geen puzzels.</p>}
             </div>
           </section>
 
