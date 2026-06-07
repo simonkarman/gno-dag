@@ -215,7 +215,7 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       {/* Overlay: floats above the map */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         {/* Player pill — top-right */}
-        <div className="absolute top-4 right-4 pointer-events-none">
+        <div className="absolute top-[calc(env(safe-area-inset-top)+1rem)] right-[calc(env(safe-area-inset-right)+1rem)] pointer-events-none">
           <div
             className="flex items-center gap-2 rounded-full px-3 py-1.5 bg-zinc-900/75 backdrop-blur-sm border shadow-lg"
             style={{ borderColor: PLAYER_COLORS[self] + '55' }}
@@ -237,7 +237,7 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
         <ScoreBoard scores={scores} />
         {/* Dev badge — bottom-left, collapsed by default */}
         {devBadge && (
-          <div className="absolute bottom-4 left-4 pointer-events-auto">
+          <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+1rem)] left-[calc(env(safe-area-inset-left)+1rem)] pointer-events-auto">
             {devBadge}
           </div>
         )}
@@ -246,7 +246,7 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       {activePuzzle && <PuzzlePanel puzzle={activePuzzle} />}
       {/* Passive chips for nearby puzzles you can't act on right now */}
       {nearbyChips.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-10 pointer-events-none px-4 pb-4 flex flex-col items-center gap-2"
+        <div className="fixed inset-x-0 bottom-0 z-10 pointer-events-none px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex flex-col items-center gap-2"
           style={{ marginBottom: activePuzzle ? '70vh' : 0 }}
         >
           {nearbyChips.map(p => (
@@ -321,7 +321,7 @@ function WaitingScreen({ devBadge }: { devBadge?: React.ReactNode }) {
 
 function ScoreBoard({ scores }: { scores: Record<PlayerName, number> }) {
   return (
-    <div className="absolute top-4 left-4 pointer-events-none">
+    <div className="absolute top-[calc(env(safe-area-inset-top)+1rem)] left-[calc(env(safe-area-inset-left)+1rem)] pointer-events-none">
       <div className="flex flex-col gap-1 rounded-lg px-3 py-2 bg-zinc-900/75 backdrop-blur-sm border border-zinc-700 shadow-lg text-sm font-mono">
         {(VALID_PLAYERS as readonly PlayerName[]).map((name) => (
           <div key={name} className="flex items-center justify-between gap-3">
@@ -375,7 +375,7 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-20 pointer-events-auto">
-      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800 border-t border-x border-zinc-600 shadow-2xl px-5 py-4 max-h-[70vh] overflow-y-auto">
+      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800 border-t border-x border-zinc-600 shadow-2xl px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{puzzle.icon}</span>
           <h2 className="font-bold text-lg">Puzzel</h2>
