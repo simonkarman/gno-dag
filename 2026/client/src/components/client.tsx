@@ -375,7 +375,7 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-20 pointer-events-auto">
-      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800 border-t border-x border-zinc-600 shadow-2xl px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
+      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800/80 border-t border-x border-zinc-600 shadow-2xl px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{puzzle.icon}</span>
           <h2 className="font-bold text-lg">Puzzel</h2>

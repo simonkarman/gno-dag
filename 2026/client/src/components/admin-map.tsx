@@ -11,7 +11,7 @@ const ROAD_STYLES: Record<string, { stroke: string; width: number; opacity: numb
   tertiary:    { stroke: '#a1a1aa', width: 2.5, opacity: 0.9 },
   residential: { stroke: '#71717a', width: 1.8, opacity: 0.85 },
   service:     { stroke: '#52525b', width: 1.2, opacity: 0.7 },
-  cycleway:    { stroke: '#22c55e', width: 1.0, opacity: 0.65 },
+  cycleway:    { stroke: '#52525b', width: 1.0, opacity: 0.65 },
   footway:     { stroke: '#3f3f46', width: 0.8, opacity: 0.6 },
   pedestrian:  { stroke: '#3f3f46', width: 1.2, opacity: 0.65 },
   unclassified:{ stroke: '#71717a', width: 1.5, opacity: 0.75 },
@@ -20,6 +20,40 @@ const DEFAULT_ROAD_STYLE = { stroke: '#3f3f46', width: 0.8, opacity: 0.5 };
 
 const MAP_W = 320;
 const MAP_H = 176;
+
+// Inset matches the main map INSET
+const INSET = 0.05; // 5% on every side
+const VB_X = MAP_W * INSET;
+const VB_Y = MAP_H * INSET;
+const VB_W = MAP_W * (1 - 2 * INSET);
+const VB_H = MAP_H * (1 - 2 * INSET);
+
+// Tweakable fade parameters (change these to adjust the vignette boundaries)
+const FADE_INWARD = 5;
+const FADE_OUTWARD = 35;
+
+// Programmatic Inner/Outer boundaries
+const INNER_X = VB_X + FADE_INWARD;
+const INNER_Y = VB_Y + FADE_INWARD;
+const INNER_W = VB_W - 2 * FADE_INWARD;
+const INNER_H = VB_H - 2 * FADE_INWARD;
+
+const OUTER_X = VB_X - FADE_OUTWARD;
+const OUTER_Y = VB_Y - FADE_OUTWARD;
+const OUTER_W = VB_W + 2 * FADE_OUTWARD;
+const OUTER_H = VB_H + 2 * FADE_OUTWARD;
+
+const INNER_XR = VB_X + VB_W - FADE_INWARD;
+const INNER_YB = VB_Y + VB_H - FADE_INWARD;
+
+const OUTER_XR = VB_X + VB_W + FADE_OUTWARD;
+const OUTER_YB = VB_Y + VB_H + FADE_OUTWARD;
+
+// Mask viewport limits (500% area coverage)
+const MASK_MIN_X = VB_X - 5 * VB_W;
+const MASK_MAX_X = VB_X + 6 * VB_W;
+const MASK_MIN_Y = VB_Y - 5 * VB_H;
+const MASK_MAX_Y = VB_Y + 6 * VB_H;
 
 interface Props {
   puzzles: AdminPuzzle[];
@@ -113,6 +147,26 @@ export function AdminMap({
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
     >
+      <defs>
+        {/* Linear gradients for rectangular fade */}
+        <linearGradient id="admin-fade-left" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="admin-fade-right" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="admin-fade-top" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="admin-fade-bottom" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+      </defs>
+
       {/* Roads */}
       {ROADS.map((road, i) => {
         const style = ROAD_STYLES[road.type] ?? DEFAULT_ROAD_STYLE;
@@ -130,6 +184,55 @@ export function AdminMap({
           />
         );
       })}
+
+      {/* Solid cover masks (outermost 500% borders) */}
+      <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={OUTER_X - MASK_MIN_X} height={MASK_MAX_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+      <rect x={OUTER_XR} y={MASK_MIN_Y} width={MASK_MAX_X - OUTER_XR} height={MASK_MAX_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+      <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={MASK_MAX_X - MASK_MIN_X} height={OUTER_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+      <rect x={MASK_MIN_X} y={OUTER_YB} width={MASK_MAX_X - MASK_MIN_X} height={MASK_MAX_Y - OUTER_YB} fill="#18181b" pointerEvents="none" />
+
+      {/* Linear fade-out vignettes */}
+      <rect x={OUTER_X} y={OUTER_Y} width={INNER_X - OUTER_X} height={OUTER_YB - OUTER_Y} fill="url(#admin-fade-left)" pointerEvents="none" />
+      <rect x={INNER_XR} y={OUTER_Y} width={OUTER_XR - INNER_XR} height={OUTER_YB - OUTER_Y} fill="url(#admin-fade-right)" pointerEvents="none" />
+      <rect x={OUTER_X} y={OUTER_Y} width={OUTER_XR - OUTER_X} height={INNER_Y - OUTER_Y} fill="url(#admin-fade-top)" pointerEvents="none" />
+      <rect x={OUTER_X} y={INNER_YB} width={OUTER_XR - OUTER_X} height={OUTER_YB - INNER_YB} fill="url(#admin-fade-bottom)" pointerEvents="none" />
+
+      {/* Test Outlines (Inner FADE_INWARD inward white / Outer FADE_OUTWARD outward red) */}
+      <rect
+        x={VB_X}
+        y={VB_Y}
+        width={VB_W}
+        height={VB_H}
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="0.8"
+        strokeOpacity={0.4}
+        pointerEvents="none"
+      />
+      <rect
+        x={INNER_X}
+        y={INNER_Y}
+        width={INNER_W}
+        height={INNER_H}
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="0.8"
+        strokeDasharray="2,2"
+        strokeOpacity={0.2}
+        pointerEvents="none"
+      />
+      <rect
+        x={OUTER_X}
+        y={OUTER_Y}
+        width={OUTER_W}
+        height={OUTER_H}
+        fill="none"
+        stroke="#ef4444"
+        strokeWidth="0.8"
+        strokeDasharray="2,2"
+        strokeOpacity={0.2}
+        pointerEvents="none"
+      />
 
       {/* Secondary locations (other-player-at-location requirements) */}
       {puzzles.flatMap((puzzle) =>

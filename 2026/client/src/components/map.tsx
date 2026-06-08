@@ -80,7 +80,7 @@ const ROAD_STYLES: Record<string, { stroke: string; width: number; opacity: numb
   tertiary:    { stroke: '#a1a1aa', width: 2.5, opacity: 0.9 },
   residential: { stroke: '#71717a', width: 1.8, opacity: 0.85 },
   service:     { stroke: '#52525b', width: 1.2, opacity: 0.7 },
-  cycleway:    { stroke: '#22c55e', width: 1.0, opacity: 0.65 },
+  cycleway:    { stroke: '#52525b', width: 1.0, opacity: 0.65 },
   footway:     { stroke: '#3f3f46', width: 0.8, opacity: 0.6 },
   pedestrian:  { stroke: '#3f3f46', width: 1.2, opacity: 0.65 },
   unclassified:{ stroke: '#71717a', width: 1.5, opacity: 0.75 },
@@ -99,14 +99,86 @@ const VB_Y = MAP_H * INSET;
 const VB_W = MAP_W * (1 - 2 * INSET);
 const VB_H = MAP_H * (1 - 2 * INSET);
 
+// Tweakable fade parameters (change these to adjust the vignette boundaries)
+const FADE_INWARD = 5;
+const FADE_OUTWARD = 35;
+
+// Corner vignette parameters (shades and rounds the screen corners)
+const VIGNETTE_START = 80;     // Percentage radius where corner shading begins
+const VIGNETTE_OPACITY = 0.8; // Maximum opacity of the corner shading
+
+const PLAY_CENTER_X = MAP_W / 2; // 160
+const PLAY_CENTER_Y = MAP_H / 2; // 88
+
+// Programmatic Inner/Outer boundaries
+const INNER_X = VB_X + FADE_INWARD;
+const INNER_Y = VB_Y + FADE_INWARD;
+const INNER_W = VB_W - 2 * FADE_INWARD;
+const INNER_H = VB_H - 2 * FADE_INWARD;
+
+const OUTER_X = VB_X - FADE_OUTWARD;
+const OUTER_Y = VB_Y - FADE_OUTWARD;
+const OUTER_W = VB_W + 2 * FADE_OUTWARD;
+const OUTER_H = VB_H + 2 * FADE_OUTWARD;
+
+const INNER_XR = VB_X + VB_W - FADE_INWARD;
+const INNER_YB = VB_Y + VB_H - FADE_INWARD;
+
+const OUTER_XR = VB_X + VB_W + FADE_OUTWARD;
+const OUTER_YB = VB_Y + VB_H + FADE_OUTWARD;
+
+// Mask viewport limits (500% area coverage)
+const MASK_MIN_X = VB_X - 5 * VB_W;
+const MASK_MAX_X = VB_X + 6 * VB_W;
+const MASK_MIN_Y = VB_Y - 5 * VB_H;
+const MASK_MAX_Y = VB_Y + 6 * VB_H;
+
+// Radial Vignette Gradient computations
+const GRAD_R = VB_W / 2 + FADE_OUTWARD; // 244
+const GRAD_SCALE_Y = (VB_H / 2 + FADE_OUTWARD) / GRAD_R; // ~0.7344
+
 export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 'Jac.': 0 }, trails = { 'Govie': [], 'Jac.': [] }, activePuzzleIds = [] }: Props) {
   const secondaries = secondaryLocations(puzzles);
   return (
     <svg
       viewBox={`${VB_X} ${VB_Y} ${VB_W} ${VB_H}`}
       preserveAspectRatio="xMidYMid meet"
-      className="fixed inset-0 w-full h-full z-0 bg-zinc-900"
+      className="fixed inset-0 w-full h-full z-0 bg-zinc-900 overflow-visible"
     >
+      <defs>
+        {/* Linear gradients for rectangular fade */}
+        <linearGradient id="fade-left" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="fade-right" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="fade-top" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="fade-bottom" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
+          <stop offset="100%" stopColor="#18181b" stopOpacity="1" />
+        </linearGradient>
+
+        {/* Radial vignette gradient for corner shading */}
+        <radialGradient
+          id="vignette-fade"
+          cx={PLAY_CENTER_X}
+          cy={PLAY_CENTER_Y}
+          r={GRAD_R}
+          gradientTransform={`translate(${PLAY_CENTER_X}, ${PLAY_CENTER_Y}) scale(1, ${GRAD_SCALE_Y}) translate(-${PLAY_CENTER_X}, -${PLAY_CENTER_Y})`}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0%" stopColor="#18181b" stopOpacity={0} />
+          <stop offset={`${VIGNETTE_START}%`} stopColor="#18181b" stopOpacity={0} />
+          <stop offset="100%" stopColor="#18181b" stopOpacity={VIGNETTE_OPACITY} />
+        </radialGradient>
+      </defs>
+
         {/* Roads from OpenStreetMap (pre-baked in road-data.ts) */}
         {ROADS.map((road, i) => {
           const style = ROAD_STYLES[road.type] ?? DEFAULT_ROAD_STYLE;
@@ -124,6 +196,45 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
             />
           );
         })}
+
+        {/* Solid cover masks (outermost 500% borders) */}
+        <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={OUTER_X - MASK_MIN_X} height={MASK_MAX_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+        <rect x={OUTER_XR} y={MASK_MIN_Y} width={MASK_MAX_X - OUTER_XR} height={MASK_MAX_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+        <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={MASK_MAX_X - MASK_MIN_X} height={OUTER_Y - MASK_MIN_Y} fill="#18181b" pointerEvents="none" />
+        <rect x={MASK_MIN_X} y={OUTER_YB} width={MASK_MAX_X - MASK_MIN_X} height={MASK_MAX_Y - OUTER_YB} fill="#18181b" pointerEvents="none" />
+
+        {/* Linear fade-out vignettes */}
+        <rect x={OUTER_X} y={OUTER_Y} width={INNER_X - OUTER_X} height={OUTER_YB - OUTER_Y} fill="url(#fade-left)" pointerEvents="none" />
+        <rect x={INNER_XR} y={OUTER_Y} width={OUTER_XR - INNER_XR} height={OUTER_YB - OUTER_Y} fill="url(#fade-right)" pointerEvents="none" />
+        <rect x={OUTER_X} y={OUTER_Y} width={OUTER_XR - OUTER_X} height={INNER_Y - OUTER_Y} fill="url(#fade-top)" pointerEvents="none" />
+        <rect x={OUTER_X} y={INNER_YB} width={OUTER_XR - OUTER_X} height={OUTER_YB - INNER_YB} fill="url(#fade-bottom)" pointerEvents="none" />
+
+        {/* Corner vignette shading */}
+        <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={MASK_MAX_X - MASK_MIN_X} height={MASK_MAX_Y - MASK_MIN_Y} fill="url(#vignette-fade)" pointerEvents="none" />
+
+        {/* Test Outlines (Inner FADE_INWARD inward white / Outer FADE_OUTWARD outward red) */}
+        {/*<rect*/}
+        {/*  x={INNER_X}*/}
+        {/*  y={INNER_Y}*/}
+        {/*  width={INNER_W}*/}
+        {/*  height={INNER_H}*/}
+        {/*  fill="none"*/}
+        {/*  stroke="#ffffff"*/}
+        {/*  strokeWidth="0.8"*/}
+        {/*  strokeDasharray="2,2"*/}
+        {/*  pointerEvents="none"*/}
+        {/*/>*/}
+        {/*<rect*/}
+        {/*  x={OUTER_X}*/}
+        {/*  y={OUTER_Y}*/}
+        {/*  width={OUTER_W}*/}
+        {/*  height={OUTER_H}*/}
+        {/*  fill="none"*/}
+        {/*  stroke="#ef4444"*/}
+        {/*  strokeWidth="0.8"*/}
+        {/*  strokeDasharray="2,2"*/}
+        {/*  pointerEvents="none"*/}
+        {/*/>*/}
 
         {/* Movement trails — fade from oldest (transparent) to newest. */}
         {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
