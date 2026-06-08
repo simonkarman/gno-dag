@@ -143,6 +143,21 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
 }) {
   const self = username as PlayerName;
   const scores = useMemo(() => deriveScores(puzzles), [puzzles]);
+  const [panelCollapsed, setPanelCollapsed] = useState(false);
+
+  // Puzzle the player can currently interact with: open, assigned to them, within range.
+  const activePuzzle = currentPos
+    ? puzzles.find(p =>
+        p.assignedTo === self &&
+        derivePuzzleState(p, scores[p.assignedTo]) === 'open' &&
+        distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS,
+      ) ?? null
+    : null;
+
+  // Reset collapse state whenever a new puzzle becomes active.
+  useEffect(() => {
+    setPanelCollapsed(false);
+  }, [activePuzzle?.id]);
 
   // Waiting screen — shown regardless of location until the game starts.
   const started = useGameStarted();
@@ -176,15 +191,6 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
       </div>
     );
   }
-
-  // Puzzle the player can currently interact with: open, assigned to them, within range.
-  const activePuzzle = currentPos
-    ? puzzles.find(p =>
-        p.assignedTo === self &&
-        derivePuzzleState(p, scores[p.assignedTo]) === 'open' &&
-        distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS,
-      ) ?? null
-    : null;
 
   // Other nearby puzzles (within range) that are NOT the active one — shown as
   // passive info chips so the player understands what's around them.
@@ -243,11 +249,17 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
         )}
       </div>
       {/* Puzzle panel — slides up when at an open puzzle */}
-      {activePuzzle && <PuzzlePanel puzzle={activePuzzle} />}
+      {activePuzzle && (
+        <PuzzlePanel
+          puzzle={activePuzzle}
+          collapsed={panelCollapsed}
+          onToggleCollapse={() => setPanelCollapsed(!panelCollapsed)}
+        />
+      )}
       {/* Passive chips for nearby puzzles you can't act on right now */}
       {nearbyChips.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-10 pointer-events-none px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex flex-col items-center gap-2"
-          style={{ marginBottom: activePuzzle ? '70vh' : 0 }}
+        <div className="fixed inset-x-0 bottom-0 z-10 pointer-events-none px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex flex-col items-center gap-2 transition-all duration-300 ease-in-out"
+          style={{ marginBottom: (activePuzzle && !panelCollapsed) ? '70vh' : 0 }}
         >
           {nearbyChips.map(p => (
             <ProximityChip key={p.id} puzzle={p} self={self} score={scores[p.assignedTo]} />
@@ -338,7 +350,11 @@ function ScoreBoard({ scores }: { scores: Record<PlayerName, number> }) {
 // Puzzle panel — content + answer input
 // ---------------------------------------------------------------------------
 
-function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
+function PuzzlePanel({ puzzle, collapsed, onToggleCollapse }: {
+  puzzle: ClientPuzzle;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}) {
   const { lastResult, cooldowns } = useStore();
   const [answer, setAnswer] = useState('');
 
@@ -374,8 +390,24 @@ function PuzzlePanel({ puzzle }: { puzzle: ClientPuzzle }) {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 pointer-events-auto">
-      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800/80 border-t border-x border-zinc-600 shadow-2xl px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
+    <div className={`fixed inset-x-0 bottom-0 z-20 pointer-events-auto transition-transform duration-300 ease-in-out ${
+      collapsed ? 'translate-y-[calc(100%-2.5rem)]' : 'translate-y-0'
+    }`}>
+      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800/80 border-t border-x border-zinc-600 shadow-2xl px-5 pt-1 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
+        {/* Toggle Handle Header */}
+        <div className="flex justify-center mb-1">
+          <button
+            onClick={onToggleCollapse}
+            className="w-full py-1 flex flex-col items-center justify-center text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+          >
+            <div className="w-12 h-1 bg-zinc-600 rounded-full mb-1" />
+            <FontAwesomeIcon
+              icon={collapsed ? faChevronUp : faChevronDown}
+              className="w-2.5 h-2.5"
+            />
+          </button>
+        </div>
+
         <div className="flex items-center gap-2 mb-3">
           <span className="text-2xl">{puzzle.icon}</span>
           <h2 className="font-bold text-lg">Puzzel</h2>

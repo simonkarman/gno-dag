@@ -105,7 +105,7 @@ const FADE_OUTWARD = 35;
 
 // Corner vignette parameters (shades and rounds the screen corners)
 const VIGNETTE_START = 80;     // Percentage radius where corner shading begins
-const VIGNETTE_OPACITY = 0.8; // Maximum opacity of the corner shading
+const VIGNETTE_OPACITY = 0.8;  // Maximum opacity of the corner shading
 
 const PLAY_CENTER_X = MAP_W / 2; // 160
 const PLAY_CENTER_Y = MAP_H / 2; // 88
@@ -113,13 +113,9 @@ const PLAY_CENTER_Y = MAP_H / 2; // 88
 // Programmatic Inner/Outer boundaries
 const INNER_X = VB_X + FADE_INWARD;
 const INNER_Y = VB_Y + FADE_INWARD;
-const INNER_W = VB_W - 2 * FADE_INWARD;
-const INNER_H = VB_H - 2 * FADE_INWARD;
 
 const OUTER_X = VB_X - FADE_OUTWARD;
 const OUTER_Y = VB_Y - FADE_OUTWARD;
-const OUTER_W = VB_W + 2 * FADE_OUTWARD;
-const OUTER_H = VB_H + 2 * FADE_OUTWARD;
 
 const INNER_XR = VB_X + VB_W - FADE_INWARD;
 const INNER_YB = VB_Y + VB_H - FADE_INWARD;
@@ -211,30 +207,6 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
 
         {/* Corner vignette shading */}
         <rect x={MASK_MIN_X} y={MASK_MIN_Y} width={MASK_MAX_X - MASK_MIN_X} height={MASK_MAX_Y - MASK_MIN_Y} fill="url(#vignette-fade)" pointerEvents="none" />
-
-        {/* Test Outlines (Inner FADE_INWARD inward white / Outer FADE_OUTWARD outward red) */}
-        {/*<rect*/}
-        {/*  x={INNER_X}*/}
-        {/*  y={INNER_Y}*/}
-        {/*  width={INNER_W}*/}
-        {/*  height={INNER_H}*/}
-        {/*  fill="none"*/}
-        {/*  stroke="#ffffff"*/}
-        {/*  strokeWidth="0.8"*/}
-        {/*  strokeDasharray="2,2"*/}
-        {/*  pointerEvents="none"*/}
-        {/*/>*/}
-        {/*<rect*/}
-        {/*  x={OUTER_X}*/}
-        {/*  y={OUTER_Y}*/}
-        {/*  width={OUTER_W}*/}
-        {/*  height={OUTER_H}*/}
-        {/*  fill="none"*/}
-        {/*  stroke="#ef4444"*/}
-        {/*  strokeWidth="0.8"*/}
-        {/*  strokeDasharray="2,2"*/}
-        {/*  pointerEvents="none"*/}
-        {/*/>*/}
 
         {/* Movement trails — fade from oldest (transparent) to newest. */}
         {(['Govie', 'Jac.'] as PlayerName[]).map((name) => {
