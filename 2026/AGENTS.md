@@ -27,7 +27,7 @@ Only these two hardcoded usernames are accepted by the server.
 
 The game layers a puzzle system on top of the GPS map:
 
-- **Puzzles** are defined in a JSON state file and have: a map `location`, an `icon`, an `assignedTo` player, a `minimumPoints` threshold, extra `requirements`, an `answer` (server-only, never sent to clients), and `content` (text/image elements shown when solving).
+- **Puzzles** are defined in a JSON state file and have: a map `location`, an `icon`, an `assignedTo` player, a `minimumPoints` threshold, extra `requirements`, an `answer` (array of accepted answers, server-only, never sent to clients; stored verbatim, but comparison ignores case, diacritics, punctuation, and extra whitespace; empty array means unanswerable; legacy single-string values are auto-coerced into a one-element array on load), and `content` (text/image elements shown when solving).
 - A puzzle is `locked`, `open`, or `completed` — rendered gray / white / green on the map. Only `completed` (a boolean) is persisted; everything else clients show is **derived on the client**. The server sends only commands' results and the minimal computed state; anything purely derivable (scores, lock/open) is derived client-side.
 - A player's **score is derived on the client** = their number of completed puzzles (each completion worth **1 point**). It is never broadcast by the server.
 - A puzzle's display **state is derived on the client** with strict priority: `completed` → `completed`; else assigned player's score `< minimumPoints` → `locked`; else `open`. **Requirements do NOT influence lock/open state.**

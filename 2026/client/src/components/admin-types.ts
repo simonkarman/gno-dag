@@ -7,6 +7,10 @@ import { ContentElement, PlayerName, PuzzleState, Requirement } from '@/componen
  *
  * Only `completed` is persisted; the locked/open distinction is always derived
  * from scores (and, on the live server, player positions).
+ *
+ * `answer` is a list of accepted answers, stored verbatim. The server normalises
+ * both sides at comparison time (case, diacritics, punctuation, and extra
+ * whitespace are ignored). An empty array means the puzzle is unanswerable.
  */
 export interface AdminPuzzle {
   id: string;
@@ -15,9 +19,19 @@ export interface AdminPuzzle {
   assignedTo: PlayerName;
   minimumPoints: number;
   requirements: Requirement[];
-  answer: string;
+  answer: string[];
   content: ContentElement[];
   completed: boolean;
+}
+
+/** Coerces a loaded puzzle's `answer` field into a `string[]`. Defensive
+ *  parity with the server: a legacy single-string blob is wrapped in a
+ *  one-element array so the admin form keeps working before the server has
+ *  had a chance to re-save in the new shape. */
+export function coerceAnswer(raw: unknown): string[] {
+  if (typeof raw === 'string') return [raw];
+  if (Array.isArray(raw)) return raw.filter((a): a is string => typeof a === 'string');
+  return [];
 }
 
 /** Full application state stored in GCS — only puzzles; scores are derived. */
@@ -100,7 +114,7 @@ export function newPuzzle(location: LatLng): AdminPuzzle {
     assignedTo: 'Govie',
     minimumPoints: 0,
     requirements: [],
-    answer: '',
+    answer: [],
     content: [],
     completed: false,
   };

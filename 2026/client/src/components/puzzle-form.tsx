@@ -98,9 +98,43 @@ export function PuzzleForm({
           <label className={label}>Minimum punten</label>
           <input type="number" className={input} value={puzzle.minimumPoints} onChange={(e) => patch({ minimumPoints: Number(e.target.value) })} />
         </div>
-        <div>
-          <label className={label}>Antwoord <span className="text-red-400">(geheim)</span></label>
-          <input className={input} value={puzzle.answer} onChange={(e) => patch({ answer: e.target.value })} />
+      </div>
+
+      {/* Answers */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className={label}>Antwoorden <span className="text-red-400">(geheim)</span></label>
+          <button
+            onClick={() => patch({ answer: [...puzzle.answer, ''] })}
+            className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}
+          >
+            + Antwoord
+          </button>
+        </div>
+        <div className="flex flex-col gap-2">
+          {puzzle.answer.length === 0 && (
+            <p className="text-xs text-zinc-500">Geen geaccepteerde antwoorden — puzzel is onoplosbaar.</p>
+          )}
+          {puzzle.answer.map((a, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                className={input}
+                value={a}
+                onChange={(e) => {
+                  const next = puzzle.answer.slice();
+                  next[i] = e.target.value;
+                  patch({ answer: next });
+                }}
+                placeholder="Antwoord..."
+              />
+              <button
+                onClick={() => patch({ answer: puzzle.answer.filter((_, idx) => idx !== i) })}
+                className={`${btn} bg-red-700 hover:bg-red-600 text-white shrink-0`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 

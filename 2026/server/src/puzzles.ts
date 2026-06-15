@@ -7,6 +7,21 @@ export function otherPlayer(player: PlayerName): PlayerName {
 }
 
 /**
+ * Normalises an answer string for comparison only. Lowercases, strips
+ * diacritics (NFD), replaces punctuation with whitespace, collapses internal
+ * whitespace, and trims. Applied identically to both the user's input and each
+ * accepted answer so that puzzle authors can write answers verbatim.
+ */
+function normalizeAnswer(s: string): string {
+  return s
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Evaluates a single requirement's condition.
  * Returns false (fails safe) when the relevant player's GPS is unknown.
  */
@@ -119,7 +134,8 @@ export function tryComplete(
   if (!pos || distanceTo(pos, puzzle.location) > proximityMeters) {
     return { success: false, mutated: false, message: 'Je bent niet bij de puzzel.' };
   }
-  if (answer.trim().toLowerCase() !== puzzle.answer.trim().toLowerCase()) {
+  const candidate = normalizeAnswer(answer);
+  if (!puzzle.answer.some(a => normalizeAnswer(a) === candidate)) {
     return { success: false, mutated: false, message: 'Fout antwoord.' };
   }
 

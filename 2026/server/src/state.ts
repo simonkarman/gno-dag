@@ -60,8 +60,14 @@ export interface Puzzle {
   minimumPoints: number;
   /** Extra conditions that conditionally mutate the displayed content. */
   requirements: Requirement[];
-  /** Correct answer (case-insensitive, trimmed). NEVER sent to clients. */
-  answer: string;
+  /**
+   * Accepted answers. NEVER sent to clients. Stored verbatim (no normalisation
+   * applied at save time). At comparison time, both the user's input and each
+   * accepted answer are normalised: lowercased, NFD-stripped of diacritics,
+   * punctuation replaced with whitespace, internal whitespace collapsed, and
+   * trimmed. An empty array means the puzzle can never be answered correctly.
+   */
+  answer: string[];
   /** Content shown when the player is at the puzzle. */
   content: ContentElement[];
   /**
@@ -108,11 +114,24 @@ function emptyState(): AppState {
   };
 }
 
+/** Coerces a persisted puzzle's `answer` field into a string[]. Legacy blobs
+ *  stored `answer` as a single string; auto-upgrade those in memory so the
+ *  next save naturally rewrites the blob in the new shape. */
+function coerceAnswer(raw: unknown): string[] {
+  if (typeof raw === 'string') return [raw];
+  if (Array.isArray(raw)) return raw.filter((a): a is string => typeof a === 'string');
+  return [];
+}
+
 /** Normalises a loaded state, filling in any missing fields with safe defaults. */
 function normalise(raw: Partial<PersistedState> | undefined | null): AppState {
   const base = emptyState();
   if (!raw || typeof raw !== 'object' || !Array.isArray(raw.puzzles)) return base;
-  const puzzles = raw.puzzles.map(p => ({ ...p, completed: !!p.completed }));
+  const puzzles = raw.puzzles.map(p => ({
+    ...p,
+    answer: coerceAnswer((p as { answer?: unknown }).answer),
+    completed: !!p.completed,
+  }));
   return { puzzles, scores: computeScores(puzzles) };
 }
 

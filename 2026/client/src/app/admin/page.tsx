@@ -5,7 +5,7 @@ import { LatLng } from '@/components/geo';
 import { PLAYER_COLORS } from '@/components/colors';
 import { AdminMap } from '@/components/admin-map';
 import { PuzzleForm } from '@/components/puzzle-form';
-import { AdminPuzzle, AdminState, PLAYERS, buildPlayerColumns, derivedScores, emptyAdminState, newPuzzle } from '@/components/admin-types';
+import { AdminPuzzle, AdminState, PLAYERS, buildPlayerColumns, coerceAnswer, derivedScores, emptyAdminState, newPuzzle } from '@/components/admin-types';
 
 type Placing =
   | { kind: 'new' }
@@ -16,9 +16,17 @@ type Placing =
 const PW_KEY = 'gno-admin-pw';
 const POLL_INTERVAL_MS = 30_000;
 
-/** Normalises a loaded blob into the admin state shape. */
+/** Normalises a loaded blob into the admin state shape. Coerces legacy
+ *  single-string `answer` values into a one-element array (matches the
+ *  server-side coercion in state.ts) so the form keeps working even if the
+ *  blob hasn't been re-saved yet. */
 function normaliseState(data: Partial<AdminState> | null | undefined): AdminState {
-  return { puzzles: Array.isArray(data?.puzzles) ? data!.puzzles : [] };
+  const raw = Array.isArray(data?.puzzles) ? data!.puzzles : [];
+  const puzzles = raw.map((p) => ({
+    ...p,
+    answer: coerceAnswer((p as { answer?: unknown }).answer),
+  })) as AdminPuzzle[];
+  return { puzzles };
 }
 
 export default function AdminPage() {
