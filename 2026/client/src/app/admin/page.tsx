@@ -171,7 +171,7 @@ export default function AdminPage() {
   function onMapClick(loc: LatLng) {
     if (!placing) return;
     if (placing.kind === 'new') {
-      const p = newPuzzle(loc);
+      const p = newPuzzle(loc, state.puzzles);
       updateState(s => ({ ...s, puzzles: [...s.puzzles, p] }));
       setSelectedId(p.id);
     } else if (placing.kind === 'puzzle-location' && selected) {

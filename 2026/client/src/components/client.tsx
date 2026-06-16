@@ -193,14 +193,22 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
   }
 
   // Other nearby puzzles (within range) that are NOT the active one — shown as
-  // passive info chips so the player understands what's around them.
+  // passive info chips so the player understands what's around them. Sort so
+  // your own puzzles appear at the BOTTOM of the chip stack — closer to the
+  // map's active marker and visually prioritized as the actionable one.
   const nearbyChips = currentPos
-    ? puzzles.filter(p =>
-        p.id !== activePuzzle?.id &&
-        distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS &&
-        // Other player's puzzle (any state), or your own still-locked puzzle.
-        (p.assignedTo !== self || derivePuzzleState(p, scores[p.assignedTo]) === 'locked'),
-      )
+    ? puzzles
+        .filter(p =>
+          p.id !== activePuzzle?.id &&
+          distanceTo(currentPos, p.location) <= PUZZLE_PROXIMITY_METERS &&
+          // Other player's puzzle (any state), or your own still-locked puzzle.
+          (p.assignedTo !== self || derivePuzzleState(p, scores[p.assignedTo]) === 'locked'),
+        )
+        .sort((a, b) => {
+          const aOwn = a.assignedTo === self ? 1 : 0;
+          const bOwn = b.assignedTo === self ? 1 : 0;
+          return aOwn - bOwn;
+        })
     : [];
 
   // Puzzles whose owner is currently standing at them (open + within proximity),
@@ -467,7 +475,6 @@ function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: Pl
   const state = derivePuzzleState(puzzle, score);
   const isOwn = puzzle.assignedTo === self;
   const remaining = Math.max(0, puzzle.minimumPoints - score);
-  const puzzelWord = remaining === 1 ? 'puzzel' : 'puzzels';
 
   // Descriptive, perspective-aware message per state. Own open puzzles never
   // reach here (they show as the active panel), so 'open' always refers to the
@@ -483,8 +490,8 @@ function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: Pl
     messageClass = 'text-white';
   } else {
     message = isOwn
-      ? `Los eerst nog ${remaining} ${puzzelWord} op`
-      : `${puzzle.assignedTo} moet eerst nog ${remaining} ${puzzelWord} oplossen`;
+      ? `Je hebt ${puzzle.minimumPoints} punten nodig voor deze puzzel, je komt er dus ${remaining} te kort!`
+      : `${puzzle.assignedTo} heeft ${puzzle.minimumPoints} punten nodig voor deze puzzel, en komt er ${remaining} te kort!`;
     messageClass = 'text-zinc-400';
     progress = `${score} / ${puzzle.minimumPoints} opgelost`;
   }

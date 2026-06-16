@@ -103,16 +103,30 @@ export function buildPlayerColumns(
   return result;
 }
 
-/** Creates a new puzzle with sensible defaults at a given location. */
-export function newPuzzle(location: LatLng): AdminPuzzle {
+/**
+ * Creates a new puzzle with sensible defaults at a given location.
+ *
+ * When `existingPuzzles` is supplied, the new puzzle is assigned to the player
+ * with the FEWEST puzzles (ties broken in `PLAYERS` order) and its
+ * `minimumPoints` is set to the number of puzzles that player already has —
+ * i.e. it slots in as the next step on that player's escalating unlock chain.
+ */
+export function newPuzzle(location: LatLng, existingPuzzles: AdminPuzzle[] = []): AdminPuzzle {
+  const counts: Record<PlayerName, number> = { 'Govie': 0, 'Jac.': 0 };
+  for (const p of existingPuzzles) counts[p.assignedTo] += 1;
+  // Pick the player with the fewest puzzles; ties go to the first in PLAYERS.
+  const assignedTo: PlayerName = PLAYERS.reduce((best, name) =>
+    counts[name] < counts[best] ? name : best,
+  PLAYERS[0]);
+  const minimumPoints = counts[assignedTo];
   return {
     id: (typeof crypto !== 'undefined' && crypto.randomUUID)
       ? crypto.randomUUID().slice(0, 8)
       : Math.random().toString(36).slice(2, 10),
     icon: '❓',
     location,
-    assignedTo: 'Govie',
-    minimumPoints: 0,
+    assignedTo,
+    minimumPoints,
     requirements: [],
     answer: [],
     content: [],

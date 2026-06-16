@@ -255,14 +255,24 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
             );
           })}
 
-        {/* Puzzle markers — pins for your puzzles, dots for the other team / completed. */}
-        {puzzles.map((puzzle) => {
+        {/* Puzzle markers — pins for your puzzles, dots for the other team / completed.
+            Sort so the viewer's own puzzles render LAST (on top), keeping the
+            actionable markers visually prioritized when they overlap with the
+            other team's puzzles. */}
+        {[...puzzles]
+          .sort((a, b) => {
+            const aOwn = a.assignedTo === self ? 1 : 0;
+            const bOwn = b.assignedTo === self ? 1 : 0;
+            return aOwn - bOwn;
+          })
+          .map((puzzle) => {
           const p = toPoint(puzzle.location);
           const cx = p.x * MAP_W;
           const cy = p.y * MAP_H;
           const team = PLAYER_COLORS[puzzle.assignedTo];
           const muted = MUTED_PLAYER_COLORS[puzzle.assignedTo];
-          const state = derivePuzzleState(puzzle, scores[puzzle.assignedTo]);
+          const score = scores[puzzle.assignedTo];
+          const state = derivePuzzleState(puzzle, score);
           const isOwn = puzzle.assignedTo === self;
           const m = markerStyle(state, isOwn, team, muted);
 
@@ -305,6 +315,21 @@ export function GameMap({ positions, self, puzzles = [], scores = { 'Govie': 0, 
                   fontSize={m.r * 1.1}
                 >
                   {puzzle.icon}
+                </text>
+              )}
+              {/* Locked-own pins show the points required to unlock, in a muted gray. */}
+              {state === 'locked' && isOwn && (
+                <text
+                  x={cx} y={bodyY}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize={m.r * 1.3}
+                  fontWeight={700}
+                  fill="#a1a1aa"
+                  fillOpacity={0.85}
+                  fontFamily="monospace"
+                >
+                  {puzzle.minimumPoints}
                 </text>
               )}
             </g>
