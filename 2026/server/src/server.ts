@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import './json-logging';
 import express from 'express';
-import { createServer as createHttpServer } from 'http';
+import { createServer as createHttpServer, Server as HttpServer } from 'http';
+import { Duplex } from 'stream';
 import { createServer } from '@krmx/server';
 import { LogSeverity } from '@krmx/base';
 import { enableUnlinkedKicker } from './unlinked-kicker';
@@ -65,6 +66,12 @@ interface InstanceOptions {
 interface Instance {
   load(): Promise<void>;
   listen(port: number): Promise<unknown>;
+  /** The dummy http server this Krmx instance was attached to. Used by the
+   *  top-level upgrade dispatcher to forward upgrade events to the right
+   *  WebSocketServer based on the request pathname. */
+  dummyHttpServer: HttpServer;
+  /** Normalised pathname (with leading slash) this instance should handle. */
+  pathname: string;
 }
 
 function attachInstance(opts: InstanceOptions): Instance {
@@ -73,9 +80,45 @@ function attachInstance(opts: InstanceOptions): Instance {
   // -- Persistent state -----------------------------------------------------
   const stateStore = new StateStore(GCS_BUCKET!, gcsBlob);
 
+  // -- Dummy http server (per-instance, NEVER bound to a port) -------------
+  // Sharing one real http server across two Krmx instances does not work:
+  // each `createServer` attaches a fresh ws.WebSocketServer to the http
+  // server's 'upgrade' event, and BOTH listeners run for EVERY upgrade. The
+  // one whose `path` does not match calls `abortHandshake(socket, 400)` on
+  // the same socket the other one just upgraded with `101 Switching
+  // Protocols`, corrupting the wire (client sees "Invalid WebSocket frame:
+  // RSV1 must be clear") or returning HTTP 400 (depending on listener order).
+  //
+  // Fix: give each Krmx instance its own dummy http server, attach Krmx's
+  // WebSocketServer to that dummy, and install ONE 'upgrade' listener on the
+  // real http server that dispatches the upgrade to the right dummy based on
+  // the request pathname. The dummy is never `.listen()`-ed on a port — its
+  // `listen()` and `address()` are overridden to mirror the real server.
+  const dummyHttpServer = new HttpServer();
+  // Override .listen() to be a no-op that immediately emits 'listening' so
+  // Krmx's .listen() flow (which awaits the http server's 'listening' event)
+  // resolves without actually binding a port.
+  (dummyHttpServer as unknown as { listen: unknown }).listen = (() => {
+    setImmediate(() => dummyHttpServer.emit('listening'));
+    return dummyHttpServer;
+  });
+  // Override address() to mirror whatever the real httpServer reports. Krmx
+  // calls this in the shortcut path of its .listen() to compare ports.
+  (dummyHttpServer as unknown as { address: unknown }).address = () => httpServer.address();
+  // Make `listening` mirror the real server. Krmx checks this property in its
+  // .listen() to decide whether to take the shortcut branch. Using a getter
+  // means it stays in sync as the real server starts/stops.
+  Object.defineProperty(dummyHttpServer, 'listening', {
+    configurable: true,
+    get: () => httpServer.listening,
+  });
+
+  // Normalised pathname (with leading slash) used for upgrade dispatch.
+  const pathname = krmxPath.startsWith('/') ? krmxPath : `/${krmxPath}`;
+
   // -- Krmx server ----------------------------------------------------------
   const server = createServer({
-    http: { server: httpServer, path: krmxPath, queryParams: { version } },
+    http: { server: dummyHttpServer, path: krmxPath, queryParams: { version } },
     logger: (_severity: LogSeverity, ...args: unknown[]) => {
       const severity = _severity === 'info' ? 'debug' : _severity;
       console[severity](`[${severity}] [server] [${label}] [krmx]`, ...args);
@@ -255,13 +298,14 @@ function attachInstance(opts: InstanceOptions): Instance {
 
   return {
     load: () => stateStore.load(),
-    // IMPORTANT: each Krmx instance must have its own `.listen()` called, even
-    // though both share the same underlying Node http server. The Krmx server
-    // refuses incoming WebSocket upgrades until *its own* status transitions
-    // to 'listening', which only happens via `.listen()`. The second call
-    // takes the shortcut path inside Krmx (since `httpServer.listening` is
-    // already true), so the http server is only `.listen()`-ed once on the OS.
+    // Krmx's .listen() flips its internal status to 'listening' (without
+    // which it refuses every incoming WebSocket upgrade). The underlying
+    // dummy http server's .listen() is a no-op that immediately emits
+    // 'listening', so this resolves without binding a port. The real http
+    // server is started separately at the top level.
     listen: (port: number) => server.listen(port),
+    dummyHttpServer,
+    pathname,
   };
 }
 
@@ -283,14 +327,47 @@ const secondary = attachInstance({
   adminReloadPath: '/secondary/admin/reload',
 });
 
+// ---------------------------------------------------------------------------
+// Upgrade dispatcher — the heart of the multi-Krmx-on-one-port fix. ws does
+// not support multiple WebSocketServers attached to the same http server (see
+// the long comment inside attachInstance). We attach each Krmx instance to
+// its own dummy http server, then a single 'upgrade' listener on the REAL
+// http server forwards each upgrade to the matching dummy.
+// ---------------------------------------------------------------------------
+
+const instances = [primary, secondary];
+
+httpServer.on('upgrade', (req, socket: Duplex, head) => {
+  const url = req.url ?? '';
+  const qIndex = url.indexOf('?');
+  const pathname = qIndex === -1 ? url : url.slice(0, qIndex);
+
+  const target = instances.find(i => i.pathname === pathname);
+  if (!target) {
+    console.debug(`[debug] [server] [upgrade] no Krmx instance handles ${pathname}; rejecting`);
+    socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+    socket.destroy();
+    return;
+  }
+  // Forward to the dummy http server; ws's listener on that dummy will run
+  // WebSocketServer.handleUpgrade and complete the handshake cleanly.
+  target.dummyHttpServer.emit('upgrade', req, socket, head);
+});
+
 (async () => {
   // Load both blobs in parallel — they are independent.
   await Promise.all([primary.load(), secondary.load()]);
-  // Then start each Krmx instance in sequence. The first call boots the
-  // shared http server; the second sees `httpServer.listening === true` and
-  // brings its Krmx status to 'listening' via Krmx's shortcut branch.
-  await primary.listen(8082);
-  await secondary.listen(8082);
+
+  // Start the REAL http server first. Each Krmx instance's dummy http server
+  // mirrors this one's `listening` flag and `address()`, so once the real
+  // server is bound, the dummies report bound too.
+  await new Promise<void>(resolve => httpServer.listen(8082, () => resolve()));
+
+  // Then bring each Krmx instance to 'listening' state. Krmx will see its
+  // dummy's `listening === true` and take the shortcut branch, flipping its
+  // internal status without trying to bind a port.
+  await Promise.all([primary.listen(8082), secondary.listen(8082)]);
+
   console.info(`[info] [gno-2026] [server] GNO Dag 2026 server v${version} started on port 8082`);
   console.info(`[info] [gno-2026] [server] primary   → ws /krmx           (blob: ${GCS_BLOB})`);
   console.info(`[info] [gno-2026] [server] secondary → ws /secondary/krmx (blob: ${GCS_BLOB_SECONDARY})`);
