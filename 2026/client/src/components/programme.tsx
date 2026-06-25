@@ -21,7 +21,7 @@ interface ProgrammeEntry {
 }
 
 const PROGRAMME: ProgrammeEntry[] = [
-  { at: { h: 0, m: 0 }, text: 'Eerder: Zorg dat je ontbeten hebt en gedoucht en om 10:30 klaar zit!' },
+  { at: { h: 0, m: 0 }, text: 'GNO Dag 2026!' },
   { at: { h: 10, m: 30 }, label: '10:30', text: 'Koffie' },
   { at: { h: 11, m: 0 }, label: '11:00', text: 'Activiteit 1' },
   { at: { h: 12, m: 30 }, label: '12:30', text: 'Lunch' },
@@ -72,7 +72,7 @@ export function Programme({ onOpenApp }: { onOpenApp: () => void }) {
         {revealed.length === 0 ? (
           <p className="max-w-xs text-zinc-400">
             Zorg dat je op <span className="font-semibold text-zinc-200">{dateLabel}</span> om{' '}
-            <span className="font-semibold text-zinc-200">10:30</span> klaar zit aan de eettafel in Bodegraven.
+            <span className="font-semibold text-zinc-200">10:30</span> ontbeten hebt en gedoucht klaar zit klaar zit aan de eettafel in Bodegraven.
           </p>
         ) : (
           <ol className="flex w-full flex-col gap-2 text-left">

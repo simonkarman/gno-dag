@@ -42,11 +42,30 @@ State (puzzle definitions + the persisted `completed` flag per puzzle) lives **i
 
 ### Relevant env vars
 
-| Var | Side | Purpose |
-|---|---|---|
-| `GCS_BUCKET` | server | GCS bucket holding the state blob (required) |
-| `GCS_BLOB` | server | state blob filename (default `state.json`; use a separate one for local testing) |
-| `START_DATETIME` / `NEXT_PUBLIC_START_DATETIME` | server / client | ISO datetime the game begins |
+| Var | Side | Purpose                                                                                                              |
+|---|---|----------------------------------------------------------------------------------------------------------------------|
+| `GCS_BUCKET` | server | GCS bucket holding the state blob (required)                                                                         |
+| `GCS_BLOB` | server | primary state blob filename (default `state.json`; use a separate one for local testing)                             |
+| `GCS_BLOB_SECONDARY` | server | secondary state blob filename (default `state-dev.json`); MUST differ from `GCS_BLOB` or the server refuses to start |
+| `START_DATETIME` / `NEXT_PUBLIC_START_DATETIME` | server / client | ISO datetime the game begins                                                                                         |
+| `NEXT_PUBLIC_KRMX_SERVER_URL` | client | primary WS URL (default `ws://localhost:8082/krmx?...`)                                                              |
+| `NEXT_PUBLIC_KRMX_SERVER_URL_SECONDARY` | client | secondary WS URL (default `ws://localhost:8082/secondary/krmx?...`)                                                  |
+| `ADMIN_PASSWORD` | client | enables the primary `/admin` and `/api/admin/*` routes                                                               |
+| `ADMIN_PASSWORD_SECONDARY` | client | optional; password for `/secondary/admin`. Falls back to `ADMIN_PASSWORD` when unset                                 |
+| `GCS_BLOB_SECONDARY` | client | blob the `/secondary/admin` UI reads/writes                                                                          |
+
+## Primary vs secondary instances
+
+The server hosts **two fully independent Krmx instances** on the same Cloud Run service / HTTP port (8082):
+
+- **primary** — WebSocket at `/krmx`, persisted to `GCS_BLOB`, admin at `/admin`, reload at `/admin/reload`.
+- **secondary** — WebSocket at `/secondary/krmx`, persisted to `GCS_BLOB_SECONDARY`, admin at `/secondary/admin`, reload at `/secondary/admin/reload`.
+
+Each instance has its own `StateStore`, `positions`, `trails`, Krmx server, and event handlers — they share no in-memory state, so the same player name (`Govie` or `Jac.`) can be linked to both simultaneously. Logs are tagged `[primary]` or `[secondary]` to disambiguate.
+
+The frontend mirrors this split: `/`, `/admin`, `/reload` drive the primary; `/secondary`, `/secondary/admin`, `/secondary/reload` drive the secondary. The secondary route is not linked from any UI and is intended to be used as a secret test/staging environment running alongside the live game.
+
+The secondary also **bypasses the waiting screen unconditionally**: regardless of what `NEXT_PUBLIC_START_DATETIME` is set to, the secondary page passes an empty `startDatetime` to `<GameClient>`, which triggers the "no start time configured → always started" branch in `useGameStarted`. The primary continues to honour the env var.
 
 ## Dev mode
 

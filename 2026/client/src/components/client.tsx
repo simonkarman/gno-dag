@@ -11,7 +11,6 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 import { useSimulatedLocation } from '@/hooks/use-simulated-location';
 
 const isDev = process.env.NEXT_PUBLIC_LOCAL_DEVELOPMENT === 'true';
-const START_DATETIME = process.env.NEXT_PUBLIC_START_DATETIME ?? '';
 
 /** After a wrong (failed) answer, a puzzle's answer input is locked for this long. */
 const WRONG_ANSWER_COOLDOWN_MS = 60_000;
@@ -133,13 +132,14 @@ function usePositionHandler() {
 // Shared render tree for both production and dev views
 // ---------------------------------------------------------------------------
 
-function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, devBadge }: {
+function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, devBadge, startDatetime }: {
   username: string;
   positions: Positions;
   puzzles: ClientPuzzle[];
   inRange: boolean | null;
   currentPos: LatLng | null;
   devBadge?: React.ReactNode;
+  startDatetime?: string;
 }) {
   const self = username as PlayerName;
   const scores = useMemo(() => deriveScores(puzzles), [puzzles]);
@@ -160,9 +160,9 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
   }, [activePuzzle?.id]);
 
   // Waiting screen — shown regardless of location until the game starts.
-  const started = useGameStarted();
+  const started = useGameStarted(startDatetime);
   if (!started) {
-    return <WaitingScreen devBadge={devBadge} />;
+    return <WaitingScreen devBadge={devBadge} startDatetime={startDatetime} />;
   }
 
   if (inRange === null) {
@@ -282,25 +282,25 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
 // Waiting screen — shown before START_DATETIME, regardless of location.
 // ---------------------------------------------------------------------------
 
-/** Returns true once the current time has passed START_DATETIME. */
-function useGameStarted(): boolean {
-  const compute = () => {
-    if (!START_DATETIME) return true; // no start time configured → always started
-    const start = new Date(START_DATETIME).getTime();
+/** Returns true once the current time has passed `startDatetime`. */
+function useGameStarted(startDatetime?: string): boolean {
+  const compute = useCallback(() => {
+    if (!startDatetime) return true; // no start time configured → always started
+    const start = new Date(startDatetime).getTime();
     if (Number.isNaN(start)) return true;
     return Date.now() >= start;
-  };
+  }, [startDatetime]);
   const [started, setStarted] = useState(compute);
   useEffect(() => {
     if (started) return;
     const id = setInterval(() => setStarted(compute()), 1000);
     return () => clearInterval(id);
-  }, [started]);
+  }, [started, compute]);
   return started;
 }
 
-function WaitingScreen({ devBadge }: { devBadge?: React.ReactNode }) {
-  const target = START_DATETIME ? new Date(START_DATETIME) : null;
+function WaitingScreen({ devBadge, startDatetime }: { devBadge?: React.ReactNode; startDatetime?: string }) {
+  const target = startDatetime ? new Date(startDatetime) : null;
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -516,20 +516,20 @@ function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: Pl
 // Production view: real GPS only
 // ---------------------------------------------------------------------------
 
-function PlayerView({ username }: { username: string }) {
+function PlayerView({ username, startDatetime }: { username: string; startDatetime?: string }) {
   const { positions, puzzles } = useStore();
   const { inRange, currentPos, handlePosition } = usePositionHandler();
 
   useGeolocation(handlePosition);
 
-  return <PlayerViewContent username={username} positions={positions} puzzles={puzzles} inRange={inRange} currentPos={currentPos} />;
+  return <PlayerViewContent username={username} positions={positions} puzzles={puzzles} inRange={inRange} currentPos={currentPos} startDatetime={startDatetime} />;
 }
 
 // ---------------------------------------------------------------------------
 // Dev view: simulated location + toggle to real GPS
 // ---------------------------------------------------------------------------
 
-function DevPlayerView({ username }: { username: string }) {
+function DevPlayerView({ username, startDatetime }: { username: string; startDatetime?: string }) {
   const { positions, puzzles, lastPosition } = useStore();
   const [useReal, setUseReal] = useState(false);
   const { inRange, currentPos, handlePosition } = usePositionHandler();
@@ -554,6 +554,7 @@ function DevPlayerView({ username }: { username: string }) {
       puzzles={puzzles}
       inRange={inRange}
       currentPos={currentPos}
+      startDatetime={startDatetime}
       devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} stepMeters={stepMeters} onStepChange={setStepMeters} />}
     />
   );
@@ -646,7 +647,7 @@ function DevBadge({ useReal, simPos, onToggle, onReset, onMove, stepMeters, onSt
 // Top-level client component: handles connect/link flow
 // ---------------------------------------------------------------------------
 
-export function GameClient({ serverUrl }: { serverUrl: string }) {
+export function GameClient({ serverUrl, startDatetime }: { serverUrl: string; startDatetime?: string }) {
   const { status } = useClient();
   const [username, setUsername] = useState<string>('');
   const [failureReason, setFailureReason] = useState('');
@@ -700,8 +701,8 @@ export function GameClient({ serverUrl }: { serverUrl: string }) {
 
   if (status === 'linked') {
     return isDev
-      ? <DevPlayerView username={username} />
-      : <PlayerView username={username} />;
+      ? <DevPlayerView username={username} startDatetime={startDatetime} />
+      : <PlayerView username={username} startDatetime={startDatetime} />;
   }
 
   if (status === 'closed') {

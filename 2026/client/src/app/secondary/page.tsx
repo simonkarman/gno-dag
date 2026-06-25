@@ -6,10 +6,18 @@ import { InstallPrompt } from '@/components/install-prompt';
 import { Programme } from '@/components/programme';
 import { useDisplayMode } from '@/hooks/use-display-mode';
 
-const serverUrl = process.env.NEXT_PUBLIC_KRMX_SERVER_URL ?? 'ws://localhost:8082/krmx?version=0.0.1';
-const startDatetime = process.env.NEXT_PUBLIC_START_DATETIME ?? '';
+const serverUrl = process.env.NEXT_PUBLIC_KRMX_SERVER_URL_SECONDARY ?? 'ws://localhost:8082/secondary/krmx?version=0.0.1';
+// The secondary is always treated as "live" regardless of NEXT_PUBLIC_START_DATETIME.
+// Passing '' triggers the "no start time configured → always started" branch in
+// useGameStarted, so the waiting screen is bypassed unconditionally.
+const startDatetime = undefined;
 
-export default function Home() {
+/**
+ * Secondary instance of the game — mirror of `/`, but connects to the
+ * secondary Krmx server. URL is kept secret and used as a test/staging
+ * environment so two parallel games can run side-by-side.
+ */
+export default function SecondaryHome() {
   const { ready, isIPad, isStandalone, isIOSChrome } = useDisplayMode();
   // In-memory only: a reload always brings the user back to the programme /
   // install prompt. Previously this was persisted to localStorage, which left
