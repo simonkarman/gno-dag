@@ -11,6 +11,11 @@ const serverUrl = process.env.NEXT_PUBLIC_KRMX_SERVER_URL_SECONDARY ?? 'ws://loc
 // Passing '' triggers the "no start time configured → always started" branch in
 // useGameStarted, so the waiting screen is bypassed unconditionally.
 const startDatetime = undefined;
+// The secondary is also always in dev mode regardless of NEXT_PUBLIC_LOCAL_DEVELOPMENT,
+// so real GPS is replaced by the simulated arrow-key-driven position. This makes
+// the secondary route useful as a test/staging environment without needing to be
+// physically on-site.
+const forceDev = true;
 
 /**
  * Secondary instance of the game — mirror of `/`, but connects to the
@@ -36,7 +41,7 @@ export default function SecondaryHome() {
   if (forceApp || (isIPad && isStandalone)) {
     return (
       <main className="flex min-h-[90svh] flex-col items-center justify-center px-4">
-        <GameClient serverUrl={serverUrl} startDatetime={startDatetime} />
+        <GameClient serverUrl={serverUrl} startDatetime={startDatetime} forceDev={forceDev} />
       </main>
     );
   }

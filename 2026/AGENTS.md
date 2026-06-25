@@ -67,9 +67,11 @@ The frontend mirrors this split: `/`, `/admin`, `/reload` drive the primary; `/s
 
 The secondary also **bypasses the waiting screen unconditionally**: regardless of what `NEXT_PUBLIC_START_DATETIME` is set to, the secondary page passes an empty `startDatetime` to `<GameClient>`, which triggers the "no start time configured → always started" branch in `useGameStarted`. The primary continues to honour the env var.
 
+Similarly, the secondary **always runs in dev mode unconditionally**: regardless of `NEXT_PUBLIC_LOCAL_DEVELOPMENT`, the secondary page passes `forceDev` to `<GameClient>`, so real GPS is replaced by the simulated arrow-key-driven position. This makes the secondary usable as a remote test/staging environment without needing to be physically on-site. The primary continues to honour the env var.
+
 ## Dev mode
 
-When `NEXT_PUBLIC_LOCAL_DEVELOPMENT=true`, real GPS is replaced by a simulated position that can be moved with arrow keys (or on-screen buttons). A collapsible "DEV" badge overlays the map.
+When `NEXT_PUBLIC_LOCAL_DEVELOPMENT=true`, real GPS is replaced by a simulated position that can be moved with arrow keys (or on-screen buttons). A collapsible "DEV" badge overlays the map. The secondary route (`/secondary`) always runs in dev mode regardless of this env var (see "Primary vs secondary instances" above).
 
 ## Deployment
 

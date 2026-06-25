@@ -647,7 +647,11 @@ function DevBadge({ useReal, simPos, onToggle, onReset, onMove, stepMeters, onSt
 // Top-level client component: handles connect/link flow
 // ---------------------------------------------------------------------------
 
-export function GameClient({ serverUrl, startDatetime }: { serverUrl: string; startDatetime?: string }) {
+export function GameClient({
+  serverUrl,
+  startDatetime,
+  forceDev = false,
+}: { serverUrl: string; startDatetime?: string; forceDev?: boolean }) {
   const { status } = useClient();
   const [username, setUsername] = useState<string>('');
   const [failureReason, setFailureReason] = useState('');
@@ -700,7 +704,7 @@ export function GameClient({ serverUrl, startDatetime }: { serverUrl: string; st
   }
 
   if (status === 'linked') {
-    return isDev
+    return (isDev || forceDev)
       ? <DevPlayerView username={username} startDatetime={startDatetime} />
       : <PlayerView username={username} startDatetime={startDatetime} />;
   }
