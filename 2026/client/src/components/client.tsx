@@ -342,7 +342,7 @@ function PuzzlePanel({ puzzle, collapsed, onToggleCollapse }: {
     <div className={`fixed inset-x-0 bottom-0 z-20 pointer-events-auto transition-transform duration-300 ease-in-out ${
       collapsed ? 'translate-y-[calc(100%-2.5rem)]' : 'translate-y-0'
     }`}>
-      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800/80 border-t border-x border-zinc-600 shadow-2xl px-5 pt-1 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
+      <div className="mx-auto max-w-md rounded-t-2xl bg-zinc-800/90 border-t border-x border-zinc-600 shadow-2xl px-5 pt-1 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[70vh] overflow-y-auto">
         {/* Toggle Handle Header */}
         <div className="flex justify-center mb-1">
           <button
