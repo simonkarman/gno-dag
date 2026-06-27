@@ -72,7 +72,7 @@ export function Programme({ onOpenApp }: { onOpenApp: () => void }) {
         {revealed.length === 0 ? (
           <p className="max-w-xs text-zinc-400">
             Zorg dat je op <span className="font-semibold text-zinc-200">{dateLabel}</span> om{' '}
-            <span className="font-semibold text-zinc-200">10:30</span> ontbeten hebt en gedoucht klaar zit klaar zit aan de eettafel in Bodegraven.
+            <span className="font-semibold text-zinc-200">10:30</span> ontbeten hebt en gedoucht klaar zit aan de eettafel in Bodegraven.
           </p>
         ) : (
           <ol className="flex w-full flex-col gap-2 text-left">
