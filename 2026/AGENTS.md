@@ -4,16 +4,18 @@
 
 ## Purpose
 
-A real-time two-player GPS tracking web app. The two players — **Govie** and **Jac.** — each open the app on their phone, allow location access, and see both themselves and the other person as colored dots on a live SVG street map. The game area is centered on a house in **Bodegraven, Netherlands**.
+A real-time two-player GPS tracking web app. The two players — **Govie** and **Jac.** — each have a **team iPad** that displays the live SVG street map and is used to interact with puzzles, plus a dedicated **GPS-broadcaster phone** that runs at `/gps/govie` or `/gps/jac` and feeds the team's location to the server. The game area is centered on a house in **Bodegraven, Netherlands**.
 
-Only these two hardcoded usernames are accepted by the server.
+The server accepts four usernames: `Govie` and `Jac.` (iPad/display) plus `Govie-gps` and `Jac.-gps` (GPS broadcaster phones). The iPad never requests GPS itself — even in dev mode.
 
 ## How it works
 
-1. The browser's geolocation API streams the player's GPS position to the server via WebSocket.
-2. If the player is outside the defined geographic bounding box, the map is hidden and replaced with a screen showing the distance back to the house.
-3. The server transforms GPS coordinates to normalized `[0,1]` map positions and broadcasts both players' positions to all connected clients.
-4. The SVG map re-renders player dots in real time: **Govie = amber**, **Jac. = blue**. The "self" player gets an additional outer ring.
+1. The team's **GPS phone** (at `/gps/<player>`) streams the device's GPS position to the server via WebSocket as the `Govie-gps` / `Jac.-gps` user.
+2. The server maps `*-gps` location messages to the base player's position record, transforms them to normalized `[0,1]` map positions, and broadcasts both players' positions to all connected clients.
+3. The **iPad** (at `/`) is linked as `Govie` or `Jac.`, never reads GPS, and renders the SVG map from the broadcast positions. The "self" player's dot is its team's GPS phone position with an additional outer ring. Puzzle proximity is computed against the team's position (i.e. the GPS phone).
+4. If the GPS phone is outside the defined geographic bounding box, it sends `clear-location` and stops broadcasting; the team's dot vanishes from every iPad. The iPad itself never shows an out-of-range screen (it has no GPS of its own).
+5. The GPS beacon page uses the **Wake Lock API** to keep the phone's screen on while the page is open; if unsupported the user must disable auto-lock manually.
+6. **Govie = amber**, **Jac. = blue** throughout.
 
 ## Key architectural details
 
@@ -63,15 +65,15 @@ The server hosts **two fully independent Krmx instances** on the same Cloud Run 
 
 Each instance has its own `StateStore`, `positions`, `trails`, Krmx server, and event handlers — they share no in-memory state, so the same player name (`Govie` or `Jac.`) can be linked to both simultaneously. Logs are tagged `[primary]` or `[secondary]` to disambiguate.
 
-The frontend mirrors this split: `/`, `/admin`, `/reload` drive the primary; `/secondary`, `/secondary/admin`, `/secondary/reload` drive the secondary. The secondary route is not linked from any UI and is intended to be used as a secret test/staging environment running alongside the live game.
+The frontend mirrors this split: `/`, `/gps/<player>`, `/admin`, `/reload` drive the primary; `/secondary`, `/secondary/gps/<player>`, `/secondary/admin`, `/secondary/reload` drive the secondary. The secondary routes are not linked from any UI and are intended to be used as a secret test/staging environment running alongside the live game.
 
 The secondary also **bypasses the waiting screen unconditionally**: regardless of what `NEXT_PUBLIC_START_DATETIME` is set to, the secondary page passes an empty `startDatetime` to `<GameClient>`, which triggers the "no start time configured → always started" branch in `useGameStarted`. The primary continues to honour the env var.
 
-Similarly, the secondary **always runs in dev mode unconditionally**: regardless of `NEXT_PUBLIC_LOCAL_DEVELOPMENT`, the secondary page passes `forceDev` to `<GameClient>`, so real GPS is replaced by the simulated arrow-key-driven position. This makes the secondary usable as a remote test/staging environment without needing to be physically on-site. The primary continues to honour the env var.
+Similarly, the secondary's GPS beacon page (`/secondary/gps/<player>`) **always runs in dev mode unconditionally**: regardless of `NEXT_PUBLIC_LOCAL_DEVELOPMENT`, it passes `forceDev` to `<GpsBeacon>`, so real GPS is replaced by the simulated arrow-key-driven position. This makes the secondary usable as a remote test/staging environment without needing to be physically on-site. The primary GPS beacon (`/gps/<player>`) continues to honour the env var.
 
 ## Dev mode
 
-When `NEXT_PUBLIC_LOCAL_DEVELOPMENT=true`, real GPS is replaced by a simulated position that can be moved with arrow keys (or on-screen buttons). A collapsible "DEV" badge overlays the map. The secondary route (`/secondary`) always runs in dev mode regardless of this env var (see "Primary vs secondary instances" above).
+When `NEXT_PUBLIC_LOCAL_DEVELOPMENT=true`, the GPS beacon page (`/gps/<player>`) replaces real GPS with a simulated position that can be moved with arrow keys (or on-screen buttons). The iPad client (`/`) shows a small "DEV" badge indicator only — it never requests GPS itself, so the simulator only lives on the beacon page. The secondary GPS beacon (`/secondary/gps/<player>`) is always in dev mode regardless of this env var (see "Primary vs secondary instances" above).
 
 ## Deployment
 

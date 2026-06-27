@@ -1,16 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPersonWalking, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faPersonWalking, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { createClient, createStore } from '@krmx/client-react';
-import { Point, isInRange, LatLng, distanceTo, formatDistance, HOUSE, fromPoint } from '@/components/geo';
+import { Point, LatLng, distanceTo, fromPoint } from '@/components/geo';
 import { GameMap } from '@/components/map';
 import { ClientPuzzle, GameState, PUZZLE_PROXIMITY_METERS, deriveScores, derivePuzzleState } from '@/components/puzzles';
-import { useGeolocation } from '@/hooks/use-geolocation';
-import { useSimulatedLocation } from '@/hooks/use-simulated-location';
-
-const isDev = process.env.NEXT_PUBLIC_LOCAL_DEVELOPMENT === 'true';
 
 /** After a wrong (failed) answer, a puzzle's answer input is locked for this long. */
 const WRONG_ANSWER_COOLDOWN_MS = 60_000;
@@ -39,13 +35,6 @@ interface StoreState {
   lastResult: PuzzleResult | null;
   /** Per-puzzle wrong-answer lockout deadlines (puzzle id → epoch ms). In-memory only; resets on reload. */
   cooldowns: Record<string, number>;
-  /**
-   * The player's last-known position as broadcast by the server right after
-   * linking. `undefined` = not yet received; `null` = server has no prior
-   * position; otherwise the resume point. Consumed by the dev simulator so a
-   * reload continues where you left off instead of snapping to the house.
-   */
-  lastPosition: Point | null | undefined;
 }
 
 export const useStore = createStore(
@@ -55,19 +44,12 @@ export const useStore = createStore(
     puzzles: [],
     lastResult: null,
     cooldowns: {},
-    lastPosition: undefined,
   } as StoreState,
   (state, action) => {
     switch (action.type) {
       case 'positions': {
         const a = action as { type: 'positions'; payload: Positions };
         return { ...state, positions: a.payload };
-      }
-      case 'last-position': {
-        // Sent once, first, right after linking — the player's resume point
-        // (or null if the server has no prior position for them).
-        const a = action as { type: 'last-position'; payload: Point | null };
-        return { ...state, lastPosition: a.payload };
       }
       case 'game-state': {
         const a = action as { type: 'game-state'; payload: GameState };
@@ -104,46 +86,32 @@ const PLAYER_COLORS: Record<PlayerName, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Shared: build a position handler that sends location updates to the server
+// The iPad view.
+//
+// Since June 2026 the iPad NEVER reads GPS itself — the team's location is
+// sourced from a dedicated GPS-broadcaster phone running at /gps/<player>,
+// relayed through the server's `positions` broadcast. So the iPad's "where am
+// I" is just `positions[self]`, converted back to lat/lng for proximity math.
 // ---------------------------------------------------------------------------
 
-function usePositionHandler() {
-  const [inRange, setInRange] = useState<boolean | null>(null);
-  const [currentPos, setCurrentPos] = useState<LatLng | null>(null);
-  const inRangeRef = useRef<boolean | null>(null);
-
-  const handlePosition = useCallback((pos: LatLng) => {
-    const nowInRange = isInRange(pos);
-    setCurrentPos(pos);
-    if (inRangeRef.current === true && !nowInRange) {
-      client.send({ type: 'clear-location' });
-    }
-    inRangeRef.current = nowInRange;
-    setInRange(nowInRange);
-    if (nowInRange) {
-      client.send({ type: 'location', payload: pos });
-    }
-  }, []);
-
-  return { inRange, currentPos, handlePosition };
-}
-
-// ---------------------------------------------------------------------------
-// Shared render tree for both production and dev views
-// ---------------------------------------------------------------------------
-
-function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, devBadge, startDatetime }: {
+function PlayerViewContent({ username, positions, puzzles, devBadge, startDatetime }: {
   username: string;
   positions: Positions;
   puzzles: ClientPuzzle[];
-  inRange: boolean | null;
-  currentPos: LatLng | null;
   devBadge?: React.ReactNode;
   startDatetime?: string;
 }) {
   const self = username as PlayerName;
   const scores = useMemo(() => deriveScores(puzzles), [puzzles]);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
+
+  // Team position from the GPS phone (via server). `null` until the phone
+  // sends its first sample or after it goes out-of-range / disconnects.
+  const selfPoint = positions[self];
+  const currentPos: LatLng | null = useMemo(
+    () => (selfPoint ? fromPoint(selfPoint) : null),
+    [selfPoint],
+  );
 
   // Puzzle the player can currently interact with: open, assigned to them, within range.
   const activePuzzle = currentPos
@@ -163,33 +131,6 @@ function PlayerViewContent({ username, positions, puzzles, inRange, currentPos, 
   const started = useGameStarted(startDatetime);
   if (!started) {
     return <WaitingScreen devBadge={devBadge} startDatetime={startDatetime} />;
-  }
-
-  if (inRange === null) {
-    return (
-      <div className="flex flex-col items-center gap-3 mt-12 px-4 text-center">
-        <p className="text-zinc-400">Locatie ophalen...</p>
-      </div>
-    );
-  }
-
-  if (!inRange) {
-    const distance = currentPos ? distanceTo(currentPos, HOUSE) : null;
-    return (
-      <div className="flex flex-col items-center gap-4 mt-12 px-6 text-center">
-        {devBadge}
-        <div className="text-4xl">📍</div>
-        <h2 className="font-bold text-xl">Je bent er nog niet!</h2>
-        <p className="text-zinc-400 max-w-xs">
-          Je bevindt je nog niet op de juiste locatie. Ga naar het huis van Jac. en Govie om te beginnen.
-        </p>
-        {distance !== null && (
-          <p className="text-zinc-300 font-mono text-sm">
-            Afstand: <span className="font-bold text-white">{formatDistance(distance)}</span>
-          </p>
-        )}
-      </div>
-    );
   }
 
   // Other nearby puzzles (within range) that are NOT the active one — shown as
@@ -513,66 +454,35 @@ function ProximityChip({ puzzle, self, score }: { puzzle: ClientPuzzle; self: Pl
 }
 
 // ---------------------------------------------------------------------------
-// Production view: real GPS only
+// iPad view — no GPS here. Position is sourced from positions[self].
 // ---------------------------------------------------------------------------
 
-function PlayerView({ username, startDatetime }: { username: string; startDatetime?: string }) {
+function PlayerView({ username, startDatetime, isDevMode }: {
+  username: string;
+  startDatetime?: string;
+  isDevMode: boolean;
+}) {
   const { positions, puzzles } = useStore();
-  const { inRange, currentPos, handlePosition } = usePositionHandler();
-
-  useGeolocation(handlePosition);
-
-  return <PlayerViewContent username={username} positions={positions} puzzles={puzzles} inRange={inRange} currentPos={currentPos} startDatetime={startDatetime} />;
-}
-
-// ---------------------------------------------------------------------------
-// Dev view: simulated location + toggle to real GPS
-// ---------------------------------------------------------------------------
-
-function DevPlayerView({ username, startDatetime }: { username: string; startDatetime?: string }) {
-  const { positions, puzzles, lastPosition } = useStore();
-  const [useReal, setUseReal] = useState(false);
-  const { inRange, currentPos, handlePosition } = usePositionHandler();
-
-  // Resume the simulator from the server's last-known position (sent first on
-  // link) so a reload continues where you left off instead of snapping to the
-  // house and tearing a jump through the trail. `undefined` = not yet received
-  // (keep waiting); `null` = no prior position (fall back to the house).
-  const resumeReady = lastPosition !== undefined;
-  const resume = {
-    ready: resumeReady,
-    position: resumeReady ? (lastPosition ? fromPoint(lastPosition) : HOUSE) : null,
-  };
-
-  const { pos: simPos, reset: resetSimPos, move, stepMeters, setStepMeters } = useSimulatedLocation(useReal ? () => {} : handlePosition, resume);
-  useGeolocation(useReal ? handlePosition : () => {});
-
   return (
     <PlayerViewContent
       username={username}
       positions={positions}
       puzzles={puzzles}
-      inRange={inRange}
-      currentPos={currentPos}
       startDatetime={startDatetime}
-      devBadge={<DevBadge useReal={useReal} simPos={simPos} onToggle={() => setUseReal(r => !r)} onReset={resetSimPos} onMove={move} stepMeters={stepMeters} onStepChange={setStepMeters} />}
+      devBadge={isDevMode ? <DevBadge player={username as PlayerName} /> : undefined}
     />
   );
 }
 
-function DevBadge({ useReal, simPos, onToggle, onReset, onMove, stepMeters, onStepChange }: {
-  useReal: boolean;
-  simPos: LatLng;
-  onToggle: () => void;
-  onReset: () => void;
-  onMove: (dir: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', fine?: boolean) => void;
-  stepMeters: number;
-  onStepChange: (meters: number) => void;
-}) {
+/**
+ * Tiny dev-mode indicator. Real movement control lives on the
+ * /gps/<player> beacon page now (and only there).
+ */
+function DevBadge({ player }: { player: PlayerName }) {
   const [open, setOpen] = useState(false);
+  const gpsPath = `/gps/${player.replace('.', '').toLowerCase()}`;
   return (
     <div className="flex flex-col items-start gap-2">
-      {/* Collapsed toggle — always visible */}
       <button
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-amber-900/50 border border-amber-700/50 text-amber-400/70 text-xs font-mono hover:bg-amber-900/70 hover:text-amber-300 transition-all cursor-pointer"
@@ -580,63 +490,10 @@ function DevBadge({ useReal, simPos, onToggle, onReset, onMove, stepMeters, onSt
         <FontAwesomeIcon icon={open ? faChevronDown : faChevronUp} className="w-2.5 h-2.5" />
         DEV
       </button>
-
-      {/* Expanded panel */}
       {open && (
-        <div className="flex flex-col gap-2 rounded-lg bg-amber-900/70 border border-amber-600 px-3 py-2 text-xs text-amber-300 font-mono backdrop-blur-sm shadow-lg">
-          <div className="flex flex-wrap items-center gap-2">
-            {useReal ? (
-              <span>echte GPS</span>
-            ) : (
-              <span>{simPos.lat.toFixed(6)}, {simPos.lng.toFixed(6)}</span>
-            )}
-            <span className="text-amber-500">·</span>
-            <button
-              className="underline hover:text-amber-100 transition-colors cursor-pointer"
-              onClick={onToggle}
-            >
-              {useReal ? 'gebruik simulatie' : 'gebruik echte GPS'}
-            </button>
-            {!useReal && (
-              <>
-                <span className="text-amber-500">·</span>
-                <button
-                  className="underline hover:text-amber-100 transition-colors cursor-pointer"
-                  onClick={onReset}
-                >
-                  reset
-                </button>
-              </>
-            )}
-          </div>
-          {!useReal && (
-            <>
-              <div className="flex items-center gap-2">
-                <label htmlFor="dev-step">stap (m)</label>
-                <input
-                  id="dev-step"
-                  type="number"
-                  min={0.5}
-                  step={0.5}
-                  value={stepMeters}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    onStepChange(Number.isFinite(v) ? Math.max(0.5, v) : 0.5);
-                  }}
-                  className="w-16 rounded bg-amber-950/60 border border-amber-700 px-1.5 py-0.5 text-amber-100 focus:outline-none focus:border-amber-400"
-                />
-                <span className="text-amber-500/80">Shift = 1/10 stap</span>
-              </div>
-              <div className="grid grid-cols-3 gap-1">
-                <div />
-                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowUp', e.shiftKey)}>↑</button>
-                <div />
-                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowLeft', e.shiftKey)}>←</button>
-                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowDown', e.shiftKey)}>↓</button>
-                <button className="flex items-center justify-center rounded bg-amber-800/60 hover:bg-amber-700/60 active:bg-amber-600/60 px-3 py-1 cursor-pointer" onClick={(e) => onMove('ArrowRight', e.shiftKey)}>→</button>
-              </div>
-            </>
-          )}
+        <div className="flex flex-col gap-1 rounded-lg bg-amber-900/70 border border-amber-600 px-3 py-2 text-xs text-amber-300 font-mono backdrop-blur-sm shadow-lg max-w-xs">
+          <span>Geen GPS op iPad.</span>
+          <span>Open <code className="text-amber-100">{gpsPath}</code> in een ander tabblad om {player} te bewegen.</span>
         </div>
       )}
     </div>
@@ -652,6 +509,7 @@ export function GameClient({
   startDatetime,
   forceDev = false,
 }: { serverUrl: string; startDatetime?: string; forceDev?: boolean }) {
+  const isDev = process.env.NEXT_PUBLIC_LOCAL_DEVELOPMENT === 'true' || forceDev;
   const { status } = useClient();
   const [username, setUsername] = useState<string>('');
   const [failureReason, setFailureReason] = useState('');
@@ -704,9 +562,7 @@ export function GameClient({
   }
 
   if (status === 'linked') {
-    return (isDev || forceDev)
-      ? <DevPlayerView username={username} startDatetime={startDatetime} />
-      : <PlayerView username={username} startDatetime={startDatetime} />;
+    return <PlayerView username={username} startDatetime={startDatetime} isDevMode={isDev} />;
   }
 
   if (status === 'closed') {

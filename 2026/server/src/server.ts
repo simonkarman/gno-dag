@@ -35,6 +35,30 @@ if (GCS_BLOB === GCS_BLOB_SECONDARY) {
 const VALID_PLAYERS = ['Govie', 'Jac.'] as const;
 type PlayerName = typeof VALID_PLAYERS[number];
 
+/**
+ * GPS-broadcaster usernames. A separate phone per team links with one of these
+ * names from /gps/<player>; it sends `location` / `clear-location` messages
+ * that get attributed to the base player ('Govie' or 'Jac.'). The iPad links
+ * as the plain base name and never sends GPS.
+ */
+const VALID_GPS_USERS = ['Govie-gps', 'Jac.-gps'] as const;
+type GpsName = typeof VALID_GPS_USERS[number];
+type AnyUser = PlayerName | GpsName;
+
+const VALID_USERS = [...VALID_PLAYERS, ...VALID_GPS_USERS] as const;
+
+function isGpsName(name: string): name is GpsName {
+  return (VALID_GPS_USERS as readonly string[]).includes(name);
+}
+
+/** Strip the -gps suffix to map a GPS-broadcaster username to its base player. */
+function baseNameOf(name: AnyUser): PlayerName {
+  if (isGpsName(name)) {
+    return name.slice(0, -'-gps'.length) as PlayerName;
+  }
+  return name as PlayerName;
+}
+
 // ---------------------------------------------------------------------------
 // HTTP server (shared between both Krmx instances)
 // ---------------------------------------------------------------------------
@@ -124,7 +148,7 @@ function attachInstance(opts: InstanceOptions): Instance {
       console[severity](`[${severity}] [server] [${label}] [krmx]`, ...args);
     },
     isValidUsername(username: string) {
-      return (VALID_PLAYERS as readonly string[]).includes(username);
+      return (VALID_USERS as readonly string[]).includes(username);
     },
   });
 
@@ -226,58 +250,83 @@ function attachInstance(opts: InstanceOptions): Instance {
 
   // -- Krmx event handlers --------------------------------------------------
   server.on('link', (username) => {
-    const player = username as PlayerName;
-    console.info(`[info] [gno-2026] [${label}] [player] ${player} linked`);
+    const user = username as AnyUser;
+    const player = baseNameOf(user);
+    const isGps = isGpsName(user);
+    console.info(`[info] [gno-2026] [${label}] [player] ${user} linked${isGps ? ' (gps broadcaster)' : ''}`);
 
     // Send the player's last-known position FIRST, before anything else. A
-    // (re)joining client (notably the dev simulator) waits for this message
-    // and resumes exactly where it left off, instead of snapping to a default
-    // position and drawing a spurious jump in its trail. `null` means we have
-    // no prior position for this player (fresh server or kicked after going
-    // idle).
+    // (re)joining client (notably the dev simulator on the GPS phone) waits
+    // for this message and resumes exactly where it left off, instead of
+    // snapping to a default position and drawing a spurious jump in its
+    // trail. `null` means we have no prior position for this player (fresh
+    // server or kicked after going idle). For GPS broadcasters this resumes
+    // the simulator; for the iPad it is harmless metadata.
     server.send(username, {
       type: 'last-position',
       payload: positions[player] ? geoTransform.toPoint(positions[player]!) : null,
     });
 
-    // Send current state immediately so the joining player sees the map right away.
-    server.send(username, { type: 'positions', payload: positionsPayload() });
-    server.send(username, { type: 'game-state', payload: toClientGameState(stateStore.get(), positions) });
+    // GPS broadcasters don't render a map or puzzles, so we don't need to
+    // send them positions/game-state. The iPad (base-named user) needs both
+    // immediately so it can render right away.
+    if (!isGps) {
+      server.send(username, { type: 'positions', payload: positionsPayload() });
+      server.send(username, { type: 'game-state', payload: toClientGameState(stateStore.get(), positions) });
+    }
   });
 
   server.on('leave', (username) => {
-    const player = username as PlayerName;
-    console.info(`[info] [gno-2026] [${label}] [player] ${player} left — clearing position`);
-    positions[player] = null;
-    clearTrail(player);
-    broadcastPositions();
-    maybeBroadcastGameState();
+    const user = username as AnyUser;
+    const player = baseNameOf(user);
+    const isGps = isGpsName(user);
+    if (isGps) {
+      // The GPS phone (sole source of truth for this player's position) has
+      // disconnected — clear the player's position so the iPad sees the dot
+      // disappear from the map.
+      console.info(`[info] [gno-2026] [${label}] [player] ${user} left — clearing ${player}'s position`);
+      positions[player] = null;
+      clearTrail(player);
+      broadcastPositions();
+      maybeBroadcastGameState();
+    } else {
+      // The iPad left, but the GPS phone may still be broadcasting — keep the
+      // position so the other team's iPad still sees us, and so we reappear
+      // immediately when the iPad rejoins.
+      console.info(`[info] [gno-2026] [${label}] [player] ${user} left (iPad) — position retained (GPS broadcaster still owns it)`);
+    }
   });
 
   server.on('message', (username, message) => {
-    const player = username as PlayerName;
+    const user = username as AnyUser;
+    const player = baseNameOf(user);
+    const isGps = isGpsName(user);
 
     if (message.type === 'location') {
       const { lat, lng } = message.payload as { lat: number; lng: number };
       if (typeof lat !== 'number' || typeof lng !== 'number') {
-        console.warn(`[warn] [gno-2026] [${label}] [player] ${player} sent invalid location payload`);
+        console.warn(`[warn] [gno-2026] [${label}] [player] ${user} sent invalid location payload`);
         return;
       }
-      console.debug(`[debug] [gno-2026] [${label}] [player] ${player} location update: ${lat}, ${lng}`);
+      console.debug(`[debug] [gno-2026] [${label}] [player] ${user} location update for ${player}: ${lat}, ${lng}`);
       positions[player] = { lat, lng };
       updateTrail(player, { lat, lng });
       broadcastPositions();
       maybeBroadcastGameState();
     } else if (message.type === 'clear-location') {
-      console.debug(`[debug] [gno-2026] [${label}] [player] ${player} cleared location (out of range)`);
+      console.debug(`[debug] [gno-2026] [${label}] [player] ${user} cleared ${player}'s location (out of range)`);
       positions[player] = null;
       clearTrail(player);
       broadcastPositions();
       maybeBroadcastGameState();
     } else if (message.type === 'complete-puzzle') {
+      if (isGps) {
+        console.warn(`[warn] [gno-2026] [${label}] [player] ${user} attempted complete-puzzle (GPS broadcasters cannot solve puzzles)`);
+        return;
+      }
       const { id, answer } = message.payload as { id: string; answer: string };
       if (typeof id !== 'string' || typeof answer !== 'string') {
-        console.warn(`[warn] [gno-2026] [${label}] [player] ${player} sent invalid complete-puzzle payload`);
+        console.warn(`[warn] [gno-2026] [${label}] [player] ${user} sent invalid complete-puzzle payload`);
         return;
       }
       const result = tryComplete(stateStore.get(), positions, player, id, answer, PUZZLE_PROXIMITY_METERS);
@@ -286,7 +335,7 @@ function attachInstance(opts: InstanceOptions): Instance {
         payload: { id, success: result.success, message: result.message },
       });
       if (result.mutated) {
-        console.info(`[info] [gno-2026] [${label}] [player] ${player} completed puzzle ${id}`);
+        console.info(`[info] [gno-2026] [${label}] [player] ${user} completed puzzle ${id}`);
         stateStore.save();
         // Completing a puzzle changes scores, which may unlock other puzzles.
         broadcastGameState();
