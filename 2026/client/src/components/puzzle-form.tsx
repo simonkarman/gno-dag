@@ -7,7 +7,6 @@ import { AdminPuzzle, PLAYERS } from '@/components/admin-types';
 interface Props {
   puzzle: AdminPuzzle;
   onChange: (updated: AdminPuzzle) => void;
-  onDelete: () => void;
   /** Activate map-placement mode for the puzzle's main location. */
   onPlaceLocation: () => void;
   /** Activate map-placement mode for a requirement's secondary location. */
@@ -19,9 +18,10 @@ interface Props {
 const label = 'block text-xs font-semibold text-zinc-400 mb-1';
 const input = 'w-full rounded bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-400';
 const btn = 'rounded px-2 py-1 text-xs font-semibold transition-colors';
+const colHeader = 'font-bold text-xs uppercase text-zinc-400 tracking-wider';
 
 export function PuzzleForm({
-  puzzle, onChange, onDelete, onPlaceLocation, onPlaceRequirementLocation, placingLabel,
+  puzzle, onChange, onPlaceLocation, onPlaceRequirementLocation, placingLabel,
 }: Props) {
   const patch = (p: Partial<AdminPuzzle>) => onChange({ ...puzzle, ...p });
 
@@ -51,110 +51,105 @@ export function PuzzleForm({
     }
   }
 
-  // ---- content ----
-  // Content editing is handled by the reusable <ContentEditor /> below.
-
   return (
-    <div className="flex flex-col gap-4 text-sm">
-      <div className="flex items-center justify-between">
-        <h2 className="font-bold text-base">Puzzel bewerken</h2>
-        <button onClick={onDelete} className={`${btn} bg-red-700 hover:bg-red-600 text-white`}>
-          Verwijderen
-        </button>
+    <div className="flex text-sm h-full min-h-0">
+      {/* Column 1 — Algemeen */}
+      <div className="w-80 shrink-0 overflow-y-auto p-4 flex flex-col gap-4">
+        <h3 className={colHeader}>Algemeen</h3>
+
+        {placingLabel && (
+          <div className="rounded bg-amber-900/60 border border-amber-600 px-2 py-1.5 text-amber-200 text-xs">
+            Klik op de kaart om <strong>{placingLabel}</strong> te plaatsen.
+          </div>
+        )}
+
+        {/* Basic fields */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={label}>ID</label>
+            <input className={input} value={puzzle.id} onChange={(e) => patch({ id: e.target.value })} />
+          </div>
+          <div>
+            <label className={label}>Icoon</label>
+            <input className={input} value={puzzle.icon} onChange={(e) => patch({ icon: e.target.value })} />
+          </div>
+          <div>
+            <label className={label}>Toegewezen aan</label>
+            <select className={input} value={puzzle.assignedTo} onChange={(e) => patch({ assignedTo: e.target.value as AdminPuzzle['assignedTo'] })}>
+              {PLAYERS.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={label}>Voltooid</label>
+            <button
+              onClick={() => patch({ completed: !puzzle.completed })}
+              className={`${input} text-left font-semibold ${puzzle.completed ? 'text-green-400' : 'text-zinc-400'}`}
+            >
+              {puzzle.completed ? '✓ Voltooid' : '○ Niet voltooid'}
+            </button>
+          </div>
+          <div>
+            <label className={label}>Minimum punten</label>
+            <input type="number" className={input} value={puzzle.minimumPoints} onChange={(e) => patch({ minimumPoints: Number(e.target.value) })} />
+          </div>
+        </div>
+
+        {/* Answers */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className={label}>Antwoorden <span className="text-red-400">(geheim)</span></label>
+            <button
+              onClick={() => patch({ answer: [...puzzle.answer, ''] })}
+              className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}
+            >
+              + Antwoord
+            </button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {puzzle.answer.length === 0 && (
+              <p className="text-xs text-zinc-500">Geen geaccepteerde antwoorden — puzzel is onoplosbaar.</p>
+            )}
+            {puzzle.answer.map((a, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  className={input}
+                  value={a}
+                  onChange={(e) => {
+                    const next = puzzle.answer.slice();
+                    next[i] = e.target.value;
+                    patch({ answer: next });
+                  }}
+                  placeholder="Antwoord..."
+                />
+                <button
+                  onClick={() => patch({ answer: puzzle.answer.filter((_, idx) => idx !== i) })}
+                  className={`${btn} bg-red-700 hover:bg-red-600 text-white shrink-0`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className={label}>Locatie</label>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs text-zinc-300">
+              {puzzle.location.lat.toFixed(6)}, {puzzle.location.lng.toFixed(6)}
+            </span>
+            <button onClick={onPlaceLocation} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
+              Kies op kaart
+            </button>
+          </div>
+        </div>
       </div>
 
-      {placingLabel && (
-        <div className="rounded bg-amber-900/60 border border-amber-600 px-2 py-1.5 text-amber-200 text-xs">
-          Klik op de kaart om <strong>{placingLabel}</strong> te plaatsen.
-        </div>
-      )}
-
-      {/* Basic fields */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={label}>ID</label>
-          <input className={input} value={puzzle.id} onChange={(e) => patch({ id: e.target.value })} />
-        </div>
-        <div>
-          <label className={label}>Icoon</label>
-          <input className={input} value={puzzle.icon} onChange={(e) => patch({ icon: e.target.value })} />
-        </div>
-        <div>
-          <label className={label}>Toegewezen aan</label>
-          <select className={input} value={puzzle.assignedTo} onChange={(e) => patch({ assignedTo: e.target.value as AdminPuzzle['assignedTo'] })}>
-            {PLAYERS.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className={label}>Voltooid</label>
-          <button
-            onClick={() => patch({ completed: !puzzle.completed })}
-            className={`${input} text-left font-semibold ${puzzle.completed ? 'text-green-400' : 'text-zinc-400'}`}
-          >
-            {puzzle.completed ? '✓ Voltooid' : '○ Niet voltooid'}
-          </button>
-        </div>
-        <div>
-          <label className={label}>Minimum punten</label>
-          <input type="number" className={input} value={puzzle.minimumPoints} onChange={(e) => patch({ minimumPoints: Number(e.target.value) })} />
-        </div>
-      </div>
-
-      {/* Answers */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className={label}>Antwoorden <span className="text-red-400">(geheim)</span></label>
-          <button
-            onClick={() => patch({ answer: [...puzzle.answer, ''] })}
-            className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}
-          >
-            + Antwoord
-          </button>
-        </div>
-        <div className="flex flex-col gap-2">
-          {puzzle.answer.length === 0 && (
-            <p className="text-xs text-zinc-500">Geen geaccepteerde antwoorden — puzzel is onoplosbaar.</p>
-          )}
-          {puzzle.answer.map((a, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                className={input}
-                value={a}
-                onChange={(e) => {
-                  const next = puzzle.answer.slice();
-                  next[i] = e.target.value;
-                  patch({ answer: next });
-                }}
-                placeholder="Antwoord..."
-              />
-              <button
-                onClick={() => patch({ answer: puzzle.answer.filter((_, idx) => idx !== i) })}
-                className={`${btn} bg-red-700 hover:bg-red-600 text-white shrink-0`}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Location */}
-      <div>
-        <label className={label}>Locatie</label>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-zinc-300">
-            {puzzle.location.lat.toFixed(6)}, {puzzle.location.lng.toFixed(6)}
-          </span>
-          <button onClick={onPlaceLocation} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
-            Kies op kaart
-          </button>
-        </div>
-      </div>
-
-      {/* Requirements */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className={label}>Voorwaarden</label>
+      {/* Column 2 — Voorwaarden */}
+      <div className="w-96 shrink-0 overflow-y-auto p-4 border-l border-zinc-800 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h3 className={colHeader}>Voorwaarden</h3>
           <button onClick={addRequirement} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
             + Voorwaarde
           </button>
@@ -225,10 +220,13 @@ export function PuzzleForm({
         </div>
       </div>
 
-      {/* Content */}
-      <div>
-        <label className={label}>Inhoud</label>
-        <ContentEditor content={puzzle.content} onChange={(content) => patch({ content })} />
+      {/* Column 3 — Inhoud */}
+      <div className="flex-1 min-w-0 overflow-y-auto p-4 border-l border-zinc-800 flex flex-col gap-2">
+        <ContentEditor
+          content={puzzle.content}
+          onChange={(content) => patch({ content })}
+          headerLabel={<h3 className={colHeader}>Inhoud</h3>}
+        />
       </div>
     </div>
   );
@@ -255,9 +253,11 @@ function estimateTextareaRows(value: string): number {
   return Math.min(20, Math.max(2, rows));
 }
 
-function ContentEditor({ content, onChange }: {
+function ContentEditor({ content, onChange, headerLabel }: {
   content: ContentElement[];
   onChange: (content: ContentElement[]) => void;
+  /** Optional label rendered on the left of the action-button row. */
+  headerLabel?: React.ReactNode;
 }) {
   function addContent(el: ContentElement) {
     onChange([...content, el]);
@@ -280,13 +280,16 @@ function ContentEditor({ content, onChange }: {
 
   return (
     <div>
-      <div className="flex items-center justify-end mb-2 gap-2">
-        <button onClick={() => addContent({ type: 'text', value: '' })} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
-          + Tekst
-        </button>
-        <button onClick={() => addContent({ type: 'image', url: '', alt: '' })} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
-          + Afbeelding
-        </button>
+      <div className="flex items-center justify-between mb-2 gap-2">
+        {headerLabel ?? <span />}
+        <div className="flex items-center gap-2">
+          <button onClick={() => addContent({ type: 'text', value: '' })} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
+            + Tekst
+          </button>
+          <button onClick={() => addContent({ type: 'image', url: '', alt: '' })} className={`${btn} bg-zinc-700 hover:bg-zinc-600 text-white`}>
+            + Afbeelding
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         {content.length === 0 && (
@@ -326,7 +329,7 @@ function ContentEditor({ content, onChange }: {
                 />
                 {el.url && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={el.url} alt={el.alt ?? ''} className="rounded max-h-32 object-contain bg-zinc-900" />
+                  <img src={el.url} alt={el.alt ?? ''} className="rounded max-h-48 max-w-md object-contain bg-zinc-900" />
                 )}
               </div>
             )}

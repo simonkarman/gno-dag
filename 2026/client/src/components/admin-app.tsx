@@ -287,21 +287,68 @@ export function AdminApp({
       </header>
 
       <div className="flex-1 flex min-h-0">
-        {/* Map */}
-        <div className="flex-1 min-w-0 relative">
-          <AdminMap
-            puzzles={state.puzzles}
-            selectedId={selectedId}
-            placing={placing !== null}
-            onMapClick={onMapClick}
-            onSelectPuzzle={setSelectedId}
-            onMovePuzzle={movePuzzle}
-            onMoveSecondary={moveSecondary}
-          />
-          {placing && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 rounded bg-amber-900/80 border border-amber-600 px-3 py-1.5 text-xs text-amber-100">
-              Klik op de kaart om {placingLabel} te plaatsen ·{' '}
-              <button className="underline" onClick={() => setPlacing(null)}>annuleren</button>
+        {/* Left column: map on top, puzzle form panel below (when a puzzle is selected) */}
+        <div className="flex-1 min-w-0 flex flex-col min-h-0">
+          {/* Map */}
+          <div className="flex-1 min-h-0 relative">
+            <AdminMap
+              puzzles={state.puzzles}
+              selectedId={selectedId}
+              placing={placing !== null}
+              onMapClick={onMapClick}
+              onSelectPuzzle={setSelectedId}
+              onMovePuzzle={movePuzzle}
+              onMoveSecondary={moveSecondary}
+            />
+            {placing && (
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 rounded bg-amber-900/80 border border-amber-600 px-3 py-1.5 text-xs text-amber-100">
+                Klik op de kaart om {placingLabel} te plaatsen ·{' '}
+                <button className="underline" onClick={() => setPlacing(null)}>annuleren</button>
+              </div>
+            )}
+          </div>
+
+          {/* Puzzle form panel below the map */}
+          {selected && (
+            <div className="h-[45%] shrink-0 border-t border-zinc-800 flex flex-col min-h-0 bg-zinc-950">
+              {/* Panel header */}
+              <div className="flex items-center gap-3 px-4 py-2 border-b border-zinc-800 shrink-0">
+                <span className="text-lg">{selected.icon}</span>
+                <span className="font-mono text-sm text-zinc-300">{selected.id}</span>
+                <span className="text-xs text-zinc-500">
+                  · toegewezen aan{' '}
+                  <span style={{ color: PLAYER_COLORS[selected.assignedTo] }} className="font-semibold">
+                    {selected.assignedTo}
+                  </span>
+                  {' '}· min {selected.minimumPoints}
+                </span>
+                <div className="flex-1" />
+                <button
+                  onClick={() => deletePuzzle(selected.id)}
+                  className="rounded bg-red-700 hover:bg-red-600 px-2 py-1 text-xs font-semibold text-white"
+                >
+                  Verwijderen
+                </button>
+                <button
+                  onClick={() => setSelectedId(null)}
+                  className="rounded bg-zinc-800 hover:bg-zinc-700 px-2 py-1 text-xs"
+                  aria-label="Sluiten"
+                  title="Sluiten"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Three-column form body */}
+              <div className="flex-1 min-h-0">
+                <PuzzleForm
+                  puzzle={selected}
+                  onChange={(u) => updatePuzzle(selected.id, u)}
+                  onPlaceLocation={() => setPlacing({ kind: 'puzzle-location' })}
+                  onPlaceRequirementLocation={(reqIndex) => setPlacing({ kind: 'requirement-location', reqIndex })}
+                  placingLabel={placingLabel}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -382,20 +429,6 @@ export function AdminApp({
               ))}
             </div>
           </section>
-
-          {/* Selected puzzle form */}
-          {selected && (
-            <section className="border-t border-zinc-800 pt-4">
-              <PuzzleForm
-                puzzle={selected}
-                onChange={(u) => updatePuzzle(selected.id, u)}
-                onDelete={() => deletePuzzle(selected.id)}
-                onPlaceLocation={() => setPlacing({ kind: 'puzzle-location' })}
-                onPlaceRequirementLocation={(reqIndex) => setPlacing({ kind: 'requirement-location', reqIndex })}
-                placingLabel={placingLabel}
-              />
-            </section>
-          )}
         </aside>
       </div>
     </div>

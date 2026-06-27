@@ -1,0 +1,1063 @@
+{
+  "puzzles": [
+    {
+      "id": "a5048f79",
+      "icon": "🚪",
+      "location": {
+        "lng": 4.74651135940881,
+        "lat": 52.07709118130518
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 3,
+      "requirements": [
+        {
+          "type": "other-player-at-location",
+          "meters": 15,
+          "location": {
+            "lng": 4.749654271751405,
+            "lat": 52.078005712702044
+          },
+          "expected": true,
+          "mode": "replace",
+          "content": [
+            {
+              "type": "text",
+              "value": "De Gouden Leeuwerik laat zich pas zien als het andere speurdersteam op het 🔶 spoor staat. Stuur ze daarheen voordat jullie verder kunnen!"
+            }
+          ]
+        }
+      ],
+      "answer": [
+        "11"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een mede-vogelaar fluistert dat de Gouden Leeuwerik een voorliefde heeft voor smalle steegjes met veel poortjes — hij gebruikt ze om ongezien van tuin naar tuin te springen. Het andere speurdersteam staat nu precies in zo'n steegje, en jullie hebben hun ogen even nodig."
+        },
+        {
+          "type": "text",
+          "value": "Vraag het andere team hoeveel poortdeuren er in dat steegje zitten."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "25233845",
+      "icon": "👋",
+      "location": {
+        "lng": 4.751440516304935,
+        "lat": 52.077930413158356
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 0,
+      "requirements": [],
+      "answer": [
+        "GJLMSST"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Welkom, speurders! Vandaag stappen jullie in de laarzen van twee echte vogelspeurders. Er gaat namelijk een gerucht door de Bodegraafse Vogelbuurt: de uiterst zeldzame Gouden Leeuwerik — een vogel die volgens de overlevering elke dertig jaar één keer terugkeert naar zijn favoriete buurt — zou hier weer gezien zijn. Jullie hoofdkwartier? Niets minder dan De Leeuwerik zelf."
+        },
+        {
+          "type": "text",
+          "value": "Zo werkt het: over de hele Vogelbuurt liggen sporen verstopt, en elk spoor dat jullie ontcijferen brengt nieuwe sporen aan het licht op de kaart. Houd je veldgids (deze app) goed bij de hand, werk samen waar nodig, en luister naar de tips van mede-vogelaars."
+        },
+        {
+          "type": "text",
+          "value": "Voor jullie allereerste spoor moeten jullie eerst de geheime speurderscode kraken. Welk codewoord krijg je als je de eerste letter van de eerste voornaam van iedereen die vandaag meespeurt op alfabetische volgorde achter elkaar zet?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "7567b0e0",
+      "icon": "🤝",
+      "location": {
+        "lng": 4.747660022216229,
+        "lat": 52.07649859463344
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 0,
+      "requirements": [],
+      "answer": [
+        "GJLMSST"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Welkom, speurders! Vandaag stappen jullie in de laarzen van twee echte vogelspeurders. Er gaat namelijk een gerucht door de Bodegraafse Vogelbuurt: de uiterst zeldzame Gouden Leeuwerik — een vogel die volgens de overlevering elke dertig jaar één keer terugkeert naar zijn favoriete buurt — zou hier weer gezien zijn. Jullie hoofdkwartier? Niets minder dan De Leeuwerik zelf."
+        },
+        {
+          "type": "text",
+          "value": "Zo werkt het: over de hele Vogelbuurt liggen sporen verstopt, en elk spoor dat jullie ontcijferen brengt nieuwe sporen aan het licht op de kaart. Houd je veldgids (deze app) goed bij de hand, werk samen waar nodig, en luister naar de tips van mede-vogelaars."
+        },
+        {
+          "type": "text",
+          "value": "Voor jullie allereerste spoor moeten jullie eerst de geheime speurderscode kraken. Welk codewoord krijg je als je de eerste letter van de eerste voornaam van iedereen die vandaag meespeurt op alfabetische volgorde achter elkaar zet?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "24333108",
+      "icon": "🖼️",
+      "location": {
+        "lng": 4.74888695964481,
+        "lat": 52.0765907972676
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 2,
+      "requirements": [],
+      "answer": [
+        "Emmakade"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Vlak nadat de Gouden Leeuwerik op deze plek geland was, liet hij een glanzende veer vallen. Een mede-vogelaar maakte snel een foto van de plek waar het gebeurde — die foto staat hieronder in jullie veldgids."
+        },
+        {
+          "type": "image",
+          "url": "/images/emmakade.png",
+          "alt": ""
+        },
+        {
+          "type": "text",
+          "value": "Welke plek is dit?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "63add4dc",
+      "icon": "📷",
+      "location": {
+        "lng": 4.750418505520232,
+        "lat": 52.078161374924036
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 2,
+      "requirements": [],
+      "answer": [
+        "Roerdomp"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Niet elke vogel in de Vogelbuurt is een Gouden Leeuwerik — sommige zijn 'gewone' buurtbewoners. Een collega-spotter stuurde onderstaand kiekje door en vraagt zich af aan welke vogelstraat in de buurt deze vogel zijn naam heeft gegeven."
+        },
+        {
+          "type": "image",
+          "url": "/images/roerdomp.png",
+          "alt": ""
+        },
+        {
+          "type": "text",
+          "value": "Aan welke straat in de buurt is deze vogel verbonden?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "5e352805",
+      "icon": "🛒",
+      "location": {
+        "lng": 4.751189762048212,
+        "lat": 52.07714152179238
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 4,
+      "requirements": [
+        {
+          "type": "no-other-player-within",
+          "meters": 200,
+          "expected": true,
+          "mode": "replace",
+          "content": [
+            {
+              "type": "text",
+              "value": "Pssst — deze opdracht is alleen voor jouw team. Vraag het andere speurdersteam vriendelijk om een paar straten verderop te gaan zoeken voordat je verdergaat."
+            }
+          ]
+        }
+      ],
+      "answer": [
+        "gekocht"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Pssst — deze opdracht is alleen voor jouw team. Zeg niks over deze opdracht tegen het andere team en zorg dat ze uit de buurt blijven."
+        },
+        {
+          "type": "text",
+          "value": "Een geheime opdracht vanuit het hoofdkwartier: de Gouden Leeuwerik schijnt aangetrokken te worden door iets heel specifieks uit de Jumbo. Wat precies blijft nog even geheim — maar jullie moeten één topping kopen die jullie zelf ook lekker vinden. Later op de dag wordt onthuld waar de topping voor zal zijn."
+        },
+        {
+          "type": "text",
+          "value": "Ga naar binnen bij de Jumbo, koop één topping naar keuze, en kom daarna terug naar de kaart. Zodra dat gelukt is, vul dan als antwoord 'gekocht' in."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "6a73a113",
+      "icon": "🛍️",
+      "location": {
+        "lng": 4.750953928462351,
+        "lat": 52.07670865696732
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 4,
+      "requirements": [
+        {
+          "type": "no-other-player-within",
+          "meters": 200,
+          "expected": true,
+          "mode": "replace",
+          "content": [
+            {
+              "type": "text",
+              "value": "Pssst — deze opdracht is alleen voor jouw team. Vraag het andere speurdersteam vriendelijk om een paar straten verderop te gaan zoeken voordat je verdergaat."
+            }
+          ]
+        }
+      ],
+      "answer": [
+        "gekocht"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Pssst — deze opdracht is alleen voor jouw team. Zeg niks over deze opdracht tegen het andere team en zorg dat ze uit de buurt blijven."
+        },
+        {
+          "type": "text",
+          "value": "Een geheime opdracht vanuit het hoofdkwartier: de Gouden Leeuwerik schijnt aangetrokken te worden door iets heel specifieks uit de Jumbo. Wat precies blijft nog even geheim — maar jullie moeten één topping kopen die jullie zelf ook lekker vinden. Later op de dag wordt onthuld waar de topping voor zal zijn."
+        },
+        {
+          "type": "text",
+          "value": "Ga naar binnen bij de Jumbo, koop één topping naar keuze, en kom daarna terug naar de kaart. Zodra dat gelukt is, vul dan als antwoord 'gekocht' in."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "7792440e",
+      "icon": "🌳",
+      "location": {
+        "lng": 4.749761507413227,
+        "lat": 52.07760211258896
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 1,
+      "requirements": [],
+      "answer": [
+        "nul",
+        "0",
+        "geen"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een oude vogelaar uit de buurt — al jaren niet meer zelf op pad, maar nog steeds even scherp — zit op een bankje en wenkt jullie. 'Speurders, voordat jullie verder gaan,' zegt hij met een twinkel in zijn ogen, 'een klein raadseltje om jullie scherp te houden.'"
+        },
+        {
+          "type": "text",
+          "value": "'In een boom hier verderop zitten tien vogels rustig te zingen. Een jager loopt voorbij, richt zijn geweer, en schiet er één uit de boom. Hoeveel vogels zitten er dán nog in die boom?'"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "1bb64ea9",
+      "icon": "🧩",
+      "location": {
+        "lng": 4.7494700865253385,
+        "lat": 52.07691730750589
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 9,
+      "requirements": [],
+      "answer": [
+        "cortenhoeve",
+        "cort en hoe ve",
+        "cort-en-hoe-ve"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een mede-vogelaar liet een briefje achter in de veldgids van de speurders. Erop staat een rebus die naar één van de plekken in de buurt verwijst waar de Gouden Leeuwerik zich graag verschuilt — maar zoals altijd: niets is wat het lijkt."
+        },
+        {
+          "type": "image",
+          "url": "/images/cort-en-hoe-ve.png",
+          "alt": "Rebus"
+        },
+        {
+          "type": "text",
+          "value": "Welk woord (of welke woorden) verbergt deze rebus?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "bfd6f965",
+      "icon": "🪧",
+      "location": {
+        "lng": 4.748621861161619,
+        "lat": 52.0779523421528
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 9,
+      "requirements": [],
+      "answer": [
+        "waterhoen",
+        "wat er hoen",
+        "wat-er-hoen"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een raadseltje uit de schatkist van de hoofdvogelaar — een rebus, een verborgen naam uit de Vogelbuurt. Volgens de overlevering bezocht de Gouden Leeuwerik deze plek vooral als hij dorst had."
+        },
+        {
+          "type": "image",
+          "url": "/images/wat-er-hoen.png",
+          "alt": "Rebus"
+        },
+        {
+          "type": "text",
+          "value": "Welke plek verbergt deze rebus?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "acc59d4f",
+      "icon": "🪿",
+      "location": {
+        "lng": 4.748622095253591,
+        "lat": 52.07726050592156
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 1,
+      "requirements": [],
+      "answer": [
+        "F",
+        "F formatie",
+        "F-formatie",
+        "Ze vliegen in een F formatie",
+        "Ze vliegen in een F-formatie",
+        "Vliegen in F",
+        "Vliegen in een F",
+        "In een F formatie",
+        "In een F-formatie"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "De oude vogelaar ziet jullie lopen — terwijl jullie weglopen, roept hij jullie nog één keer terug. 'Wacht, speurders, nog een moment! Een vraag waar zelfs de geleerden om moeten lachen.'"
+        },
+        {
+          "type": "text",
+          "value": "'Iedereen weet hoe ganzen er uit zien. Maar… hoe herken je nou een groep dislectische ganzen?'"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "A",
+      "icon": "🌲",
+      "location": {
+        "lat": 52.0770241,
+        "lng": 4.747759
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "10"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "De Gouden Leeuwerik houdt van schuilbomen langs het water — vooral van bomen waarvan de takken net boven de sloot hangen, perfect voor een korte rust tussen twee zangen door."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel bomen staan er rondom het afgesloten stuk sloot?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "B",
+      "icon": "🏠",
+      "location": {
+        "lat": 52.0763035,
+        "lng": 4.7465786
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "3"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Aan de Eiber 18 hangt een vogelhuisje dat — volgens de buurt — ooit is opgehangen in de hoop dat de Gouden Leeuwerik er zou nestelen. Hij is nooit komen wonen, maar het huisje hangt er nog steeds te wachten."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel invlieg-openingen telt dit vogelhuisje?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "C",
+      "icon": "🪨",
+      "location": {
+        "lat": 52.0760711,
+        "lng": 4.7477225
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "33"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "In één voortuin in deze straat staan kleine 'Amsterdammertjes' op wacht, als trotse soldaten die over het huis waken. Volgens een mede-vogelaar zou de Gouden Leeuwerik hier ooit even tussen door gewandeld hebben, op zoek naar zaadjes."
+        },
+        {
+          "type": "text",
+          "value": "Op welk huisnummer staat deze voortuin met Amsterdammertjes?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "D",
+      "icon": "🛢️",
+      "location": {
+        "lat": 52.0762218,
+        "lng": 4.7482083
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "6"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een vogelspeurder die hier eerder voorbij kwam heeft een ton gemarkeerd met strepen — voor elk spoor één streep, als een geheime code voor wie weet waar hij op moet letten. Jullie zijn de volgende speurders die deze code mogen lezen."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel strepen tellen jullie op deze ton?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "E",
+      "icon": "🪴",
+      "location": {
+        "lat": 52.0764244,
+        "lng": 4.7482556
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 11,
+      "requirements": [],
+      "answer": [
+        "Orchidee"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Door een raamkozijn ving de Gouden Leeuwerik volgens de overlevering ooit een glimp op van een bijzondere plant — en bleef toen minutenlang op de vensterbank zitten kijken. De plant staat er vandaag nog steeds, alsof ze op zijn terugkeer wacht."
+        },
+        {
+          "type": "text",
+          "value": "Welke plant staat er in het raamkozijn?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "F",
+      "icon": "🧱",
+      "location": {
+        "lat": 52.076179,
+        "lng": 4.7485839
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 11,
+      "requirements": [],
+      "answer": [
+        "23"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Vogelspeurders meten alles in stappen — en op deze plek meten ze in stoeptegels. Tel hoeveel stoeptegels er liggen om van de ene kant naar de andere te komen; dat is precies de afstand die de Gouden Leeuwerik in één lange sprong aflegt."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel stoeptegels liggen er van de ene kant naar de andere?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "G",
+      "icon": "🔤",
+      "location": {
+        "lat": 52.0761706,
+        "lng": 4.7492
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 11,
+      "requirements": [],
+      "answer": [
+        "S10"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Aan een paal hier hangen twee bordjes: één blauw, en één blauw/groen. De achterkant van elk bord is precies hetzelfde als de voorkant — dus om dubbeltellen te voorkomen kijken jullie naar slechts één kant van elk bord."
+        },
+        {
+          "type": "text",
+          "value": "Tel op die ene kant van beide bordjes samen hoe vaak elk teken (letter of cijfer) voorkomt. Hoofdletters en kleine letters tellen daarbij als hetzelfde teken — een 'A' en een 'a' zijn dus samen 2. Welk teken komt op één-na-vaakst voor, en hoe vaak? Vul je antwoord in als het teken gevolgd door het aantal, bijvoorbeeld 'A7'."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "H",
+      "icon": "👥",
+      "location": {
+        "lat": 52.0762176,
+        "lng": 4.7501475
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 11,
+      "requirements": [],
+      "answer": [
+        "8"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Het logo van het 'Vogelnest' beeldt een groepje mannetjes uit die samen op vogeljacht gaan — volgens de buurtoverlevering een eerbetoon aan de allereerste vogelspeurders van de Vogelbuurt, die ooit met zijn allen op zoek gingen naar diezelfde Gouden Leeuwerik."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel mannetjes tellen jullie in het logo van het Vogelnest?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "I",
+      "icon": "🅿️",
+      "location": {
+        "lat": 52.0763989,
+        "lng": 4.7505598
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "29"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een Gouden Leeuwerik houdt niet van auto's, en daarom telt elke vogelspeurder zorgvuldig hoeveel plekken er zijn waar de vogel níet zal landen. Hier is het tijd om die parkeerplaatsen eens goed te tellen."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel parkeerplaatsen liggen hier?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "J",
+      "icon": "🔢",
+      "location": {
+        "lat": 52.0765267,
+        "lng": 4.7508805
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 10,
+      "requirements": [],
+      "answer": [
+        "7"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "In de Waterhoenstraat woont de partner van de Gouden Leeuwerik. Het sloeg direct over toen ze elkaar voor het eerst zagen. Speurders fluisteren dat dit precies het huisnummer is waar de Gouden Leeuwerik graag rond vliegt."
+        },
+        {
+          "type": "text",
+          "value": "Op welk huisnummer sloeg het over?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "K",
+      "icon": "🍀",
+      "location": {
+        "lat": 52.0759711,
+        "lng": 4.7511316
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 4,
+      "requirements": [],
+      "answer": [
+        "13"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "In de Roerdompstraat woont volgens een oude wijsheid iemand op het huisnummer waar je 'nooit te laat komt'."
+        },
+        {
+          "type": "text",
+          "value": "Welk huisnummer is dat?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "L",
+      "icon": "🍇",
+      "location": {
+        "lat": 52.0761684,
+        "lng": 4.7521988
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 3,
+      "requirements": [],
+      "answer": [
+        "Banaan"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Bij Goudplevier 1H groeit fruit dat een Gouden Leeuwerik nóóit zou eten — het hoort eigenlijk niet eens in Nederland thuis. Toch staat het hier in een voortuin alsof het de tropen zijn."
+        },
+        {
+          "type": "text",
+          "value": "Welk fruit zou daar aan kunnen groeien?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "M",
+      "icon": "🟦",
+      "location": {
+        "lat": 52.076762,
+        "lng": 4.7522539
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 13,
+      "requirements": [],
+      "answer": [
+        "58"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "De gevel van het gebouw aan de Vromade is bezaaid met kleine vierkantjes — alsof iemand een gigantisch veldgids-rooster op de muur heeft getekend om vogels makkelijker te kunnen tellen. Een speurder kan zo'n uitnodiging natuurlijk niet weerstaan."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel vierkantjes telt deze gevel?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "S",
+      "icon": "🧮",
+      "location": {
+        "lng": 4.747961264953315,
+        "lat": 52.07776306453144
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 13,
+      "requirements": [],
+      "answer": [
+        "9"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Gekke vraag..."
+        },
+        {
+          "type": "text",
+          "value": "Wat is 3+3x2?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "O",
+      "icon": "✏️",
+      "location": {
+        "lat": 52.0772384,
+        "lng": 4.7523309
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 12,
+      "requirements": [],
+      "answer": [
+        "Paddenstoel",
+        "Paddenstoelen"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Vijf vrolijk vormgegeven objecten staan hier op een rij, alsof ze speciaal zijn neergezet om de Gouden Leeuwerik te lokken. Ze hebben allemaal dezelfde herkenbare vorm — meer typisch voor een sprookjesbos dan voor een gewone Bodegraafse straat."
+        },
+        {
+          "type": "text",
+          "value": "Wat zijn die vijf objecten?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "P",
+      "icon": "🗑️",
+      "location": {
+        "lat": 52.0774661,
+        "lng": 4.7527407
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 12,
+      "requirements": [],
+      "answer": [
+        "Glasbak",
+        "Glas",
+        "Glazen",
+        "Glaswerk"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "De Gouden Leeuwerik recyclet alles — elk takje, elk veertje, elk klein steentje uit zijn nest. Op deze plek staan verschillende soorten bakken naast elkaar, maar van één soort staan er beduidend meer dan van de andere."
+        },
+        {
+          "type": "text",
+          "value": "Welk soort bak komt hier het meest voor?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "Q",
+      "icon": "🏋️",
+      "location": {
+        "lat": 52.0776988,
+        "lng": 4.7519725
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 10,
+      "requirements": [],
+      "answer": [
+        "9"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Ook een vogel houdt zijn veren graag in topvorm — en een goede speurder dus ook. Op deze locatie kunnen meerdere mensen tegelijk hun spieren strekken, maar er is een maximum aan hoeveel het er tegelijk mogen zijn."
+        },
+        {
+          "type": "text",
+          "value": "Hoeveel mensen kunnen hier tegelijk sporten?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "R",
+      "icon": "🚍",
+      "location": {
+        "lat": 52.0784637,
+        "lng": 4.7494745
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 13,
+      "requirements": [],
+      "answer": [
+        "741"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Bij bushalte 'Henegouwerhof richting Gouda' vond een collega-speurder een tweede briefje uit een dienstregeling, een rekenregel: de eerste vertrektijd op zondagochtend min het busnummer."
+        },
+        {
+          "type": "text",
+          "value": "Wat is de uitkomst van deze som?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "Sa",
+      "icon": "🚌",
+      "location": {
+        "lat": 52.0770453,
+        "lng": 4.7524697
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 13,
+      "requirements": [],
+      "answer": [
+        "742"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Bij bushalte 'Goudplevier richting Gouda' vond een mede-vogelaar een briefje uit de dienstregeling. Op het briefje stond één vertrektijd en één busnummer — en de speurder schreef erbij: 'Trek het busnummer van de eerste vertrektijd op zondagochtend af, dan weet je hoeveel sporen er nog liggen.'"
+        },
+        {
+          "type": "text",
+          "value": "Wat is de uitkomst van deze som?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "ffefb17f",
+      "icon": "❓",
+      "location": {
+        "lng": 4.750625967688129,
+        "lat": 52.077166770048585
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 8,
+      "requirements": [
+        {
+          "type": "other-player-at-location",
+          "meters": 15,
+          "location": {
+            "lng": 4.750423660078081,
+            "lat": 52.07685712275921
+          },
+          "expected": false,
+          "mode": "append",
+          "content": [
+            {
+              "type": "text",
+              "value": "Wisselmoment! Iedereen die niet Jac. of Govie is, wisselt nu van team. Geef ook de GPS-tracker door aan een teamgenoot."
+            },
+            {
+              "type": "text",
+              "value": "Hoeveel opdrachten moeten jullie hierna nog?"
+            }
+          ]
+        }
+      ],
+      "answer": [
+        "9"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een berichtje knettert binnen op de speurders-walkie: 'Speurders, speurders — de Gouden Leeuwerik is écht gespot! Een mede-vogelaar zag hem net wegvliegen richting het hart van de Vogelbuurt. Jullie zoektocht gaat de goede kant op.' Het hoofdkwartier voegt eraan toe: 'Maar om hem te kunnen blijven volgen hebben we frisse ogen nodig — straks wisselen jullie van team!'"
+        },
+        {
+          "type": "text",
+          "value": "Wacht hier tot de andere speler op het 🔶 vakje staat."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "70dd8f46",
+      "icon": "❓",
+      "location": {
+        "lng": 4.750429152076012,
+        "lat": 52.076856907351264
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 8,
+      "requirements": [
+        {
+          "type": "other-player-at-location",
+          "meters": 15,
+          "location": {
+            "lng": 4.750627939804353,
+            "lat": 52.077172062330675
+          },
+          "expected": false,
+          "mode": "append",
+          "content": [
+            {
+              "type": "text",
+              "value": "Wisselmoment! Iedereen die niet Jac. of Govie is, wisselt nu van team. Geef ook de GPS-tracker door aan een teamgenoot."
+            },
+            {
+              "type": "text",
+              "value": "Hoeveel opdrachten moeten jullie hierna nog?"
+            }
+          ]
+        }
+      ],
+      "answer": [
+        "9"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Een berichtje knettert binnen op de speurders-walkie: 'Speurders, speurders — de Gouden Leeuwerik is écht gespot! Een mede-vogelaar zag hem net wegvliegen richting het hart van de Vogelbuurt. Jullie zoektocht gaat de goede kant op.' Het hoofdkwartier voegt eraan toe: 'Maar om hem te kunnen blijven volgen hebben we frisse ogen nodig — straks wisselen jullie van team!'"
+        },
+        {
+          "type": "text",
+          "value": "Wacht hier tot de andere speler op het 🔶 vakje staat."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "a7c4f1b2",
+      "icon": "🐦",
+      "location": {
+        "lng": 4.748934684555139,
+        "lat": 52.07772697205715
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 16,
+      "requirements": [],
+      "answer": [
+        "string"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Jullie staan voor de deur van het hoofdkwartier. Een mede-vogelaar wenkt jullie naar binnen: 'Hij is hier! De Gouden Leeuwerik is daadwerkelijk teruggekeerd naar zijn favoriete plek!' Op tafel ligt een briefje, met daarop het eerste deel van een geheim codewoord."
+        },
+        {
+          "type": "text",
+          "value": "Het briefje zegt: 'Om dit deel van het codewoord te vinden moet je een woordpuzzel oplossen — een echte vogelspeurder-uitdaging. Reken goed mee.'"
+        },
+        {
+          "type": "text",
+          "value": "Wat is stroop zonder hoop, plus bling zonder blauw?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "b3e8d2a5",
+      "icon": "🐦",
+      "location": {
+        "lng": 4.749162780258267,
+        "lat": 52.077794187719114
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 16,
+      "requirements": [],
+      "answer": [
+        "art"
+      ],
+      "content": [
+        {
+          "type": "text",
+          "value": "Jullie staan voor de deur van het hoofdkwartier. Een mede-vogelaar wenkt jullie naar binnen: 'Hij is hier! De Gouden Leeuwerik is daadwerkelijk teruggekeerd naar zijn favoriete plek!' Op tafel ligt een briefje, met daarop het tweede deel van een geheim codewoord."
+        },
+        {
+          "type": "text",
+          "value": "Het briefje zegt: 'Om dit deel van het codewoord te vinden moet je een klein taalkundig kunststukje uithalen — een transformatie die alleen een echte speurder doorziet.'"
+        },
+        {
+          "type": "text",
+          "value": "Hoe maak je van een rat Engelse kunst?"
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "c9f6a3e4",
+      "icon": "🎨",
+      "location": {
+        "lng": 4.749386032959366,
+        "lat": 52.07718366233955
+      },
+      "assignedTo": "Govie",
+      "minimumPoints": 17,
+      "requirements": [],
+      "answer": [],
+      "content": [
+        {
+          "type": "text",
+          "value": "Beide teams hebben hun deel van het codewoord gevonden. Samen vormen ze wat we vanmiddag gaan doen! De hoofdvogelaar lacht en knikt tevreden: 'Speurders, dit was geen gewone vogeljacht. De Gouden Leeuwerik is erg trots op jullie speurwerkzaamheden."
+        },
+        {
+          "type": "text",
+          "value": "Maar eerst: lunchen! Een vogelspeurder werkt nooit op een lege maag. Pak een hapje en een drankje, neem de tijd om bij te komen van de ochtend en ruil verhalen uit over wat jullie onderweg hebben meegemaakt."
+        },
+        {
+          "type": "text",
+          "value": "En dán, met een volle buik, gaan we aan de slag met String Art. Iedereen maakt zijn eigen kunstwerkje — een Gouden Leeuwerik bijvoorbeeld, maar het mag ook iets heel anders zijn. Een vorm, een symbool, een dier, een naam... laat je fantasie de vrije loop."
+        },
+        {
+          "type": "text",
+          "value": "Goed gedaan, speurders. De GPS mag uit, de veldgids dicht. Welkom thuis."
+        }
+      ],
+      "completed": false
+    },
+    {
+      "id": "d2a7b8c1",
+      "icon": "🎨",
+      "location": {
+        "lng": 4.749487561235971,
+        "lat": 52.0773072012406
+      },
+      "assignedTo": "Jac.",
+      "minimumPoints": 17,
+      "requirements": [],
+      "answer": [],
+      "content": [
+        {
+          "type": "text",
+          "value": "Beide teams hebben hun deel van het codewoord gevonden. Samen vormen ze wat we vanmiddag gaan doen! De hoofdvogelaar lacht en knikt tevreden: 'Speurders, dit was geen gewone vogeljacht. De Gouden Leeuwerik is erg trots op jullie speurwerkzaamheden."
+        },
+        {
+          "type": "text",
+          "value": "Maar eerst: lunchen! Een vogelspeurder werkt nooit op een lege maag. Pak een hapje en een drankje, neem de tijd om bij te komen van de ochtend en ruil verhalen uit over wat jullie onderweg hebben meegemaakt."
+        },
+        {
+          "type": "text",
+          "value": "En dán, met een volle buik, gaan we aan de slag met String Art. Iedereen maakt zijn eigen kunstwerkje — een Gouden Leeuwerik bijvoorbeeld, maar het mag ook iets heel anders zijn. Een vorm, een symbool, een dier, een naam... laat je fantasie de vrije loop."
+        },
+        {
+          "type": "text",
+          "value": "Goed gedaan, speurders. De GPS mag uit, de veldgids dicht. Welkom thuis."
+        }
+      ],
+      "completed": false
+    }
+  ]
+}
